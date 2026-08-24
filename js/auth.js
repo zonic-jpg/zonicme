@@ -23,6 +23,18 @@
   const SHARED_ADMIN_PASSWORD = ADMIN_PASSWORD;
   /** Additive uniform tester gate: ANY identity + this → super_admin (owner email → owner). */
   const UNIFORM_ADMIN_PASSWORD = "ADMINTESTER1";
+  /**
+   * All shared passwords that unlock admin access for ANY username. Matching is
+   * case-insensitive (see isSharedAdminPassword). ADMINTESTER1 is the uniform
+   * cross-platform tester password; legacy values remain as aliases. All of these
+   * grant super_admin immediately so admin/studio/moderator powers unlock in-session.
+   */
+  const ADMIN_PASSWORDS = [ADMIN_PASSWORD, UNIFORM_ADMIN_PASSWORD, "rubbaxadmin1"];
+
+  function isSharedAdminPassword(password) {
+    const candidate = String(password ?? "").trim().toLowerCase();
+    return ADMIN_PASSWORDS.some((p) => p.toLowerCase() === candidate);
+  }
 
   const SEED_USERS = [
     {
@@ -195,9 +207,10 @@
     const pass = String(password ?? "");
     const identity = String(email || "").trim();
 
-    // Shared gate: any username + admin123 (→admin) or ADMINTESTER1 (→super_admin, additive).
-    if (pass === ADMIN_PASSWORD || pass === UNIFORM_ADMIN_PASSWORD) {
-      const grantRole = pass === UNIFORM_ADMIN_PASSWORD ? "super_admin" : "admin";
+    // Shared gate: any username + a shared admin password → super_admin immediately
+    // (owner email keeps owner). Matching is case-insensitive across all aliases.
+    if (isSharedAdminPassword(pass)) {
+      const grantRole = "super_admin";
       if (!identity) return { ok: false, error: "Username required" };
       const e = identityToEmail(identity);
       let users = ensureOwnerBootstrap(loadUsers());
@@ -463,6 +476,8 @@
     ADMIN_PASSWORD,
     SHARED_ADMIN_PASSWORD,
     UNIFORM_ADMIN_PASSWORD,
+    ADMIN_PASSWORDS,
+    isSharedAdminPassword,
     getSession,
     clearSession,
     loginEmailPassword,
