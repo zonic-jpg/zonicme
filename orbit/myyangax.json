@@ -1,0 +1,25 @@
+{
+  "appId": "myyanga",
+  "name": "MyYanga",
+  "version": "1.0",
+  "tagline": "African fashion discovery, Virtual Wear, Runway",
+  "description": "Curated African fashion — Virtual Wear, Runway, and designer discovery.",
+  "url": "https://myyangax.netlify.app",
+  "updatedAt": "2026-08-23T00:00:00.000Z",
+  "metrics": {
+    "activeUsers7d": 12840,
+    "sessions24h": 3120,
+    "virtualWearRenders": 890,
+    "runwayViews": 2140,
+    "events": 412000
+  },
+  "featured": [
+    { "title": "Virtual Wear studio", "location": "MyYangaX" },
+    { "title": "Designer Runway drops", "location": "MyYangaX" },
+    { "title": "Lookbook filters", "location": "MyYangaX" }
+  ],
+  "ingestHint": {
+    "push": "POST ${ZONICME_INGEST_URL} with X-Zonic-Api-Key",
+    "contract": "zonic-hub-ingest records[]"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "appId": "rubba",
+  "name": "Rubba",
+  "version": "1.0",
+  "tagline": "AI life-planning",
+  "description": "Goals, savings and milestones — Genie-assisted life planning for African cities.",
+  "url": "https://rubba.app",
+  "updatedAt": "2026-08-23T00:00:00.000Z",
+  "metrics": {
+    "activeUsers7d": 4100,
+    "sessions24h": 720,
+    "plansCreated": 9800,
+    "aiCalls": 3100,
+    "events": 142000
+  },
+  "featured": [
+    { "title": "Wish → plan with Genie", "location": "Rubba" },
+    { "title": "City-aware cost goals", "location": "Rubba" }
+  ]
+}

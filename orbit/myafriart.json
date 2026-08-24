@@ -1,0 +1,20 @@
+{
+  "appId": "myafriart",
+  "name": "MyAfriArt",
+  "version": "1.0",
+  "tagline": "African art marketplace / creative",
+  "description": "Discover and collect African art with AI room staging.",
+  "url": "https://myafriart.com",
+  "updatedAt": "2026-08-23T00:00:00.000Z",
+  "metrics": {
+    "activeUsers7d": 6200,
+    "sessions24h": 980,
+    "piecesListed": 1840,
+    "roomStagings": 15200,
+    "events": 228000
+  },
+  "featured": [
+    { "title": "Artist storefronts", "location": "MyAfriArt" },
+    { "title": "AI wall staging", "location": "MyAfriArt" }
+  ]
+}

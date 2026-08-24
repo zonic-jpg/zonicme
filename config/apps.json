@@ -1,0 +1,54 @@
+{
+  "version": "1.0",
+  "mission": "ZonicMe empowers Africans through the creative economy — building apps that turn fashion, art, media and everyday planning into real opportunity across the continent and diaspora.",
+  "ingest": {
+    "ZONICME_INGEST_URL": "https://YOUR-SUPABASE-PROJECT.supabase.co/functions/v1/zonic-hub-ingest",
+    "note": "Set window.ZONICME_INGEST_URL or localStorage zonicme_ingest_url to override."
+  },
+  "apps": [
+    {
+      "id": "myyanga",
+      "name": "MyYanga",
+      "summary": "African fashion discovery, Virtual Wear, and Runway.\nCreators and shoppers meet in one orbit.",
+      "detail": "MyYanga is ZonicMe’s fashion platform — browse looks, try Virtual Wear, and follow Runway drops from African designers and the diaspora. Discovery meets commerce so creators earn and audiences find style that feels like home.",
+      "url": "https://myyangax.netlify.app",
+      "thumbnail": "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80",
+      "orbit": "./orbit/myyangax.json",
+      "orbitLive": "https://myyangax.netlify.app/orbit-manifest.json",
+      "color": "#E85D04"
+    },
+    {
+      "id": "myafriart",
+      "name": "MyAfriArt",
+      "summary": "African art marketplace — discover, stage, collect.\nGalleries and collectors in one place.",
+      "detail": "MyAfriArt connects artists, galleries, and collectors across Africa and the diaspora. Discover original work, stage digital exhibitions, and collect with confidence — a marketplace built for the continent’s creative voice.",
+      "url": "https://myafriart.com",
+      "thumbnail": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=800&q=80",
+      "orbit": "./orbit/myafriart.json",
+      "orbitLive": "https://myafriart.com/orbit-manifest.json",
+      "color": "#2F7D4F"
+    },
+    {
+      "id": "rubba",
+      "name": "Rubba",
+      "summary": "Life-planning for goals, savings, milestones.\nTurn ambition into a clear next step.",
+      "detail": "Rubba helps people plan life with clarity — goals, savings targets, and milestones in one calm workspace. Built for everyday Africans who want structure without complexity, and progress they can see.",
+      "url": "https://rubba.app",
+      "thumbnail": "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=800&q=80",
+      "orbit": "./orbit/rubba.json",
+      "orbitLive": "https://rubba.app/orbit-manifest.json",
+      "color": "#C99A2E"
+    },
+    {
+      "id": "adspot",
+      "name": "AdSpot",
+      "summary": "Media & partner ads with rewarded attention.\nBrands reach real people, audiences earn.",
+      "detail": "AdSpot is the orbit’s media and partner network. Rewarded attention means brands reach consented audiences while users earn value — transparent, fair, and tuned for African markets and diaspora reach.",
+      "url": "https://adspotx.netlify.app",
+      "thumbnail": "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=800&q=80",
+      "orbit": "./orbit/adspotx.json",
+      "orbitLive": "https://adspotx.netlify.app/orbit-manifest.json",
+      "color": "#1A6B5A"
+    }
+  ]
+}

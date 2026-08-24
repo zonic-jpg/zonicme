@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ZonicMe — digital city hero</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#05070F;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif}
+  .wrap{width:100%;max-width:1280px}
+  svg{width:100%;height:auto;display:block;border-radius:14px}
+  .cap{color:#5b657a;font-size:12px;text-align:center;padding:14px}
+  .panel{cursor:pointer;transition:opacity .25s}
+  .panel:hover{opacity:1}
+  .panel:hover .glassface{filter:url(#glow)}
+  @keyframes tw{0%,100%{opacity:.25}50%{opacity:.9}}
+  .star{animation:tw 4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+  .node{animation:pulse 3s ease-in-out infinite}
+</style>
+</head>
+<body>
+<div class="wrap">
+<svg viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <radialGradient id="sky" cx="50%" cy="32%" r="75%">
+      <stop offset="0%" stop-color="#161E3E"/>
+      <stop offset="45%" stop-color="#0B1024"/>
+      <stop offset="100%" stop-color="#05070F"/>
+    </radialGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0C1124"/>
+      <stop offset="100%" stop-color="#05070F"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#123040" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#0A1626" stop-opacity="0.98"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#22D3EE"/><stop offset="100%" stop-color="#2DD4BF"/>
+    </linearGradient>
+    <linearGradient id="violet" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#A78BFA"/><stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <radialGradient id="warm" cx="50%" cy="60%" r="60%">
+      <stop offset="0%" stop-color="#F6C982" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#F6C982" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="tealglow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2DD4BF" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#2DD4BF" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="soft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="14"/></filter>
+  </defs>
+
+  <!-- sky + floor -->
+  <rect width="1280" height="560" fill="url(#sky)"/>
+  <rect y="540" width="1280" height="180" fill="url(#floor)"/>
+  <line x1="0" y1="540" x2="1280" y2="540" stroke="#1B2952" stroke-width="1" opacity="0.6"/>
+
+  <!-- stars -->
+  <g fill="#CFE5FF">
+    <circle class="star" cx="180" cy="90" r="1.4"/><circle class="star" cx="320" cy="150" r="1" style="animation-delay:1s"/>
+    <circle class="star" cx="980" cy="70" r="1.5" style="animation-delay:.5s"/><circle class="star" cx="1120" cy="140" r="1.1" style="animation-delay:2s"/>
+    <circle class="star" cx="640" cy="60" r="1.2" style="animation-delay:1.5s"/><circle class="star" cx="80" cy="210" r="1" style="animation-delay:2.5s"/>
+    <circle class="star" cx="1200" cy="230" r="1.2" style="animation-delay:.8s"/><circle class="star" cx="470" cy="100" r="1" style="animation-delay:3s"/>
+  </g>
+
+  <!-- faint city skyline -->
+  <g fill="#0E1730" opacity="0.7">
+    <rect x="40" y="300" width="70" height="240"/><rect x="120" y="250" width="50" height="290"/>
+    <rect x="1110" y="280" width="60" height="260"/><rect x="1180" y="240" width="55" height="300"/>
+    <rect x="980" y="320" width="48" height="220"/>
+  </g>
+
+  <!-- ===== NETWORK SPINE across the top — the connected ecosystem ===== -->
+  <g stroke="#2DD4BF" stroke-width="1.4" opacity="0.55" fill="none">
+    <path d="M250,250 C420,170 560,250 640,210 C740,160 880,250 1030,250"/>
+    <path d="M250,250 C400,300 560,200 640,210" opacity="0.5"/>
+    <path d="M640,210 C760,210 900,300 1030,250" opacity="0.5"/>
+    <path d="M250,250 L210,360 M1030,250 L1070,360 M460,235 L470,360 M820,235 L815,360 M640,210 L640,330"/>
+  </g>
+  <g fill="#22D3EE">
+    <circle class="node" cx="250" cy="250" r="5"/><circle class="node" cx="460" cy="235" r="4" style="animation-delay:1s"/>
+    <circle class="node" cx="820" cy="235" r="4" style="animation-delay:1.6s"/><circle class="node" cx="1030" cy="250" r="5" style="animation-delay:.6s"/>
+  </g>
+  <!-- central ZonicMe node -->
+  <circle cx="640" cy="210" r="34" fill="url(#tealglow)"/>
+  <circle cx="640" cy="210" r="13" fill="none" stroke="url(#teal)" stroke-width="2"/>
+  <circle class="node" cx="640" cy="210" r="5" fill="#fff"/>
+  <text x="640" y="170" text-anchor="middle" fill="#EAF6FF" font-size="13" font-weight="700" letter-spacing="3">ZONICME · THE SPINE</text>
+
+  <!-- glass pavilion roof glow -->
+  <ellipse cx="640" cy="360" rx="560" ry="60" fill="url(#tealglow)" opacity="0.5"/>
+
+  <!-- ===== PANELS (one per app) ===== -->
+  <!-- helper geometry: each panel 196 wide, top y=355, height 185 -->
+
+  <!-- 1. MyAfriart — artist painting -->
+  <a xlink:href="#myafriart">
+  <g class="panel">
+    <rect class="glassface" x="60" y="355" width="196" height="185" fill="url(#glass)" stroke="#2DD4BF" stroke-opacity="0.5"/>
+    <rect x="60" y="355" width="196" height="3" fill="url(#violet)"/>
+    <ellipse cx="158" cy="500" rx="80" ry="16" fill="url(#warm)"/>
+    <!-- easel -->
+    <line x1="120" y1="430" x2="120" y2="510" stroke="#6B5638" stroke-width="3"/>
+    <line x1="150" y1="430" x2="150" y2="510" stroke="#6B5638" stroke-width="3"/>
+    <rect x="108" y="425" width="56" height="46" fill="#10202c"/>
+    <rect x="113" y="430" width="46" height="36" fill="#1b3340"/>
+    <path d="M118,455 q10,-18 22,-6 q8,8 18,-4" stroke="#F2A65A" stroke-width="3" fill="none"/>
+    <circle cx="124" cy="440" r="4" fill="#E94F37"/><circle cx="150" cy="448" r="4" fill="#2DD4BF"/>
+    <!-- artist figure -->
+    <circle cx="196" cy="436" r="9" fill="#0c1a22"/>
+    <path d="M196,446 q-16,4 -16,30 l0,30 l30,0 l0,-30 q0,-24 -14,-30 Z" fill="#0c1a22"/>
+    <path d="M182,470 l-16,-12" stroke="#0c1a22" stroke-width="6" stroke-linecap="round"/>
+    <g class="node" fill="#A78BFA"><circle cx="100" cy="392" r="2.5"/><circle cx="214" cy="392" r="2.5"/></g>
+  </g>
+  </a>
+  <text x="158" y="568" text-anchor="middle" fill="#EAF6FF" font-size="16" font-weight="700">MyAfriart</text>
+  <text x="158" y="588" text-anchor="middle" fill="#8A93A8" font-size="11">Original African art</text>
+
+  <!-- 2. MyYanga — elegant lady, phone -->
+  <a xlink:href="#myyanga">
+  <g class="panel">
+    <rect class="glassface" x="265" y="355" width="196" height="185" fill="url(#glass)" stroke="#2DD4BF" stroke-opacity="0.5"/>
+    <rect x="265" y="355" width="196" height="3" fill="url(#teal)"/>
+    <ellipse cx="363" cy="500" rx="80" ry="16" fill="url(#warm)"/>
+    <!-- clothing rail -->
+    <line x1="300" y1="400" x2="300" y2="500" stroke="#33465e" stroke-width="2"/>
+    <line x1="296" y1="404" x2="320" y2="404" stroke="#33465e" stroke-width="2"/>
+    <path d="M302,406 l-5,22 l10,0 Z" fill="#7C3AED" opacity="0.8"/>
+    <path d="M313,406 l-5,20 l10,0 Z" fill="#2DD4BF" opacity="0.7"/>
+    <!-- elegant figure (gown) -->
+    <circle cx="380" cy="412" r="9" fill="#0c1a22"/>
+    <path d="M380,422 q-9,2 -10,16 l-10,62 l40,0 l-10,-62 q-1,-14 -10,-16 Z" fill="#0c1a22"/>
+    <path d="M372,452 l-12,8" stroke="#0c1a22" stroke-width="5" stroke-linecap="round"/>
+    <!-- glowing phone -->
+    <rect x="356" y="452" width="10" height="16" rx="2" fill="#22D3EE"/>
+    <rect x="357" y="453" width="8" height="14" rx="1" fill="#bdf6ff"/>
+    <g class="node" fill="#22D3EE"><circle cx="420" cy="392" r="2.5"/></g>
+  </g>
+  </a>
+  <text x="363" y="568" text-anchor="middle" fill="#EAF6FF" font-size="16" font-weight="700">MyYanga</text>
+  <text x="363" y="588" text-anchor="middle" fill="#8A93A8" font-size="11">Nigerian fashion</text>
+
+  <!-- 3. AdSpot — screen + rewards -->
+  <a xlink:href="#adspot">
+  <g class="panel">
+    <rect class="glassface" x="470" y="355" width="196" height="185" fill="url(#glass)" stroke="#2DD4BF" stroke-opacity="0.5"/>
+    <rect x="470" y="355" width="196" height="3" fill="url(#teal)"/>
+    <ellipse cx="568" cy="500" rx="80" ry="16" fill="url(#warm)"/>
+    <!-- big screen -->
+    <rect x="560" y="398" width="86" height="56" rx="3" fill="#0a1822" stroke="#2DD4BF" stroke-opacity="0.6"/>
+    <polygon points="596,412 596,440 620,426" fill="#22D3EE"/>
+    <!-- viewer figure -->
+    <circle cx="505" cy="430" r="9" fill="#0c1a22"/>
+    <path d="M505,440 q-14,4 -14,28 l0,28 l28,0 l0,-28 q0,-22 -14,-28 Z" fill="#0c1a22"/>
+    <!-- floating rewards -->
+    <circle class="node" cx="520" cy="392" r="9" fill="#F6C982"/><text x="520" y="396" text-anchor="middle" fill="#5a3d10" font-size="9" font-weight="700">₦</text>
+    <circle class="node" cx="540" cy="378" r="6" fill="#F6C982" style="animation-delay:1s"/>
+    <path d="M555,388 l8,-14 l8,14 Z" fill="#2DD4BF"/>
+  </g>
+  </a>
+  <text x="568" y="568" text-anchor="middle" fill="#EAF6FF" font-size="16" font-weight="700">AdSpot</text>
+  <text x="568" y="588" text-anchor="middle" fill="#8A93A8" font-size="11">Watch · play · earn</text>
+
+  <!-- 4. Rubba — life planning -->
+  <a xlink:href="#rubba">
+  <g class="panel">
+    <rect class="glassface" x="675" y="355" width="196" height="185" fill="url(#glass)" stroke="#2DD4BF" stroke-opacity="0.5"/>
+    <rect x="675" y="355" width="196" height="3" fill="url(#violet)"/>
+    <ellipse cx="773" cy="500" rx="80" ry="16" fill="url(#warm)"/>
+    <!-- planning figure -->
+    <circle cx="720" cy="430" r="9" fill="#0c1a22"/>
+    <path d="M720,440 q-14,4 -14,28 l0,28 l28,0 l0,-28 q0,-22 -14,-28 Z" fill="#0c1a22"/>
+    <path d="M734,460 l16,-8" stroke="#0c1a22" stroke-width="5" stroke-linecap="round"/>
+    <!-- floating goals: target + coins + checks -->
+    <circle cx="800" cy="410" r="16" fill="none" stroke="#2DD4BF" stroke-width="2"/>
+    <circle cx="800" cy="410" r="8" fill="none" stroke="#A78BFA" stroke-width="2"/>
+    <circle class="node" cx="800" cy="410" r="3" fill="#fff"/>
+    <g fill="#F6C982"><ellipse cx="828" cy="452" rx="11" ry="4"/><ellipse cx="828" cy="447" rx="11" ry="4"/><ellipse cx="828" cy="442" rx="11" ry="4"/></g>
+    <path d="M758,420 l4,5 l8,-10" stroke="#2DD4BF" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  </g>
+  </a>
+  <text x="773" y="568" text-anchor="middle" fill="#EAF6FF" font-size="16" font-weight="700">Rubba</text>
+  <text x="773" y="588" text-anchor="middle" fill="#8A93A8" font-size="11">Plan your life &amp; money</text>
+
+  <!-- 5. Owanbe — celebration -->
+  <a xlink:href="#owanbe">
+  <g class="panel">
+    <rect class="glassface" x="880" y="355" width="196" height="185" fill="url(#glass)" stroke="#2DD4BF" stroke-opacity="0.5"/>
+    <rect x="880" y="355" width="196" height="3" fill="url(#teal)"/>
+    <ellipse cx="978" cy="500" rx="84" ry="16" fill="url(#warm)"/>
+    <!-- dancing figures -->
+    <g fill="#0c1a22">
+      <circle cx="930" cy="432" r="8"/><path d="M930,440 q-12,3 -12,24 l0,26 l24,0 l0,-26 q0,-21 -12,-24 Z"/>
+      <path d="M920,452 l-12,-10 M940,452 l12,-8" stroke="#0c1a22" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="985" cy="424" r="8"/><path d="M985,432 q-12,3 -12,24 l0,28 l24,0 l0,-28 q0,-21 -12,-24 Z"/>
+      <path d="M975,448 l-10,-12 M995,448 l12,-6" stroke="#0c1a22" stroke-width="5" stroke-linecap="round"/>
+    </g>
+    <!-- drum -->
+    <path d="M1024,470 l8,30 l16,0 l8,-30 Z" fill="#6B4A2A"/><ellipse cx="1036" cy="470" rx="16" ry="5" fill="#E9D5B0"/>
+    <!-- confetti -->
+    <g class="node"><rect x="950" y="388" width="5" height="5" fill="#A78BFA"/><rect x="1000" y="380" width="5" height="5" fill="#2DD4BF" style="animation-delay:1s"/><circle cx="975" cy="378" r="3" fill="#F6C982"/></g>
+  </g>
+  </a>
+  <text x="978" y="568" text-anchor="middle" fill="#EAF6FF" font-size="16" font-weight="700">Owanbe</text>
+  <text x="978" y="588" text-anchor="middle" fill="#8A93A8" font-size="11">Plan your owambe</text>
+
+  <!-- wordmark + tagline -->
+  <g>
+    <rect x="60" y="48" width="18" height="18" fill="#2DD4BF"/>
+    <text x="88" y="64" fill="#FFFFFF" font-size="26" font-weight="800" letter-spacing="-0.5">ZonicMe</text>
+    <text x="62" y="100" fill="#C7D3E8" font-size="17" font-weight="600">Everyday life, connected.</text>
+    <text x="62" y="124" fill="#8A93A8" font-size="13">One ecosystem — real value for people, real insight for brands, real momentum for Nigeria.</text>
+  </g>
+
+  <!-- bottom hint -->
+  <text x="640" y="700" text-anchor="middle" fill="#465168" font-size="11" letter-spacing="1">EACH PANEL LINKS TO ITS APP · SELECT TO ENTER</text>
+</svg>
+</div>
+<div class="cap" style="color:#5b657a;font-size:12px;text-align:center;padding:14px">
+  ZonicMe digital-city hero (vector). Stylized concept — each glowing panel is a clickable link to its app; the network at the top is the data spine connecting them.
+</div>
+</body>
+</html>

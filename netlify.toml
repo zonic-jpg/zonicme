@@ -1,0 +1,10 @@
+# ZonicMe hub — static site (no build step). Publish repo root.
+[build]
+  publish = "."
+  command = ""
+
+# SPA-ish fallback so unknown paths land on the hub.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

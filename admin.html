@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ZonicMe Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#12110F;--muted:#5C574E;--line:#E6E2D9;--paper:#FAF8F4;--accent:#E85D04;
+  --font:"DM Sans",system-ui,sans-serif;--display:"Fraunces",Georgia,serif;--ok:#1D7A52;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:var(--font);color:var(--ink);-webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(ellipse 80% 50% at 10% 0%, rgba(232,93,4,.1), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 100% 20%, rgba(31,58,52,.08), transparent 45%),
+    linear-gradient(165deg,#faf8f4,#f0ebe3 50%,#e8efe9);
+  min-height:100vh;
+}
+a{color:inherit}
+.wrap{max-width:960px;margin:0 auto;padding:28px 20px 60px}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:28px}
+h1{margin:0;font-family:var(--display);font-size:1.75rem;font-weight:700;letter-spacing:-.02em}
+.sub{color:var(--muted);font-size:14px;margin-top:6px}
+.back{font-weight:600;font-size:14px}
+.panel{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;backdrop-filter:blur(6px)}
+label{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+input,textarea,select{
+  width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;
+  font:inherit;background:#fff;margin-bottom:12px;
+}
+textarea{min-height:72px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+button,.btn{
+  appearance:none;border:1px solid var(--ink);background:var(--ink);color:#fff;
+  padding:10px 16px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;
+}
+button.secondary,.btn.secondary{background:#fff;color:var(--ink)}
+button.danger{background:#fff;color:#A33;border-color:#A33}
+.toast{font-size:13px;color:var(--ok);font-weight:600;min-height:1.2em}
+.err{color:#A33;font-size:13px;font-weight:600;min-height:1.2em;margin-top:8px}
+.app-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.app-head h2{margin:0;font-size:1.1rem}
+.hint{font-size:13px;color:var(--muted);line-height:1.5;margin:0 0 14px}
+code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tab{
+  border:1px solid var(--line);background:#fff;color:var(--ink);
+  padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;
+}
+.tab.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.hidden{display:none !important}
+.session-bar{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.badge{
+  display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase;padding:4px 8px;border-radius:6px;background:#F0EEE8;
+}
+.badge.owner{background:#ffe8d6;color:#c45c26}
+.gate{
+  max-width:420px;margin:10vh auto;padding:28px;
+  background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:16px;
+  box-shadow:0 20px 50px rgba(18,17,15,.08);
+}
+.gate h1{font-size:1.5rem;margin-bottom:8px}
+.gate .sub{margin-bottom:20px}
+.divider-or{
+  display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px;
+  font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:16px 0;
+}
+.divider-or::before,.divider-or::after{content:"";flex:1;height:1px;background:var(--line)}
+#googleBtn{min-height:44px;display:flex;justify-content:center;margin-bottom:8px}
+.user-row{
+  display:grid;grid-template-columns:1.2fr 1fr auto;gap:10px;align-items:end;
+  padding:12px 0;border-bottom:1px solid var(--line);
+}
+.user-row:last-child{border-bottom:0}
+@media(max-width:640px){
+  .row,.user-row{grid-template-columns:1fr}
+  header{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- Sign-in gate (hidden route — not linked from public nav) -->
+<div id="gate" class="gate hidden">
+  <h1>ZonicMe Admin</h1>
+  <p class="sub">Sign in to manage apps, ingest, and roles. This page is not linked from the public hub.</p>
+  <div id="googleWrap">
+    <div id="googleBtn"></div>
+  </div>
+  <div class="divider-or" id="orDivider">or username / password</div>
+  <label for="loginEmail">Email / username</label>
+  <input id="loginEmail" type="text" autocomplete="username" placeholder="you@example.com or any username" value="oadeagbo@gmail.com" />
+  <label for="loginPass">Password</label>
+  <input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••" />
+  <button type="button" id="loginBtn" style="width:100%;margin-top:4px">Sign in</button>
+  <p class="hint" style="margin-top:14px">Admin: any username / <code>admin123</code> · Owner: <code>oadeagbo@gmail.com</code> / <code>password123</code></p>
+  <p class="err" id="loginErr"></p>
+  <p style="margin-top:18px;font-size:13px"><a class="back" href="./zonicme-hub.html">← Back to hub</a></p>
+</div>
+
+<div id="adminApp" class="wrap hidden">
+  <header>
+    <div>
+      <h1>ZonicMe Admin</h1>
+      <p class="sub">Edit application cards, ingest URL, and user roles. Saved to <code>localStorage</code>; seed from <code>config/apps.json</code>.</p>
+      <div class="session-bar" id="sessionBar"></div>
+    </div>
+    <div class="actions" style="margin:0">
+      <a class="back" href="./zonicme-hub.html">← Landing</a>
+      <button type="button" class="secondary" id="logoutBtn">Sign out</button>
+    </div>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <button type="button" class="tab active" data-tab="apps">Apps &amp; ingest</button>
+    <button type="button" class="tab" data-tab="users" id="usersTabBtn">Users &amp; roles</button>
+  </div>
+
+  <div id="tab-apps">
+    <div class="panel">
+      <label for="mission">Mission statement</label>
+      <textarea id="mission"></textarea>
+      <label for="ingestUrl">ZONICME_INGEST_URL</label>
+      <input id="ingestUrl" placeholder="https://….supabase.co/functions/v1/zonic-hub-ingest" />
+      <p class="hint">Child apps and the hub analytics section POST / fetch against this URL when set. Leave the placeholder to keep demo-only mode.</p>
+      <label for="googleClientId">GOOGLE_CLIENT_ID (optional)</label>
+      <input id="googleClientId" placeholder="xxxx.apps.googleusercontent.com" />
+      <p class="hint">Production: set Authorized JavaScript origins for this host. Soft-fails on <code>invalid_origin</code> (same pattern as AdSpot). Also: <code>window.ZONICME_GOOGLE_CLIENT_ID</code>.</p>
+    </div>
+    <div id="appsEditor"></div>
+    <div class="actions">
+      <button type="button" id="saveBtn">Save to browser</button>
+      <button type="button" class="secondary" id="exportBtn">Download JSON</button>
+      <button type="button" class="secondary" id="reloadBtn">Reload seed JSON</button>
+      <button type="button" class="danger" id="resetBtn">Clear local overrides</button>
+    </div>
+  </div>
+
+  <div id="tab-users" class="hidden">
+    <div class="panel">
+      <h2 style="margin:0 0 8px;font-size:1.1rem">Assign roles</h2>
+      <p class="hint">Roles: <code>owner</code>, <code>super_admin</code>, <code>admin</code>, <code>viewer</code>. Owner / super_admin can grant privileges. <code>oadeagbo@gmail.com</code> is always owner + super_admin.</p>
+      <div class="row">
+        <div>
+          <label for="newEmail">Email</label>
+          <input id="newEmail" type="email" placeholder="colleague@example.com" />
+        </div>
+        <div>
+          <label for="newRole">Primary role</label>
+          <select id="newRole">
+            <option value="admin">admin</option>
+            <option value="super_admin">super_admin</option>
+            <option value="viewer">viewer</option>
+            <option value="owner">owner</option>
+          </select>
+        </div>
+      </div>
+      <button type="button" id="grantBtn">Grant / update role</button>
+      <p class="err" id="usersErr"></p>
+    </div>
+    <div class="panel" id="usersList"></div>
+  </div>
+
+  <p class="toast" id="toast"></p>
+</div>
+
+<script src="./js/apps-store.js"></script>
+<script src="./js/auth.js"></script>
+<script>
+let state = null;
+let googleCleanup = null;
+
+function toast(msg) {
+  document.getElementById("toast").textContent = msg;
+  setTimeout(() => { document.getElementById("toast").textContent = ""; }, 2800);
+}
+
+function esc(s) {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;");
+}
+
+function showGate() {
+  document.getElementById("gate").classList.remove("hidden");
+  document.getElementById("adminApp").classList.add("hidden");
+  setupGoogle();
+}
+
+function showAdmin(session) {
+  document.getElementById("gate").classList.add("hidden");
+  document.getElementById("adminApp").classList.remove("hidden");
+  const roles = (session.roles || []).map((r) => `<span class="badge ${r === "owner" ? "owner" : ""}">${esc(r)}</span>`).join(" ");
+  document.getElementById("sessionBar").innerHTML =
+    `<span>Signed in as <strong>${esc(session.email)}</strong></span>${roles}`;
+  const canRoles = ZonicMeAuth.canManageRoles(session);
+  document.getElementById("usersTabBtn").classList.toggle("hidden", !canRoles);
+  if (!canRoles) {
+    document.getElementById("tab-users").classList.add("hidden");
+    document.querySelector('[data-tab="apps"]').classList.add("active");
+    document.querySelector('[data-tab="users"]').classList.remove("active");
+    document.getElementById("tab-apps").classList.remove("hidden");
+  }
+}
+
+function setupGoogle() {
+  if (googleCleanup) { googleCleanup(); googleCleanup = null; }
+  const wrap = document.getElementById("googleWrap");
+  const btn = document.getElementById("googleBtn");
+  const orDiv = document.getElementById("orDivider");
+  wrap.classList.remove("hidden");
+  orDiv.classList.remove("hidden");
+  btn.hidden = false;
+  btn.innerHTML = "";
+
+  googleCleanup = ZonicMeAuth.mountGoogleButton(btn, {
+    onCredential: (profile) => {
+      const res = ZonicMeAuth.loginGoogleProfile(profile);
+      if (!res.ok) {
+        document.getElementById("loginErr").textContent = res.error || "Google sign-in failed";
+        return;
+      }
+      enterAdmin();
+    },
+    onUnavailable: () => {
+      wrap.classList.add("hidden");
+      orDiv.classList.add("hidden");
+    },
+    onError: (msg) => {
+      document.getElementById("loginErr").textContent = msg;
+    },
+  });
+}
+
+function renderApps() {
+  const root = document.getElementById("appsEditor");
+  const readonly = !ZonicMeAuth.hasMinRole(ZonicMeAuth.getSession(), "admin");
+  root.innerHTML = state.apps.map((a, i) => `
+    <div class="panel" data-i="${i}">
+      <div class="app-head"><h2>${esc(a.name || a.id)}</h2><span style="color:var(--muted);font-size:12px">${esc(a.id)}</span></div>
+      <div class="row">
+        <div>
+          <label>Name</label>
+          <input data-field="name" data-i="${i}" value="${esc(a.name)}" ${readonly ? "disabled" : ""} />
+        </div>
+        <div>
+          <label>Website URL</label>
+          <input data-field="url" data-i="${i}" value="${esc(a.url)}" ${readonly ? "disabled" : ""} />
+        </div>
+      </div>
+      <label>Summary (card — title + ~2 lines)</label>
+      <textarea data-field="summary" data-i="${i}" ${readonly ? "disabled" : ""}>${esc(a.summary)}</textarea>
+      <label>Detail (right pane)</label>
+      <textarea data-field="detail" data-i="${i}" ${readonly ? "disabled" : ""}>${esc(a.detail || "")}</textarea>
+      <div class="row">
+        <div>
+          <label>Thumbnail URL</label>
+          <input data-field="thumbnail" data-i="${i}" value="${esc(a.thumbnail || "")}" placeholder="https://…/thumb.jpg" ${readonly ? "disabled" : ""} />
+        </div>
+        <div>
+          <label>Orbit manifest (local)</label>
+          <input data-field="orbit" data-i="${i}" value="${esc(a.orbit || "")}" ${readonly ? "disabled" : ""} />
+        </div>
+      </div>
+      <label>Orbit live URL (child app)</label>
+      <input data-field="orbitLive" data-i="${i}" value="${esc(a.orbitLive || "")}" placeholder="https://….netlify.app/orbit-manifest.json" ${readonly ? "disabled" : ""} />
+    </div>
+  `).join("");
+
+  root.querySelectorAll("[data-field]").forEach((el) => {
+    el.addEventListener("input", () => {
+      const i = +el.dataset.i;
+      const field = el.dataset.field;
+      state.apps[i][field] = el.value;
+    });
+  });
+}
+
+function renderUsers() {
+  const session = ZonicMeAuth.getSession();
+  if (!ZonicMeAuth.canManageRoles(session)) return;
+  const users = ZonicMeAuth.loadUsers();
+  document.getElementById("usersList").innerHTML = users.map((u) => `
+    <div class="user-row">
+      <div>
+        <strong>${esc(u.email)}</strong>
+        <div style="font-size:12px;color:var(--muted)">${esc(u.name || "")}</div>
+      </div>
+      <div>${(u.roles || []).map((r) => `<span class="badge ${r === "owner" ? "owner" : ""}">${esc(r)}</span>`).join(" ")}</div>
+      <div>
+        ${normalize(u.email) === ZonicMeAuth.OWNER_EMAIL
+          ? `<span style="font-size:12px;color:var(--muted)">Protected</span>`
+          : `<button type="button" class="danger" data-remove="${esc(u.email)}">Remove</button>`}
+      </div>
+    </div>
+  `).join("") || `<p class="hint">No users yet.</p>`;
+
+  document.querySelectorAll("[data-remove]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const res = ZonicMeAuth.removeUser(session, btn.getAttribute("data-remove"));
+      document.getElementById("usersErr").textContent = res.ok ? "" : (res.error || "");
+      if (res.ok) { toast("User removed"); renderUsers(); }
+    });
+  });
+}
+
+function normalize(e) { return String(e || "").trim().toLowerCase(); }
+
+function collectMission() {
+  state.mission = document.getElementById("mission").value;
+  const url = document.getElementById("ingestUrl").value.trim();
+  state.ingest = state.ingest || {};
+  state.ingest.ZONICME_INGEST_URL = url;
+  ZonicMeAppsStore.setIngestUrl(url);
+  ZonicMeAuth.setGoogleClientId(document.getElementById("googleClientId").value.trim());
+}
+
+async function enterAdmin() {
+  const session = ZonicMeAuth.getSession();
+  if (!session || !ZonicMeAuth.canAccessAdmin(session)) {
+    ZonicMeAuth.clearSession();
+    showGate();
+    document.getElementById("loginErr").textContent =
+      "This account needs admin (or higher). Ask the owner to grant a role.";
+    return;
+  }
+  showAdmin(session);
+  state = await ZonicMeAppsStore.loadConfig("./config/apps.json");
+  document.getElementById("mission").value = state.mission || "";
+  document.getElementById("ingestUrl").value = ZonicMeAppsStore.getIngestUrl(state);
+  document.getElementById("googleClientId").value = ZonicMeAuth.getGoogleClientId();
+  renderApps();
+  renderUsers();
+}
+
+document.getElementById("loginBtn").addEventListener("click", () => {
+  const email = document.getElementById("loginEmail").value;
+  const pass = document.getElementById("loginPass").value;
+  const res = ZonicMeAuth.loginEmailPassword(email, pass);
+  if (!res.ok) {
+    document.getElementById("loginErr").textContent = res.error || "Sign-in failed";
+    return;
+  }
+  if (!ZonicMeAuth.canAccessAdmin(res.session)) {
+    ZonicMeAuth.clearSession();
+    document.getElementById("loginErr").textContent =
+      "Signed in, but this account needs admin access.";
+    return;
+  }
+  document.getElementById("loginErr").textContent = "";
+  enterAdmin();
+});
+
+document.getElementById("loginPass").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") document.getElementById("loginBtn").click();
+});
+
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  ZonicMeAuth.clearSession();
+  showGate();
+});
+
+document.getElementById("tabs").addEventListener("click", (e) => {
+  const tab = e.target.closest("[data-tab]");
+  if (!tab) return;
+  const id = tab.dataset.tab;
+  if (id === "users" && !ZonicMeAuth.canManageRoles(ZonicMeAuth.getSession())) return;
+  document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t === tab));
+  document.getElementById("tab-apps").classList.toggle("hidden", id !== "apps");
+  document.getElementById("tab-users").classList.toggle("hidden", id !== "users");
+  if (id === "users") renderUsers();
+});
+
+document.getElementById("grantBtn").addEventListener("click", () => {
+  const session = ZonicMeAuth.getSession();
+  const email = document.getElementById("newEmail").value;
+  const role = document.getElementById("newRole").value;
+  const res = ZonicMeAuth.upsertUserRole(session, email, [role]);
+  document.getElementById("usersErr").textContent = res.ok ? "" : (res.error || "");
+  if (res.ok) {
+    toast(`Updated ${email}`);
+    document.getElementById("newEmail").value = "";
+    renderUsers();
+  }
+});
+
+document.getElementById("saveBtn").addEventListener("click", () => {
+  if (!ZonicMeAuth.hasMinRole(ZonicMeAuth.getSession(), "admin")) {
+    toast("Viewer cannot save");
+    return;
+  }
+  collectMission();
+  ZonicMeAppsStore.saveLocal(state);
+  toast("Saved to localStorage — refresh the landing page.");
+});
+
+document.getElementById("exportBtn").addEventListener("click", () => {
+  collectMission();
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "apps.json";
+  a.click();
+  toast("Downloaded apps.json — replace website/config/apps.json to ship defaults.");
+});
+
+document.getElementById("reloadBtn").addEventListener("click", async () => {
+  ZonicMeAppsStore.clearLocal();
+  const res = await fetch("./config/apps.json", { cache: "no-store" });
+  state = await res.json();
+  document.getElementById("mission").value = state.mission || "";
+  document.getElementById("ingestUrl").value = ZonicMeAppsStore.getIngestUrl(state);
+  renderApps();
+  toast("Reloaded seed from config/apps.json");
+});
+
+document.getElementById("resetBtn").addEventListener("click", async () => {
+  ZonicMeAppsStore.clearLocal();
+  localStorage.removeItem(ZonicMeAppsStore.INGEST_KEY);
+  state = await ZonicMeAppsStore.loadConfig("./config/apps.json");
+  document.getElementById("mission").value = state.mission || "";
+  document.getElementById("ingestUrl").value = ZonicMeAppsStore.getIngestUrl(state);
+  renderApps();
+  toast("Local overrides cleared");
+});
+
+(function boot() {
+  const session = ZonicMeAuth.getSession();
+  if (session && ZonicMeAuth.canAccessAdmin(session)) enterAdmin();
+  else showGate();
+})();
+</script>
+</body>
+</html>

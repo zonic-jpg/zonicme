@@ -1,0 +1,25 @@
+{
+  "appId": "adspot",
+  "name": "AdSpot",
+  "version": "1.0",
+  "tagline": "Media & partner ad network",
+  "description": "Rewarded attention network for brands and audiences across Africa.",
+  "url": "https://adspotx.netlify.app",
+  "updatedAt": "2026-08-23T00:00:00.000Z",
+  "metrics": {
+    "activeUsers7d": 24100,
+    "sessions24h": 9800,
+    "adWatches": 910000,
+    "partnerCampaigns": 86,
+    "events": 910000
+  },
+  "featured": [
+    { "title": "Partner network campaigns", "location": "AdSpotX" },
+    { "title": "Rewarded ad reviews", "location": "AdSpotX" },
+    { "title": "Brand analytics", "location": "AdSpotX" }
+  ],
+  "ingestHint": {
+    "push": "POST ${ZONICME_INGEST_URL} with X-Zonic-Api-Key",
+    "contract": "zonic-hub-ingest records[]"
+  }
+}
