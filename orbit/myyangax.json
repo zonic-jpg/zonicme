@@ -13,6 +13,28 @@
     "runwayViews": 2140,
     "events": 412000
   },
+  "mock": true,
+  "demographics": {
+    "mock": true,
+    "regions": [
+      { "label": "West Africa", "pct": 42 },
+      { "label": "Diaspora", "pct": 24 },
+      { "label": "East Africa", "pct": 18 },
+      { "label": "Southern Africa", "pct": 16 }
+    ],
+    "ageBands": [
+      { "label": "18–24", "pct": 32 },
+      { "label": "25–34", "pct": 44 },
+      { "label": "35–44", "pct": 16 },
+      { "label": "45+", "pct": 8 }
+    ],
+    "interests": [
+      { "label": "Fashion & style", "pct": 48 },
+      { "label": "Virtual try-on", "pct": 22 },
+      { "label": "Runway", "pct": 18 },
+      { "label": "Other", "pct": 12 }
+    ]
+  },
   "featured": [
     { "title": "Virtual Wear studio", "location": "MyYangaX" },
     { "title": "Designer Runway drops", "location": "MyYangaX" },

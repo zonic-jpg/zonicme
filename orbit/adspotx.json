@@ -13,6 +13,28 @@
     "partnerCampaigns": 86,
     "events": 910000
   },
+  "mock": true,
+  "demographics": {
+    "mock": true,
+    "regions": [
+      { "label": "West Africa", "pct": 36 },
+      { "label": "East Africa", "pct": 20 },
+      { "label": "Diaspora", "pct": 28 },
+      { "label": "Southern Africa", "pct": 16 }
+    ],
+    "ageBands": [
+      { "label": "18–24", "pct": 38 },
+      { "label": "25–34", "pct": 35 },
+      { "label": "35–44", "pct": 18 },
+      { "label": "45+", "pct": 9 }
+    ],
+    "interests": [
+      { "label": "Media & ads", "pct": 52 },
+      { "label": "Rewards", "pct": 24 },
+      { "label": "Brand deals", "pct": 16 },
+      { "label": "Other", "pct": 8 }
+    ]
+  },
   "featured": [
     { "title": "Partner network campaigns", "location": "AdSpotX" },
     { "title": "Rewarded ad reviews", "location": "AdSpotX" },

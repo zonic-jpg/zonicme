@@ -303,6 +303,29 @@ button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
   background:rgba(255,255,255,.7);
 }
 .btn-ghost:hover{background:var(--ink);color:#fff}
+.chart-grid{max-width:1140px;margin:28px auto 0;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.chart-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.chart-panel{
+  background:rgba(255,255,255,.95);border:1px solid rgba(13,148,136,.18);
+  border-radius:10px;padding:18px;box-shadow:0 8px 24px rgba(15,20,18,.05);
+}
+.chart-panel h4{margin:0 0 14px;font-family:var(--display);font-size:.95rem;font-weight:700;color:var(--ink)}
+.chart-empty{font-size:13px;color:var(--muted);margin:0}
+.bar-chart{display:flex;flex-direction:column;gap:10px}
+.bar-row{display:grid;grid-template-columns:minmax(72px,28%) 1fr 44px;gap:10px;align-items:center;font-size:12px}
+.bar-label{color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{height:10px;background:#eee;border-radius:999px;overflow:hidden}
+.bar-fill{height:100%;border-radius:999px;transition:width .4s ease}
+.bar-val{font-weight:700;text-align:right;color:var(--ink);font-size:11px}
+.demo-section{max-width:1140px;margin:32px auto 0;text-align:left}
+.demo-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.demo-head h3{margin:0;font-family:var(--display);font-size:1.15rem}
+.demo-lead{font-size:13px;color:var(--muted);margin:0 0 16px;line-height:1.5}
+.mock-badge{font-size:10px!important}
+.mock-banner{
+  max-width:720px;margin:0 auto 20px;padding:12px 16px;border-radius:8px;
+  background:#fff8f0;border:1px solid rgba(232,93,4,.35);font-size:13px;color:var(--muted);text-align:center;
+}
 
 /* Contact / footer */
 .contact{text-align:center}
@@ -317,6 +340,7 @@ footer a:hover{color:var(--teal-bright)}
 .footer-nav a{font-size:12px;letter-spacing:.06em;text-transform:uppercase;font-family:var(--display);font-weight:600}
 
 @media(max-width:900px){
+  .chart-grid,.chart-grid-3{grid-template-columns:1fr}
   .metrics{grid-template-columns:repeat(2,1fr)}
   .about-grid{grid-template-columns:1fr}
   .apps-deck-layout{
@@ -412,6 +436,9 @@ footer a:hover{color:var(--teal-bright)}
     Metrics and disclosures use <strong>anonymised data</strong> only — aggregated, consented signals without personal identifiers — so partners and operators can understand the orbit without exposing individuals.
   </div>
   <div class="metrics" id="metricGrid"></div>
+  <div id="mockBanner" class="mock-banner hidden"></div>
+  <div class="chart-grid" id="orbitCharts"></div>
+  <div id="demographicsPanel"></div>
   <div class="status-row" id="ingestStatus"></div>
   <div class="refresh-row">
     <button type="button" class="btn-ghost" id="refreshAnalytics">Refresh</button>
@@ -437,6 +464,7 @@ footer a:hover{color:var(--teal-bright)}
 
 <script src="./js/apps-store.js"></script>
 <script src="./js/zonic-track.js"></script>
+<script src="./js/analytics-hub.js"></script>
 <script>
 window.ZONIC_APP_ID = "zonicme-hub";
 
@@ -584,28 +612,40 @@ function fmt(n) {
 }
 
 function renderAnalytics(apps) {
-  const totals = { users: 0, sessions: 0, events: 0, live: 0 };
-  apps.forEach((a) => {
-    const m = orbitCache[a.id]?.metrics;
-    if (!m) return;
-    totals.live++;
-    totals.users += m.activeUsers7d || 0;
-    totals.sessions += m.sessions24h || 0;
-    totals.events += m.events || 0;
-  });
-  const spans = (window.ZonicTrack?.getSpans?.() || []).length;
+  const H = ZonicAnalyticsHub;
+  const rows = H.buildOrbitRows(apps, orbitCache);
+  const totals = H.aggregateTotals(rows);
+  const spanInfo = H.spanSummary();
+
   document.getElementById("metricGrid").innerHTML = `
     <div class="metric"><div class="label">Orbit live</div><div class="value">${totals.live}/${apps.length}</div><div class="sub">manifests</div></div>
-    <div class="metric"><div class="label">Users (7d)</div><div class="value">${fmt(totals.users)}</div><div class="sub">across apps</div></div>
-    <div class="metric"><div class="label">Sessions (24h)</div><div class="value">${fmt(totals.sessions)}</div><div class="sub">orbit metrics</div></div>
-    <div class="metric"><div class="label">Local spans</div><div class="value">${fmt(spans)}</div><div class="sub">zonic-track</div></div>`;
+    <div class="metric"><div class="label">Users (7d)</div><div class="value">${H.fmt(totals.users)}</div><div class="sub">across apps</div></div>
+    <div class="metric"><div class="label">Sessions (24h)</div><div class="value">${H.fmt(totals.sessions)}</div><div class="sub">orbit metrics</div></div>
+    <div class="metric"><div class="label">Local spans</div><div class="value">${H.fmt(spanInfo.total)}</div><div class="sub">zonic-track</div></div>`;
+
+  const mockBanner = document.getElementById("mockBanner");
+  if (totals.mockCount > 0) {
+    mockBanner.classList.remove("hidden");
+    mockBanner.innerHTML = `<strong>Mock data active</strong> — ${totals.mockCount} app(s) showing seed metrics until live orbit manifests respond. Admin can clear mock seed.`;
+  } else {
+    mockBanner.classList.add("hidden");
+    mockBanner.innerHTML = "";
+  }
+
+  document.getElementById("orbitCharts").innerHTML =
+    H.appCompareChart(rows, "activeUsers7d", "Active users (7d) by app") +
+    H.appCompareChart(rows, "sessions24h", "Sessions (24h) by app");
+
+  const feeds = apps.map((a) => orbitCache[a.id]).filter(Boolean);
+  document.getElementById("demographicsPanel").innerHTML = H.demographicsHtml(H.mergeDemographics(feeds));
 
   const ingestUrl = ZonicMeAppsStore.getIngestUrl(CONFIG);
   const ready = ingestUrl && !String(ingestUrl).includes("YOUR-SUPABASE");
-  const pills = [`<span class="pill ${ready ? "ok" : "warn"}">ingest: ${ready ? "URL set" : "set ZONICME_INGEST_URL"}</span>`];
-  apps.forEach((a) => {
-    const ok = !!orbitCache[a.id] && !orbitCache[a.id].demo;
-    pills.push(`<span class="pill ${ok || orbitCache[a.id] ? "ok" : "warn"}">${esc(a.name)}: ${orbitCache[a.id]?.demo ? "demo" : ok ? "orbit ok" : "fallback"}</span>`);
+  const pills = [`<span class="pill ${ready ? "ok" : "warn"}">ingest: ${ready ? "URL set" : "fail-open (local spans)"}</span>`];
+  rows.forEach((r) => {
+    const cls = r.mock ? "warn" : r.metrics?.activeUsers7d ? "ok" : "warn";
+    const tag = r.mock ? "mock" : r.source === "none" ? "no data" : "orbit ok";
+    pills.push(`<span class="pill ${cls}">${esc(r.name)}: ${tag}</span>`);
   });
   document.getElementById("ingestStatus").innerHTML = pills.join("");
 }
@@ -625,10 +665,10 @@ async function ingestOrbit(apps) {
     let source = "live";
     if (!feed) { feed = await fetchOrbit(a.orbit); source = "local"; }
     if (feed) {
-      orbitCache[a.id] = feed;
+      orbitCache[a.id] = { ...feed, _source: source, mock: !!feed.mock };
       ZonicTrack.span("orbit_ingest", { app: a.id, source, metrics: feed.metrics || {} });
-    } else if (a._demo) {
-      orbitCache[a.id] = { metrics: a._demo, demo: true };
+    } else if (a._demo && !ZonicAnalyticsHub.isMockDisabled()) {
+      orbitCache[a.id] = { metrics: a._demo, demo: true, mock: true, _source: "mock-seed" };
     }
   }));
 }

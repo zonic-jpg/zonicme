@@ -79,8 +79,27 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
   padding:12px 0;border-bottom:1px solid var(--line);
 }
 .user-row:last-child{border-bottom:0}
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+.chart-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:12px}
+.chart-panel{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px}
+.chart-panel h4{margin:0 0 12px;font-size:.95rem;font-weight:700}
+.bar-chart{display:flex;flex-direction:column;gap:8px}
+.bar-row{display:grid;grid-template-columns:minmax(72px,30%) 1fr 40px;gap:8px;align-items:center;font-size:12px}
+.bar-label{color:var(--muted);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{height:8px;background:#eee;border-radius:999px;overflow:hidden}
+.bar-fill{height:100%;border-radius:999px}
+.bar-val{font-weight:700;text-align:right;font-size:11px}
+.pill{font-size:11px;font-weight:600;padding:5px 10px;border-radius:20px;background:#eee;color:var(--muted);display:inline-block}
+.pill.ok{background:#e0f5ec;color:var(--ok)}
+.pill.warn{background:#fff0e6;color:var(--accent)}
+.mock-badge{margin-left:8px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
+.stat-box{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;text-align:center}
+.stat-box .v{font-family:var(--display);font-size:1.4rem;font-weight:700}
+.stat-box .l{font-size:11px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
 @media(max-width:640px){
   .row,.user-row{grid-template-columns:1fr}
+  .chart-grid,.chart-grid-3,.stat-grid{grid-template-columns:1fr}
   header{flex-direction:column}
 }
 </style>
@@ -120,6 +139,7 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
 
   <div class="tabs" id="tabs">
     <button type="button" class="tab active" data-tab="apps">Apps &amp; ingest</button>
+    <button type="button" class="tab" data-tab="analytics" id="analyticsTabBtn">Analytics</button>
     <button type="button" class="tab" data-tab="users" id="usersTabBtn">Users &amp; roles</button>
   </div>
 
@@ -140,6 +160,23 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
       <button type="button" class="secondary" id="exportBtn">Download JSON</button>
       <button type="button" class="secondary" id="reloadBtn">Reload seed JSON</button>
       <button type="button" class="danger" id="resetBtn">Clear local overrides</button>
+    </div>
+  </div>
+
+  <div id="tab-analytics" class="hidden">
+    <div class="panel">
+      <h2 style="margin:0 0 8px;font-size:1.1rem">Orbit analytics</h2>
+      <p class="hint">Charts from orbit manifests, local <code>zonic-track</code> spans, and anonymised demographics. Ingest is fail-open when <code>ZONICME_INGEST_URL</code> is unset.</p>
+      <div class="stat-grid" id="adminStatGrid"></div>
+      <div class="chart-grid" id="adminOrbitCharts"></div>
+      <div id="adminDemographics"></div>
+      <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:8px" id="adminIngestPills"></div>
+      <div class="actions" style="margin-top:16px">
+        <button type="button" class="secondary" id="refreshAdminAnalytics">Refresh analytics</button>
+        <button type="button" class="danger" id="deleteMockBtn">Delete mock seed data</button>
+        <button type="button" class="secondary" id="restoreMockBtn">Restore mock seed</button>
+        <button type="button" class="secondary" id="flushSpansBtn">Flush spans to ingest</button>
+      </div>
     </div>
   </div>
 
@@ -172,10 +209,74 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
 </div>
 
 <script src="./js/apps-store.js"></script>
+<script src="./js/zonic-track.js"></script>
+<script src="./js/analytics-hub.js"></script>
 <script src="./js/auth.js"></script>
 <script>
 let state = null;
 let googleCleanup = null;
+const adminOrbitCache = {};
+
+async function fetchOrbitAdmin(url) {
+  if (!url) return null;
+  try {
+    const res = await fetch(url, { mode: "cors", cache: "no-store" });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (_) {
+    return null;
+  }
+}
+
+async function ingestOrbitAdmin(apps) {
+  const demo = ZonicAnalyticsHub.DEMO_METRICS;
+  await Promise.all(
+    apps.map(async (a) => {
+      let feed = await fetchOrbitAdmin(a.orbitLive);
+      let source = "live";
+      if (!feed) {
+        feed = await fetchOrbitAdmin(a.orbit);
+        source = "local";
+      }
+      if (feed) {
+        adminOrbitCache[a.id] = { ...feed, _source: source, mock: !!feed.mock };
+      } else if (demo[a.id] && !ZonicAnalyticsHub.isMockDisabled()) {
+        adminOrbitCache[a.id] = { metrics: demo[a.id], demo: true, mock: true, _source: "mock-seed" };
+      }
+    })
+  );
+}
+
+async function renderAdminAnalytics() {
+  if (!state?.apps) return;
+  const H = ZonicAnalyticsHub;
+  await ingestOrbitAdmin(state.apps);
+  const rows = H.buildOrbitRows(state.apps, adminOrbitCache);
+  const totals = H.aggregateTotals(rows);
+  const spanInfo = H.spanSummary();
+
+  document.getElementById("adminStatGrid").innerHTML = `
+    <div class="stat-box"><div class="v">${totals.live}/${state.apps.length}</div><div class="l">Orbit live</div></div>
+    <div class="stat-box"><div class="v">${H.fmt(totals.users)}</div><div class="l">Users 7d</div></div>
+    <div class="stat-box"><div class="v">${H.fmt(totals.sessions)}</div><div class="l">Sessions 24h</div></div>
+    <div class="stat-box"><div class="v">${H.fmt(spanInfo.total)}</div><div class="l">Local spans</div></div>`;
+
+  document.getElementById("adminOrbitCharts").innerHTML =
+    H.appCompareChart(rows, "activeUsers7d", "Active users (7d)") +
+    H.appCompareChart(rows, "events", "Events by app");
+
+  const feeds = state.apps.map((a) => adminOrbitCache[a.id]).filter(Boolean);
+  document.getElementById("adminDemographics").innerHTML = H.demographicsHtml(H.mergeDemographics(feeds));
+
+  const ingestUrl = ZonicMeAppsStore.getIngestUrl(state);
+  const ready = ingestUrl && !String(ingestUrl).includes("YOUR-SUPABASE");
+  const pills = [`<span class="pill ${ready ? "ok" : "warn"}">ingest: ${ready ? "configured" : "fail-open"}</span>`];
+  if (totals.mockCount) pills.push(`<span class="pill warn">${totals.mockCount} mock app(s)</span>`);
+  rows.forEach((r) => {
+    pills.push(`<span class="pill ${r.mock ? "warn" : "ok"}">${esc(r.name)}: ${r.mock ? "mock" : "live"}</span>`);
+  });
+  document.getElementById("adminIngestPills").innerHTML = pills.join("");
+}
 
 function toast(msg) {
   document.getElementById("toast").textContent = msg;
@@ -375,8 +476,10 @@ document.getElementById("tabs").addEventListener("click", (e) => {
   if (id === "users" && !ZonicMeAuth.canManageRoles(ZonicMeAuth.getSession())) return;
   document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t === tab));
   document.getElementById("tab-apps").classList.toggle("hidden", id !== "apps");
+  document.getElementById("tab-analytics").classList.toggle("hidden", id !== "analytics");
   document.getElementById("tab-users").classList.toggle("hidden", id !== "users");
   if (id === "users") renderUsers();
+  if (id === "analytics") renderAdminAnalytics();
 });
 
 document.getElementById("grantBtn").addEventListener("click", () => {
@@ -430,6 +533,26 @@ document.getElementById("resetBtn").addEventListener("click", async () => {
   document.getElementById("ingestUrl").value = ZonicMeAppsStore.getIngestUrl(state);
   renderApps();
   toast("Local overrides cleared");
+});
+
+document.getElementById("refreshAdminAnalytics").addEventListener("click", () => {
+  renderAdminAnalytics().then(() => toast("Analytics refreshed"));
+});
+
+document.getElementById("deleteMockBtn").addEventListener("click", () => {
+  ZonicAnalyticsHub.disableMockSeed();
+  Object.keys(adminOrbitCache).forEach((k) => delete adminOrbitCache[k]);
+  renderAdminAnalytics().then(() => toast("Mock seed disabled — only live orbit data shown"));
+});
+
+document.getElementById("restoreMockBtn").addEventListener("click", () => {
+  ZonicAnalyticsHub.enableMockSeed();
+  renderAdminAnalytics().then(() => toast("Mock seed restored"));
+});
+
+document.getElementById("flushSpansBtn").addEventListener("click", async () => {
+  const res = await ZonicTrack.flush();
+  toast(res.remote ? `Flushed ${res.flushed} spans` : `Buffered locally (${res.buffered || 0} spans)`);
 });
 
 (function boot() {
