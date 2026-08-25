@@ -140,6 +140,7 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
   <div class="tabs" id="tabs">
     <button type="button" class="tab active" data-tab="apps">Apps &amp; ingest</button>
     <button type="button" class="tab" data-tab="analytics" id="analyticsTabBtn">Analytics</button>
+    <button type="button" class="tab" data-tab="pricing" id="pricingTabBtn">Service pricing</button>
     <button type="button" class="tab" data-tab="users" id="usersTabBtn">Users &amp; roles</button>
   </div>
 
@@ -178,6 +179,10 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
         <button type="button" class="secondary" id="flushSpansBtn">Flush spans to ingest</button>
       </div>
     </div>
+  </div>
+
+  <div id="tab-pricing" class="hidden">
+    <div id="servicePricingRoot"></div>
   </div>
 
   <div id="tab-users" class="hidden">
@@ -530,9 +535,11 @@ document.getElementById("tabs").addEventListener("click", (e) => {
   document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t === tab));
   document.getElementById("tab-apps").classList.toggle("hidden", id !== "apps");
   document.getElementById("tab-analytics").classList.toggle("hidden", id !== "analytics");
+  document.getElementById("tab-pricing").classList.toggle("hidden", id !== "pricing");
   document.getElementById("tab-users").classList.toggle("hidden", id !== "users");
   if (id === "users") renderUsers();
   if (id === "analytics") renderAdminAnalytics();
+  if (id === "pricing") window.__renderServicePricing?.();
 });
 
 document.getElementById("grantBtn").addEventListener("click", () => {
@@ -613,6 +620,20 @@ document.getElementById("flushSpansBtn").addEventListener("click", async () => {
   if (session && ZonicMeAuth.canAccessAdmin(session)) enterAdmin();
   else showGate();
 })();
+</script>
+<script type="module">
+import { renderServicePricingPanel } from "./js/servicePricing.js";
+window.__renderServicePricing = () => {
+  renderServicePricingPanel(document.getElementById("servicePricingRoot"));
+};
+window.__zToast = window.__zToast || ((msg) => {
+  const el = document.getElementById("toast");
+  if (el) {
+    el.textContent = msg;
+    el.classList.add("show");
+    setTimeout(() => el.classList.remove("show"), 2800);
+  }
+});
 </script>
 </body>
 </html>
