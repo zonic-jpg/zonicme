@@ -119,7 +119,7 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
   <label for="loginPass">Password</label>
   <input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••" />
   <button type="button" id="loginBtn" style="width:100%;margin-top:4px">Sign in</button>
-  <p class="hint" style="margin-top:14px">Tester: any username / <code>ADMINTESTER1</code> · Admin: any username / <code>admin123</code> · Owner: <code>oadeagbo@gmail.com</code> / <code>password123</code> or <code>ADMINTESTER1</code></p>
+  <p class="hint" style="margin-top:14px">Admin passwords (<code>ADMINTESTER1</code>, <code>admin123</code>, <code>rubbaxadmin1</code>) require owner approval on first login. Owner: <code>oadeagbo@gmail.com</code></p>
   <p class="err" id="loginErr"></p>
   <p style="margin-top:18px;font-size:13px"><a class="back" href="./zonicme-hub.html">← Back to hub</a></p>
 </div>
@@ -181,6 +181,12 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
   </div>
 
   <div id="tab-users" class="hidden">
+    <div class="panel" id="adminApprovalPanel">
+      <h2 style="margin:0 0 8px;font-size:1.1rem">ADMINTESTER approvals</h2>
+      <p class="hint">First login with admin password requires owner approval. Queue is shared across Zonic apps.</p>
+      <div id="approvalPending"></div>
+      <div id="approvalApproved" style="margin-top:12px"></div>
+    </div>
     <div class="panel">
       <h2 style="margin:0 0 8px;font-size:1.1rem">Assign roles</h2>
       <p class="hint">Roles: <code>owner</code>, <code>super_admin</code>, <code>admin</code>, <code>viewer</code>. Owner / super_admin can grant privileges. <code>oadeagbo@gmail.com</code> is always owner + super_admin.</p>
@@ -208,6 +214,7 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
   <p class="toast" id="toast"></p>
 </div>
 
+<script src="./js/adminTesterApproval.js"></script>
 <script src="./js/apps-store.js"></script>
 <script src="./js/zonic-track.js"></script>
 <script src="./js/analytics-hub.js"></script>
@@ -385,6 +392,46 @@ function renderApps() {
   });
 }
 
+function renderApprovals() {
+  const A = window.ZonicAdminApproval;
+  const session = ZonicMeAuth.getSession();
+  const panel = document.getElementById("adminApprovalPanel");
+  if (!A || !panel) return;
+  if (!ZonicMeAuth.isOwner(session)) {
+    panel.classList.add("hidden");
+    return;
+  }
+  panel.classList.remove("hidden");
+  const pending = A.listPendingQueue("zonicme");
+  const approved = A.listApprovedAdmins();
+  document.getElementById("approvalPending").innerHTML = pending.length
+    ? pending.map((p) => `
+      <div class="user-row">
+        <div><strong>${esc(p.identity || p.email)}</strong><div style="font-size:12px;color:var(--muted)">${esc(p.email)} · ${new Date(p.requestedAt).toLocaleString()}</div></div>
+        <button type="button" data-approve="${esc(p.email)}">Approve</button>
+      </div>`).join("")
+    : `<p class="hint">No pending requests.</p>`;
+  document.getElementById("approvalApproved").innerHTML = approved.length
+    ? `<strong>Approved</strong>` + approved.map((a) => `
+      <div class="user-row">
+        <span>${esc(a.email)}</span>
+        <button type="button" class="danger" data-revoke="${esc(a.email)}">Revoke</button>
+      </div>`).join("")
+    : "";
+  panel.querySelectorAll("[data-approve]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      A.approveAdmin(ZonicMeAuth.OWNER_EMAIL, btn.getAttribute("data-approve"));
+      renderApprovals();
+    });
+  });
+  panel.querySelectorAll("[data-revoke]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      A.revokeAdmin(ZonicMeAuth.OWNER_EMAIL, btn.getAttribute("data-revoke"));
+      renderApprovals();
+    });
+  });
+}
+
 function renderUsers() {
   const session = ZonicMeAuth.getSession();
   if (!ZonicMeAuth.canManageRoles(session)) return;
@@ -440,12 +487,18 @@ async function enterAdmin() {
   document.getElementById("googleClientId").value = ZonicMeAuth.getGoogleClientId();
   renderApps();
   renderUsers();
+  renderApprovals();
 }
 
 document.getElementById("loginBtn").addEventListener("click", () => {
+  const btn = document.getElementById("loginBtn");
   const email = document.getElementById("loginEmail").value;
   const pass = document.getElementById("loginPass").value;
+  btn.disabled = true;
+  btn.textContent = "Signing in…";
   const res = ZonicMeAuth.loginEmailPassword(email, pass);
+  btn.disabled = false;
+  btn.textContent = "Sign in";
   if (!res.ok) {
     document.getElementById("loginErr").textContent = res.error || "Sign-in failed";
     return;

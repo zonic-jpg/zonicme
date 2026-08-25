@@ -1,38 +1,16 @@
-# ZonicMe hub — local auth notes
+# ZonicMe auth
 
-## Admin URL (hidden — not in public nav)
+Orbit standard: [MyYangaX AUTH.md](https://github.com/zonic-jpg/myyangax/blob/main/AUTH.md)
 
-Open: `http://localhost:8766/admin.html`
+## ADMINTESTER approval
 
-## Shared admin sign-in
+Passwords (case-insensitive): `ADMINTESTER1`, `admin123`, `rubbaxadmin1`
 
-- Username: **any** (email or bare name)
-- Password: `admin123`
-- Role: **admin** (full access to Apps & ingest on `admin.html`)
+- First login on `admin.html` → **PENDING** until owner approves
+- Owner queue: **Users & roles** tab → ADMINTESTER approvals
+- Owner: `oadeagbo@gmail.com` (never pending)
 
-## Owner sign-in
+## Admin sign-in
 
-- Email: `oadeagbo@gmail.com`
-- Password: `password123`
-- Roles: **owner** + **super_admin** (can grant roles in **Users & roles**)
-
-## Google OAuth (production)
-
-1. Create a Google Cloud OAuth **Web** client.
-2. Add Authorized JavaScript origins for your deploy host (and `http://localhost:8766` for local).
-3. Set client id via:
-   - Admin field **GOOGLE_CLIENT_ID**, or
-   - `localStorage zonicme_google_client_id`, or
-   - `window.ZONICME_GOOGLE_CLIENT_ID = "….apps.googleusercontent.com"`
-4. Invalid / missing origins soft-fail (button hides); email/password still works — same pattern as AdSpot.
-
-## Roles
-
-| Role | Access |
-|------|--------|
-| owner | Full + grant roles |
-| super_admin | Full + grant roles |
-| admin | Apps / ingest tools |
-| viewer | Sign-in only (no write) |
-
-Session: signed-ish token in `localStorage` (`zonicme_admin_session_v1`). Demo-only signing — replace with real backend JWT for production.
+- `website/admin.html` (not linked from public hub)
+- Module: `website/js/adminTesterApproval.js` + `website/js/auth.js`

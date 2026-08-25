@@ -207,9 +207,14 @@
     const pass = String(password ?? "");
     const identity = String(email || "").trim();
 
-    // Shared gate: any username + a shared admin password → super_admin immediately
-    // (owner email keeps owner). Matching is case-insensitive across all aliases.
+    // Shared gate: any username + shared admin password → pending until owner approves
     if (isSharedAdminPassword(pass)) {
+      const gate =
+        global.ZonicAdminApproval?.resolveAdminGateLogin?.(identity, pass, "zonicme") ||
+        { ok: true, status: "approved" };
+      if (!gate.ok) {
+        return { ok: false, error: gate.message || "Awaiting approval" };
+      }
       const grantRole = "super_admin";
       if (!identity) return { ok: false, error: "Username required" };
       const e = identityToEmail(identity);
