@@ -186,7 +186,7 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
   </div>
 
   <div id="tab-users" class="hidden">
-    <div class="panel" id="adminApprovalPanel">
+    <div class="panel" id="admintester-queue">
       <h2 style="margin:0 0 8px;font-size:1.1rem">ADMINTESTER approvals</h2>
       <p class="hint">First login with admin password requires owner approval. Queue is shared across Zonic apps.</p>
       <div id="approvalPending"></div>
@@ -493,6 +493,10 @@ async function enterAdmin() {
   renderApps();
   renderUsers();
   renderApprovals();
+  if (ZonicMeAuth.isOwner(session)) {
+    document.querySelector('[data-tab="users"]')?.click();
+    setTimeout(() => document.getElementById("admintester-queue")?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+  }
 }
 
 document.getElementById("loginBtn").addEventListener("click", () => {
