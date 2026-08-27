@@ -683,6 +683,7 @@ async function boot() {
     myafriart: { activeUsers7d: 6200, sessions24h: 980, events: 228000 },
     rubba: { activeUsers7d: 4100, sessions24h: 720, events: 142000 },
     adspot: { activeUsers7d: 24100, sessions24h: 9800, events: 910000 },
+    owanbex: { activeUsers7d: 3200, sessions24h: 640, events: 98000 },
   };
   const apps = CONFIG.apps || [];
   apps.forEach((a) => { a._demo = demo[a.id]; });
@@ -717,7 +718,18 @@ window.addEventListener("scroll", () => {
   document.getElementById("siteHeader").classList.toggle("solid", window.scrollY > 40);
 }, { passive: true });
 
-boot();
+boot().catch((err) => {
+  console.error("[ZonicMe hub boot]", err);
+  const apps = (window.ZonicMeAppsStore?.FALLBACK?.apps) || [];
+  if (apps.length) {
+    CONFIG = { apps, mission: document.getElementById("missionText")?.textContent || "" };
+    renderNavApps(apps);
+    renderDeck(apps);
+  } else {
+    document.getElementById("appDetail").innerHTML =
+      `<p class="detail-empty">Could not load applications. <a href="./config/apps.json">Check config</a>.</p>`;
+  }
+});
 </script>
 </body>
 </html>

@@ -36,11 +36,11 @@
           "African art marketplace — discover, stage, collect.\nGalleries and collectors in one place.",
         detail:
           "MyAfriArt connects artists, galleries, and collectors across Africa and the diaspora. Discover original work, stage digital exhibitions, and collect with confidence — a marketplace built for the continent’s creative voice.",
-        url: "https://myafriart.com",
+        url: "https://myafriartx.netlify.app",
         thumbnail:
           "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=800&q=80",
         orbit: "./orbit/myafriart.json",
-        orbitLive: "https://myafriart.com/orbit-manifest.json",
+        orbitLive: "https://myafriartx.netlify.app/orbit-manifest.json",
         color: "#2F7D4F",
       },
       {
@@ -50,11 +50,11 @@
           "Life-planning for goals, savings, milestones.\nTurn ambition into a clear next step.",
         detail:
           "Rubba helps people plan life with clarity — goals, savings targets, and milestones in one calm workspace. Built for everyday Africans who want structure without complexity, and progress they can see.",
-        url: "https://rubba.app",
+        url: "https://rubba.netlify.app",
         thumbnail:
           "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=800&q=80",
         orbit: "./orbit/rubba.json",
-        orbitLive: "https://rubba.app/orbit-manifest.json",
+        orbitLive: "https://rubba.netlify.app/orbit-manifest.json",
         color: "#C99A2E",
       },
       {
@@ -70,6 +70,20 @@
         orbit: "./orbit/adspotx.json",
         orbitLive: "https://adspotx.netlify.app/orbit-manifest.json",
         color: "#1A6B5A",
+      },
+      {
+        id: "owanbex",
+        name: "OwanbeX",
+        summary:
+          "Plan Nigerian celebrations end-to-end.\nVendors, budgets, aso ebi, guest lists.",
+        detail:
+          "OwanbeX helps families and brands plan weddings, birthdays, and milestone events across Nigeria — vetted vendors, live Naira budgets, aso ebi coordination, and brand analytics in one planner.",
+        url: "https://owanbex.netlify.app",
+        thumbnail:
+          "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80",
+        orbit: "./orbit/owanbex.json",
+        orbitLive: "https://owanbex.netlify.app/orbit-manifest.json",
+        color: "#9B2335",
       },
     ],
   };

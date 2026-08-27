@@ -1,10 +1,37 @@
-# ZonicMe hub — static site (no build step). Publish repo root.
+# ZonicMe hub — static site (no build step). Publish website root.
 [build]
   publish = "."
   command = ""
 
-# SPA-ish fallback so unknown paths land on the hub.
+# Static assets must win over SPA fallback (js/config/orbit/assets/admin.html).
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
+  from = "/js/*"
+  to = "/js/:splat"
   status = 200
+  force = true
+
+[[redirects]]
+  from = "/config/*"
+  to = "/config/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/orbit/*"
+  to = "/orbit/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/assets/*"
+  to = "/assets/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/admin.html"
+  to = "/admin.html"
+  status = 200
+  force = true
+
+# No /* → index.html catch-all — it breaks /js/*.js and /config/*.json on the static hub.

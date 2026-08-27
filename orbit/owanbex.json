@@ -1,0 +1,41 @@
+{
+  "appId": "owanbex",
+  "name": "OwanbeX",
+  "version": "1.0",
+  "tagline": "Plan your dream Nigerian celebration",
+  "description": "Event planning with vetted vendors, live budgets, and aso ebi.",
+  "url": "https://owanbex.netlify.app",
+  "updatedAt": "2026-08-27T00:00:00.000Z",
+  "metrics": {
+    "activeUsers7d": 3200,
+    "sessions24h": 640,
+    "eventsPlanned": 890,
+    "vendorShortlists": 12400,
+    "events": 98000
+  },
+  "mock": true,
+  "demographics": {
+    "mock": true,
+    "regions": [
+      { "label": "South West Nigeria", "pct": 38 },
+      { "label": "FCT / North", "pct": 22 },
+      { "label": "South East", "pct": 20 },
+      { "label": "Diaspora", "pct": 20 }
+    ],
+    "ageBands": [
+      { "label": "25–34", "pct": 42 },
+      { "label": "35–44", "pct": 34 },
+      { "label": "45+", "pct": 24 }
+    ],
+    "interests": [
+      { "label": "Weddings", "pct": 48 },
+      { "label": "Birthdays", "pct": 22 },
+      { "label": "Corporate events", "pct": 18 },
+      { "label": "Other", "pct": 12 }
+    ]
+  },
+  "featured": [
+    { "title": "Vendor shortlists", "location": "OwanbeX" },
+    { "title": "Live Naira budgets", "location": "OwanbeX" }
+  ]
+}

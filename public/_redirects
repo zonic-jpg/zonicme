@@ -1,0 +1,3 @@
+# Static assets must not SPA-fallback to index.html (breaks hub boot).
+/admin    /admin.html   200
+/hub      /zonicme-hub.html   200
