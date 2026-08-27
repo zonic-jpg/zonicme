@@ -1,16 +1,27 @@
-# ZonicMe auth
+# ZonicMe auth — Zonic orbit standard (5 rules)
 
-Orbit standard: [MyYangaX AUTH.md](https://github.com/zonic-jpg/myyangax/blob/main/AUTH.md)
+See MyYangaX `AUTH.md` for the full orbit standard.
 
-## ADMINTESTER approval
+## Rule 1 — Owner always in
 
-Passwords (case-insensitive): `ADMINTESTER1`, `admin123`, `rubbaxadmin1`
+`oadeagbo@gmail.com` → owner + super_admin immediately on `admin.html`.
 
-- First login on `admin.html` → **PENDING** until owner approves
-- Owner queue: **Users & roles** tab → ADMINTESTER approvals
-- Owner: `oadeagbo@gmail.com` (never pending)
+## Rule 2 — ADMINTESTER queue
 
-## Admin sign-in
+Any other username/email + admin password → **PENDING** (awaiting-approval message).
 
-- `website/admin.html` (not linked from public hub)
-- Module: `website/js/adminTesterApproval.js` + `website/js/auth.js`
+## Rule 3 — Owner queue on login
+
+Owner login → **Users & roles** tab → ADMINTESTER approvals (`#admintester-queue`).
+
+## Rule 4 — Approved = full access
+
+Approved testers get super_admin on admin console (apps, ingest, all panels).
+
+## Rule 5 — Owner allocates rights
+
+Owner grants roles/privileges via Users & roles UI.
+
+## Module
+
+`website/js/adminTesterApproval.js` · `website/js/auth.js`
