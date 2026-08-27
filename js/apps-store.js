@@ -24,7 +24,7 @@
           "MyYanga is ZonicMe’s fashion platform — browse looks, try Virtual Wear, and follow Runway drops from African designers and the diaspora. Discovery meets commerce so creators earn and audiences find style that feels like home.",
         url: "https://myyangax.netlify.app",
         thumbnail:
-          "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=800&q=80",
+          "https://images.unsplash.com/photo-1595777457583-faa945f5f948?auto=format&fit=crop&w=800&q=80",
         orbit: "./orbit/myyangax.json",
         orbitLive: "https://myyangax.netlify.app/orbit-manifest.json",
         color: "#E85D04",
@@ -66,7 +66,7 @@
           "AdSpot is the orbit’s media and partner network. Rewarded attention means brands reach consented audiences while users earn value — transparent, fair, and tuned for African markets and diaspora reach.",
         url: "https://adspotx.netlify.app",
         thumbnail:
-          "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=800&q=80",
+          "https://images.unsplash.com/photo-1595777457583-faa945f5f948?auto=format&fit=crop&w=800&q=80",
         orbit: "./orbit/adspotx.json",
         orbitLive: "https://adspotx.netlify.app/orbit-manifest.json",
         color: "#1A6B5A",
