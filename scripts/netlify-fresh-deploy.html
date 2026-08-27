@@ -1,0 +1,45 @@
+<!doctype html><html><body><pre id="log">starting…</pre><script>
+(async () => {
+  const log = (x) => { document.getElementById('log').textContent = typeof x === 'string' ? x : JSON.stringify(x, null, 2); };
+  const cfg = await fetch('./b64deploy-zonicme.json').then(r => r.json());
+  const TOKEN = cfg.token;
+  const SITE_ID = cfg.siteId;
+  const files = Object.fromEntries(Object.entries(cfg.manifest).map(([p, h]) => ['/' + p, h]));
+  log('creating deploy…');
+  const create = await fetch(`https://api.netlify.com/api/v1/sites/${SITE_ID}/deploys`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${TOKEN}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ files }),
+  });
+  const deploy = await create.json();
+  if (!create.ok) throw new Error(`create ${create.status} ${JSON.stringify(deploy)}`);
+  log({ deploy: deploy.id, required: (deploy.required || []).length });
+  const hashToPath = Object.fromEntries(Object.entries(files).map(([p, h]) => [h, p]));
+  let n = 0;
+  for (const hash of deploy.required || []) {
+    const rel = hashToPath[hash];
+    const key = rel.slice(1);
+    const b64 = cfg.payloads[key];
+    if (!b64) throw new Error(`missing payload ${key}`);
+    const bin = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    const put = await fetch(`https://api.netlify.com/api/v1/deploys/${deploy.id}/files${rel}`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${TOKEN}`, 'Content-Type': 'application/octet-stream' },
+      body: bin,
+    });
+    if (!put.ok) throw new Error(`upload ${rel} ${put.status} ${await put.text()}`);
+    n++;
+    log({ uploaded: n, last: rel });
+  }
+  for (let i = 0; i < 30; i++) {
+    await new Promise(r => setTimeout(r, 2000));
+    const st = await fetch(`https://api.netlify.com/api/v1/deploys/${deploy.id}`, {
+      headers: { Authorization: `Bearer ${TOKEN}` },
+    }).then(r => r.json());
+    log({ state: st.state, url: st.ssl_url || st.deploy_ssl_url, i });
+    if (st.state === 'ready') { window.__done = st; return; }
+    if (st.state === 'error') throw new Error(st.error_message || 'deploy error');
+  }
+  throw new Error('timeout');
+})().catch(e => { log('ERR ' + e); window.__done = { error: String(e) }; });
+</script></body></html>
