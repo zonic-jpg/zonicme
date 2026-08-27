@@ -38,7 +38,7 @@
           "MyAfriArt connects artists, galleries, and collectors across Africa and the diaspora. Discover original work, stage digital exhibitions, and collect with confidence — a marketplace built for the continent’s creative voice.",
         url: "https://myafriartx.netlify.app",
         thumbnail:
-          "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=800&q=80",
+          "https://images.unsplash.com/photo-1578926375605-eaf755ff882c?auto=format&fit=crop&w=800&q=80",
         orbit: "./orbit/myafriart.json",
         orbitLive: "https://myafriartx.netlify.app/orbit-manifest.json",
         color: "#2F7D4F",
@@ -66,7 +66,7 @@
           "AdSpot is the orbit’s media and partner network. Rewarded attention means brands reach consented audiences while users earn value — transparent, fair, and tuned for African markets and diaspora reach.",
         url: "https://adspotx.netlify.app",
         thumbnail:
-          "https://images.unsplash.com/photo-1611162616475-46b635cb6868?auto=format&fit=crop&w=800&q=80",
+          "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=800&q=80",
         orbit: "./orbit/adspotx.json",
         orbitLive: "https://adspotx.netlify.app/orbit-manifest.json",
         color: "#1A6B5A",
