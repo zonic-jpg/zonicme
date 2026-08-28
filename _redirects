@@ -1,0 +1,8 @@
+# ZonicMe hub — static routing (publish = website root)
+/js/*        /js/:splat        200
+/config/*    /config/:splat    200
+/orbit/*      /orbit/:splat     200
+/assets/*    /assets/:splat    200
+/admin       /admin.html       200
+/config      /admin.html       302
+/hub         /zonicme-hub.html 200

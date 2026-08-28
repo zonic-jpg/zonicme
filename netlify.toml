@@ -1,4 +1,4 @@
-# ZonicMe hub — static site (no build step). Publish website root.
+# ZonicMe hub - static site (no build step). Publish website root.
 [build]
   publish = "."
   command = ""
@@ -34,4 +34,11 @@
   status = 200
   force = true
 
-# No /* → index.html catch-all — it breaks /js/*.js and /config/*.json on the static hub.
+# Config admin panel (content loaders bookmark /config)
+[[redirects]]
+  from = "/config"
+  to = "/admin.html"
+  status = 302
+  force = true
+
+# No /* to index.html catch-all - it breaks /js/*.js and /config/*.json on the static hub.
