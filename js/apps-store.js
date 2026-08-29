@@ -2,7 +2,7 @@
  * ZonicMe apps config — seed from config/apps.json, editable via admin → localStorage.
  */
 (function (global) {
-  const STORAGE_KEY = "zonicme_apps_config_v1";
+  const STORAGE_KEY = "zonicme_apps_config_v2";
   const INGEST_KEY = "zonicme_ingest_url";
   const DEFAULT_CONFIG_URL = "./config/apps.json";
 
@@ -23,7 +23,7 @@
         detail:
           "MyYanga is ZonicMe’s fashion platform — browse looks, try Virtual Wear, and follow Runway drops from African designers and the diaspora. Discovery meets commerce so creators earn and audiences find style that feels like home.",
         url: "https://myyangax.netlify.app",
-        thumbnail: "./assets/thumb-african-fashion.jpg",
+        thumbnail: "./assets/thumb-myyanga.jpg",
         orbit: "./orbit/myyangax.json",
         orbitLive: "https://myyangax.netlify.app/orbit-manifest.json",
         color: "#E85D04",
@@ -36,8 +36,7 @@
         detail:
           "MyAfriArt connects artists, galleries, and collectors across Africa and the diaspora. Discover original work, stage digital exhibitions, and collect with confidence — a marketplace built for the continent’s creative voice.",
         url: "https://myafriartx.netlify.app",
-        thumbnail:
-          "https://images.unsplash.com/photo-1578926375605-eaf755ff882c?auto=format&fit=crop&w=800&q=80",
+        thumbnail: "./assets/thumb-afriart.jpg",
         orbit: "./orbit/myafriart.json",
         orbitLive: "https://myafriartx.netlify.app/orbit-manifest.json",
         color: "#2F7D4F",
@@ -50,8 +49,7 @@
         detail:
           "Rubba helps people plan life with clarity — goals, savings targets, and milestones in one calm workspace. Built for everyday Africans who want structure without complexity, and progress they can see.",
         url: "https://rubba.netlify.app",
-        thumbnail:
-          "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=800&q=80",
+        thumbnail: "./assets/thumb-rubba.jpg",
         orbit: "./orbit/rubba.json",
         orbitLive: "https://rubba.netlify.app/orbit-manifest.json",
         color: "#C99A2E",
@@ -64,7 +62,7 @@
         detail:
           "AdSpot is the orbit’s media and partner network. Rewarded attention means brands reach consented audiences while users earn value — transparent, fair, and tuned for African markets and diaspora reach.",
         url: "https://adspotx.netlify.app",
-        thumbnail: "./assets/thumb-african-fashion.jpg",
+        thumbnail: "./assets/thumb-adspot.jpg",
         orbit: "./orbit/adspotx.json",
         orbitLive: "https://adspotx.netlify.app/orbit-manifest.json",
         color: "#1A6B5A",
@@ -77,8 +75,7 @@
         detail:
           "OwanbeX helps families and brands plan weddings, birthdays, and milestone events across Nigeria — vetted vendors, live Naira budgets, aso ebi coordination, and brand analytics in one planner.",
         url: "https://owanbex.netlify.app",
-        thumbnail:
-          "https://images.unsplash.com/photo-1591604466374-42e045186142?auto=format&fit=crop&w=800&q=80",
+        thumbnail: "./assets/thumb-owanbe.jpg",
         orbit: "./orbit/owanbex.json",
         orbitLive: "https://owanbex.netlify.app/orbit-manifest.json",
         color: "#9B2335",

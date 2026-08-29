@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-<link rel="icon" href="./assets/zonicme-mark.svg" type="image/svg+xml">
+<link rel="icon" href="./assets/zonicme-logo.png" type="image/png">
 <style>
 :root{
   --ink:#0f1412; --muted:#5a635e; --line:#d5e0da; --accent:#e85d04;
@@ -53,7 +53,7 @@ button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
   display:inline-flex;align-items:center;gap:0;flex-shrink:0;
   line-height:0;
 }
-.logo img{height:36px;width:auto;display:block;filter:drop-shadow(0 2px 8px rgba(0,0,0,.25))}
+.logo img{height:40px;width:auto;display:block;filter:drop-shadow(0 2px 10px rgba(0,0,0,.35))}
 .nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
 .nav > a,.nav > .drop > button{
   font-family:var(--display);font-size:12px;font-weight:600;letter-spacing:.08em;
@@ -79,36 +79,30 @@ button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
   min-height:100vh;display:flex;align-items:center;justify-content:center;
   text-align:center;color:#fff;position:relative;padding:100px 24px 80px;overflow:hidden;
   background:
-    linear-gradient(180deg,rgba(8,14,16,.72) 0%,rgba(12,22,20,.5) 38%,rgba(10,16,14,.88) 100%),
-    radial-gradient(ellipse 70% 55% at 75% 35%, rgba(232,93,4,.45), transparent 62%),
-    radial-gradient(ellipse 50% 40% at 20% 70%, rgba(13,148,136,.35), transparent 55%),
+    linear-gradient(180deg,rgba(8,14,16,.28) 0%,rgba(12,22,20,.12) 42%,rgba(10,16,14,.42) 100%),
+    linear-gradient(90deg,rgba(8,14,16,.22) 0%,transparent 28%,transparent 72%,rgba(8,14,16,.22) 100%),
     url("./assets/zonicme-city-hero.png") center/cover no-repeat;
 }
 .hero::before{
-  content:"";position:absolute;inset:0;pointer-events:none;
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;
   background-image:
-    linear-gradient(115deg, transparent 40%, rgba(45,212,191,.18) 40.5%, transparent 41%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cpath d='M0 50h100M50 0v100' stroke='%23fff' stroke-opacity='0.08'/%3E%3Ccircle cx='50' cy='50' r='18' fill='none' stroke='%23e8a017' stroke-opacity='0.12'/%3E%3C/svg%3E");
-  background-size:auto, 100px 100px;
-  mix-blend-mode:soft-light;
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cpath d='M0 50h100M50 0v100' stroke='%23fff' stroke-opacity='0.06'/%3E%3C/svg%3E");
+  background-size:100px 100px;
 }
 .hero::after{
   content:"";position:absolute;inset:0;pointer-events:none;
-  background:
-    radial-gradient(circle at 50% 100%, rgba(232,160,23,.2), transparent 45%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cpath fill='none' stroke='%23e8a017' stroke-opacity='0.14' d='M0 100c40-30 80-30 120 0s80 30 120 0'/%3E%3C/svg%3E");
-  background-size:auto, 200px 100px;opacity:.95;
+  background:radial-gradient(ellipse 55% 40% at 50% 48%, rgba(0,0,0,.22), transparent 70%);
 }
 .hero-inner{max-width:780px;position:relative;z-index:1}
 .hero h1{
   font-family:var(--display);font-weight:800;font-size:clamp(2rem,5.5vw,3.4rem);
   letter-spacing:.06em;text-transform:uppercase;line-height:1.15;margin-bottom:18px;
-  text-shadow:0 4px 28px rgba(0,0,0,.45), 0 0 40px rgba(232,93,4,.25);
+  text-shadow:0 2px 18px rgba(0,0,0,.55), 0 1px 2px rgba(0,0,0,.4);
 }
 .hero p{
-  font-size:clamp(1rem,2.2vw,1.2rem);line-height:1.65;opacity:.95;
+  font-size:clamp(1rem,2.2vw,1.2rem);line-height:1.65;opacity:.98;
   max-width:36em;margin:0 auto 28px;font-weight:400;
-  text-shadow:0 2px 16px rgba(0,0,0,.4);
+  text-shadow:0 2px 12px rgba(0,0,0,.5);
 }
 .btn-cta{
   display:inline-block;padding:13px 34px;border:2px solid #fff;border-radius:4px;
@@ -138,28 +132,19 @@ button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
 /* —— Applications: left card deck + detail pane —— */
 .apps-deck-layout{
   display:grid;
-  grid-template-columns:minmax(260px,320px) minmax(0,1fr);
-  gap:28px;
+  grid-template-columns:minmax(280px,360px) minmax(0,1fr);
+  gap:24px;
   align-items:stretch;
-  min-height:520px;
+  min-height:480px;
 }
 .apps-deck{
-  max-height:560px;
-  overflow-y:auto;
-  overflow-x:hidden;
-  scroll-snap-type:y mandatory;
-  scroll-padding:12px;
-  padding:6px 10px 6px 4px;
-  display:flex;flex-direction:column;gap:14px;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:thin;
-  scrollbar-color:rgba(232,93,4,.45) transparent;
+  max-height:none;
+  overflow:visible;
+  padding:4px 6px 4px 2px;
+  display:flex;flex-direction:column;gap:10px;
 }
-.apps-deck::-webkit-scrollbar{width:6px}
-.apps-deck::-webkit-scrollbar-thumb{background:rgba(232,93,4,.45);border-radius:4px}
 
 .deck-card{
-  scroll-snap-align:center;
   flex:0 0 auto;
   border:1px solid rgba(13,148,136,.18);
   border-radius:12px;
@@ -168,36 +153,37 @@ button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
   backdrop-filter:blur(6px);
   cursor:pointer;
   text-align:left;
-  display:flex;flex-direction:column;
-  opacity:.72;
-  transform:scale(.96);
+  display:grid;
+  grid-template-columns:96px minmax(0,1fr);
+  align-items:stretch;
+  min-height:88px;
+  opacity:.78;
   transition:opacity .28s ease, transform .28s ease, box-shadow .28s ease, border-color .28s ease;
   box-shadow:0 6px 18px rgba(15,20,18,.06);
 }
-.deck-card:hover{opacity:.92;transform:scale(.98);border-color:rgba(232,160,23,.45)}
+.deck-card:hover{opacity:.95;border-color:rgba(232,160,23,.45)}
 .deck-card.is-active{
   opacity:1;
-  transform:scale(1);
   border-color:var(--accent);
-  box-shadow:0 16px 40px rgba(232,93,4,.22), 0 0 0 1px rgba(232,93,4,.25), 0 0 24px rgba(45,212,191,.12);
+  box-shadow:0 12px 28px rgba(232,93,4,.18), 0 0 0 1px rgba(232,93,4,.22);
 }
 .deck-card:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
 .deck-thumb{
-  aspect-ratio:16/10;
   background:linear-gradient(135deg,#1a2e2a,#c2410c);
   overflow:hidden;
   position:relative;
+  min-height:88px;
 }
 .deck-thumb::after{
   content:"";position:absolute;inset:0;
-  background:linear-gradient(180deg,transparent 40%,rgba(8,14,16,.5));
+  background:linear-gradient(90deg,transparent 55%,rgba(8,14,16,.12));
   pointer-events:none;
 }
 .deck-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s ease}
-.deck-card.is-active .deck-thumb img{transform:scale(1.05)}
-.deck-body{padding:12px 14px 14px}
+.deck-card.is-active .deck-thumb img{transform:scale(1.04)}
+.deck-body{padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:4px}
 .deck-body h3{
-  font-family:var(--display);font-size:.95rem;font-weight:700;letter-spacing:.02em;
+  font-family:var(--display);font-size:.92rem;font-weight:700;letter-spacing:.02em;
   margin-bottom:6px;line-height:1.25;
 }
 .deck-summary{
@@ -254,16 +240,30 @@ button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
 }
 .detail-empty{color:var(--muted);font-size:14px;margin:auto}
 
-/* About */
-.about-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:start}
-.about-grid p{color:var(--muted);line-height:1.7;margin-bottom:14px}
+/* About + reveal */
+.about-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:36px;align-items:start}
+.about-grid > div > p{color:var(--muted);line-height:1.7;margin-bottom:14px}
 .about-panel{
   background:linear-gradient(145deg,#0f1c1a 0%,#1a3d36 55%,#2a2418 100%);
-  color:#f0f0f0;padding:28px;border-radius:10px;
+  color:#f0f0f0;padding:26px 24px;border-radius:10px;
   box-shadow:0 16px 44px rgba(0,0,0,.18), inset 0 1px 0 rgba(45,212,191,.2);
 }
-.about-panel h3{font-family:var(--display);margin-bottom:10px;font-size:1.15rem}
-.about-panel p{color:rgba(255,255,255,.78);margin:0;line-height:1.6;font-size:14px}
+.about-panel h3{font-family:var(--display);margin-bottom:8px;font-size:1.15rem}
+.about-panel .reveal-lead{color:rgba(255,255,255,.78);margin:0 0 18px;line-height:1.55;font-size:13px}
+.reveal-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.reveal-col h4{
+  font-family:var(--display);font-size:.78rem;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--gold);margin:0 0 10px;
+}
+.reveal-col ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.reveal-col li{
+  position:relative;padding-left:14px;color:rgba(255,255,255,.86);
+  font-size:13px;line-height:1.45;
+}
+.reveal-col li::before{
+  content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--gold));
+}
 
 /* Analytics */
 .analytics-wrap{
@@ -343,24 +343,21 @@ footer a:hover{color:var(--teal-bright)}
   .chart-grid,.chart-grid-3{grid-template-columns:1fr}
   .metrics{grid-template-columns:repeat(2,1fr)}
   .about-grid{grid-template-columns:1fr}
+  .reveal-cols{grid-template-columns:1fr}
   .apps-deck-layout{
     grid-template-columns:1fr;
     min-height:0;gap:20px;
   }
   .apps-deck{
     max-height:none;
-    flex-direction:row;
-    overflow-x:auto;
-    overflow-y:hidden;
-    scroll-snap-type:x mandatory;
-    scroll-padding:16px;
-    gap:14px;
-    padding:4px 4px 12px;
+    flex-direction:column;
+    overflow:visible;
+    gap:10px;
+    padding:0;
   }
   .deck-card{
-    flex:0 0 min(78vw,300px);
-    scroll-snap-align:center;
-    max-width:300px;
+    grid-template-columns:88px minmax(0,1fr);
+    max-width:none;
   }
   .apps-detail{min-height:260px;padding:22px}
 }
@@ -368,7 +365,7 @@ footer a:hover{color:var(--teal-bright)}
   .metrics{grid-template-columns:1fr}
   .nav > a,.nav > .drop > button{padding:8px 8px;font-size:11px}
   .hero{min-height:92vh}
-  .deck-card{flex-basis:82vw}
+  .deck-card{grid-template-columns:76px minmax(0,1fr);min-height:80px}
 }
 </style>
 </head>
@@ -378,7 +375,7 @@ footer a:hover{color:var(--teal-bright)}
 <header class="site-header" id="siteHeader">
   <div class="header-inner">
     <a class="logo" href="#top" aria-label="ZonicMe home">
-      <img src="./assets/zonicme-logo.svg" alt="ZonicMe" width="188" height="40">
+      <img src="./assets/zonicme-logo.png" alt="ZonicMe" width="158" height="67">
     </a>
     <nav class="nav" aria-label="Primary">
       <a href="#about">About</a>
@@ -401,7 +398,7 @@ footer a:hover{color:var(--teal-bright)}
 
 <section class="section" id="applications">
   <h2 class="section-title">ZonicMe Applications</h2>
-  <p class="section-lead">Scroll the deck — each app opens in the detail pane with its full story and live site.</p>
+  <p class="section-lead">Five apps in the Zonic orbit — select a card to open its story and live site.</p>
   <div class="divider"></div>
   <div class="apps-deck-layout">
     <div class="apps-deck" id="appDeck" role="listbox" aria-label="Application cards" tabindex="0"></div>
@@ -419,9 +416,29 @@ footer a:hover{color:var(--teal-bright)}
       <p>ZonicMe is the parent group behind a family of Nigerian and pan-African consumer apps. We build products across fashion, art, media and everyday planning — each solving a real need for the continent and its diaspora.</p>
       <p>Our mission is to empower Africans through the creative economy: creators earn, audiences discover, and brands connect with real communities across the orbit.</p>
     </div>
-    <aside class="about-panel">
-      <h3>One orbit. Many apps.</h3>
-      <p>Child apps publish orbit manifests so the family stays connected — fashion, art, media and planning under one trusted parent group across Africa and the diaspora.</p>
+    <aside class="about-panel" id="reveal">
+      <h3>What the orbit reveals</h3>
+      <p class="reveal-lead">One family of apps — clear value for people who use them, and clear opportunity for brands who meet them there.</p>
+      <div class="reveal-cols">
+        <div class="reveal-col">
+          <h4>For users</h4>
+          <ul>
+            <li>Discover African fashion, art, media and celebrations in one trusted orbit</li>
+            <li>Tools for style, planning and events that fit everyday life across Africa and the diaspora</li>
+            <li>Earn rewarded attention on AdSpot while keeping control of what you engage with</li>
+            <li>Move between apps without losing the ZonicMe parent you already trust</li>
+          </ul>
+        </div>
+        <div class="reveal-col">
+          <h4>For brands</h4>
+          <ul>
+            <li>Reach consented audiences inside fashion, art, media and celebration contexts</li>
+            <li>Partner across the orbit instead of rebuilding presence app by app</li>
+            <li>Use privacy-first, anonymised orbit signals to understand demand — not personal dossiers</li>
+            <li>Activate campaigns, sponsorships and marketplace presence where culture already lives</li>
+          </ul>
+        </div>
+      </div>
     </aside>
   </div>
 </section>
@@ -589,6 +606,8 @@ function bindDeckObserver() {
   const deck = document.getElementById("appDeck");
   const cards = [...deck.querySelectorAll(".deck-card")];
   if (!cards.length) return;
+  // Compact deck shows all cards — click selects; skip scroll-spy unless overflowing.
+  if (deck.scrollHeight <= deck.clientHeight + 4) return;
 
   deckObserver = new IntersectionObserver(
     (entries) => {
@@ -683,6 +702,7 @@ async function boot() {
     myafriart: { activeUsers7d: 6200, sessions24h: 980, events: 228000 },
     rubba: { activeUsers7d: 4100, sessions24h: 720, events: 142000 },
     adspot: { activeUsers7d: 24100, sessions24h: 9800, events: 910000 },
+    owanbex: { activeUsers7d: 3200, sessions24h: 640, events: 98000 },
   };
   const apps = CONFIG.apps || [];
   apps.forEach((a) => { a._demo = demo[a.id]; });
@@ -717,7 +737,18 @@ window.addEventListener("scroll", () => {
   document.getElementById("siteHeader").classList.toggle("solid", window.scrollY > 40);
 }, { passive: true });
 
-boot();
+boot().catch((err) => {
+  console.error("[ZonicMe hub boot]", err);
+  const apps = (window.ZonicMeAppsStore?.FALLBACK?.apps) || [];
+  if (apps.length) {
+    CONFIG = { apps, mission: document.getElementById("missionText")?.textContent || "" };
+    renderNavApps(apps);
+    renderDeck(apps);
+  } else {
+    document.getElementById("appDetail").innerHTML =
+      `<p class="detail-empty">Could not load applications. <a href="./config/apps.json">Check config</a>.</p>`;
+  }
+});
 </script>
 </body>
 </html>
