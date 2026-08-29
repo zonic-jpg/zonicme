@@ -74,13 +74,19 @@ button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
 }
 .drop-menu a:hover{background:#eef8f5;color:var(--accent)}
 
-/* —— Full-bleed hero (lifestyle + tech weave) —— */
+/* —— Half-viewport hero (cover image, no stretch; copy top-left) —— */
 .hero{
-  min-height:100vh;display:flex;align-items:center;justify-content:center;
-  text-align:center;color:#fff;position:relative;padding:100px 24px 80px;overflow:hidden;
-  background:
-    linear-gradient(180deg,rgba(8,14,16,.14) 0%,rgba(12,22,20,.04) 45%,rgba(10,16,14,.22) 100%),
-    url("./assets/zonicme-city-hero.png") center/cover no-repeat;
+  height:50vh;min-height:280px;max-height:50vh;
+  display:flex;align-items:flex-start;justify-content:flex-start;
+  text-align:left;color:#fff;position:relative;
+  padding:88px 24px 28px;overflow:hidden;
+  background-color:#0c1614;
+  background-image:
+    linear-gradient(180deg,rgba(8,14,16,.28) 0%,rgba(12,22,20,.12) 42%,rgba(10,16,14,.36) 100%),
+    url("./assets/zonicme-city-hero.png");
+  background-repeat:no-repeat;
+  background-position:center center;
+  background-size:cover; /* cover crops; never stretch/distort */
 }
 .hero::before{
   content:"";position:absolute;inset:0;pointer-events:none;opacity:.12;
@@ -91,15 +97,18 @@ button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
 .hero::after{
   content:none;
 }
-.hero-inner{max-width:780px;position:relative;z-index:1}
+.hero-inner{
+  max-width:640px;width:100%;position:relative;z-index:1;
+  margin:0;align-self:flex-start;
+}
 .hero h1{
-  font-family:var(--display);font-weight:800;font-size:clamp(2rem,5.5vw,3.4rem);
-  letter-spacing:.06em;text-transform:uppercase;line-height:1.15;margin-bottom:18px;
+  font-family:var(--display);font-weight:800;font-size:clamp(1.55rem,4.2vw,2.55rem);
+  letter-spacing:.06em;text-transform:uppercase;line-height:1.15;margin-bottom:14px;
   text-shadow:0 2px 18px rgba(0,0,0,.55), 0 1px 2px rgba(0,0,0,.4);
 }
 .hero p{
-  font-size:clamp(1rem,2.2vw,1.2rem);line-height:1.65;opacity:.98;
-  max-width:36em;margin:0 auto 28px;font-weight:400;
+  font-size:clamp(.95rem,1.8vw,1.1rem);line-height:1.6;opacity:.98;
+  max-width:34em;margin:0 0 22px;font-weight:400;
   text-shadow:0 2px 12px rgba(0,0,0,.5);
 }
 .btn-cta{
@@ -216,7 +225,24 @@ button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
   font-family:var(--display);font-size:clamp(1.35rem,2.5vw,1.75rem);
   font-weight:800;letter-spacing:.02em;line-height:1.2;
 }
-.detail-copy{color:var(--muted);line-height:1.7;font-size:15px;flex:1}
+.detail-copy{color:var(--muted);line-height:1.7;font-size:15px}
+.detail-features-title{
+  font-family:var(--display);font-size:11px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:2px;
+}
+.detail-features{
+  list-style:none;margin:0;padding:0;
+  display:grid;gap:8px;
+}
+.detail-features li{
+  position:relative;padding-left:18px;
+  font-size:14px;line-height:1.45;color:var(--ink);
+}
+.detail-features li::before{
+  content:"";position:absolute;left:0;top:.55em;
+  width:7px;height:7px;border-radius:50%;
+  background:var(--detail-accent, var(--accent));
+}
 .detail-meta{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:8px}
 .detail-url{
   display:inline-flex;align-items:center;gap:6px;
@@ -362,7 +388,8 @@ footer a:hover{color:var(--teal-bright)}
 @media(max-width:560px){
   .metrics{grid-template-columns:1fr}
   .nav > a,.nav > .drop > button{padding:8px 8px;font-size:11px}
-  .hero{min-height:92vh}
+  .hero{height:50vh;min-height:260px;max-height:50vh;padding:76px 18px 20px}
+  .hero h1{font-size:clamp(1.35rem,6vw,1.85rem)}
   .deck-card{grid-template-columns:76px minmax(0,1fr);min-height:80px}
 }
 </style>
@@ -560,10 +587,16 @@ function renderDetail(app) {
   }
   pane.style.setProperty("--detail-accent", app.color || "var(--accent)");
   const copy = app.detail || app.summary || "";
+  const features = Array.isArray(app.features) ? app.features.filter(Boolean) : [];
+  const featureList = features.length
+    ? `<div class="detail-features-title">Key features</div>
+       <ul class="detail-features">${features.map((f) => `<li>${esc(f)}</li>`).join("")}</ul>`
+    : "";
   pane.innerHTML = `
     <div class="detail-kicker">Application</div>
     <h3>${esc(app.name)}</h3>
     <p class="detail-copy">${esc(copy)}</p>
+    ${featureList}
     <div class="detail-meta">
       ${app.url
         ? `<a class="detail-url" href="${esc(app.url)}" target="_blank" rel="noopener">${esc(app.url)}</a>`
@@ -696,14 +729,22 @@ async function boot() {
   if (CONFIG.mission) document.getElementById("missionText").textContent = CONFIG.mission;
 
   const demo = {
-    myyanga: { activeUsers7d: 12840, sessions24h: 3120, events: 412000 },
-    myafriart: { activeUsers7d: 6200, sessions24h: 980, events: 228000 },
-    rubba: { activeUsers7d: 4100, sessions24h: 720, events: 142000 },
-    adspot: { activeUsers7d: 24100, sessions24h: 9800, events: 910000 },
-    owanbex: { activeUsers7d: 3200, sessions24h: 640, events: 98000 },
+    myyanga: { activeUsers7d: 14820, sessions24h: 3640, events: 486000 },
+    myafriart: { activeUsers7d: 7340, sessions24h: 1180, events: 268000 },
+    rubba: { activeUsers7d: 5120, sessions24h: 890, events: 176000 },
+    adspot: { activeUsers7d: 26800, sessions24h: 11240, events: 1040000 },
+    owanbex: { activeUsers7d: 4180, sessions24h: 780, events: 124000 },
   };
+  const fallbackById = Object.fromEntries(
+    (ZonicMeAppsStore.FALLBACK?.apps || []).map((a) => [a.id, a])
+  );
   const apps = CONFIG.apps || [];
-  apps.forEach((a) => { a._demo = demo[a.id]; });
+  apps.forEach((a) => {
+    a._demo = demo[a.id];
+    if (!Array.isArray(a.features) || !a.features.length) {
+      a.features = fallbackById[a.id]?.features || [];
+    }
+  });
 
   renderNavApps(apps);
   renderDeck(apps);

@@ -1,17 +1,20 @@
 {
   "appId": "myyanga",
   "name": "MyYanga",
-  "version": "1.0",
+  "version": "1.1",
   "tagline": "African fashion discovery, Virtual Wear, Runway",
   "description": "Curated African fashion — Virtual Wear, Runway, and designer discovery.",
   "url": "https://myyangax.netlify.app",
-  "updatedAt": "2026-08-23T00:00:00.000Z",
+  "updatedAt": "2026-08-29T12:00:00.000Z",
   "metrics": {
-    "activeUsers7d": 12840,
-    "sessions24h": 3120,
-    "virtualWearRenders": 890,
-    "runwayViews": 2140,
-    "events": 412000
+    "activeUsers7d": 14820,
+    "returningUsers7d": 9240,
+    "sessions24h": 3640,
+    "avgSessionSec": 312,
+    "virtualWearRenders": 1240,
+    "runwayViews": 2860,
+    "wishlistAdds": 4180,
+    "events": 486000
   },
   "mock": true,
   "demographics": {
@@ -35,10 +38,15 @@
       { "label": "Other", "pct": 12 }
     ]
   },
+  "series7d": {
+    "activeUsers": [11800, 12140, 12620, 13200, 13880, 14320, 14820],
+    "sessions": [2800, 2920, 3100, 3280, 3410, 3520, 3640]
+  },
   "featured": [
     { "title": "Virtual Wear studio", "location": "MyYangaX" },
     { "title": "Designer Runway drops", "location": "MyYangaX" },
-    { "title": "Lookbook filters", "location": "MyYangaX" }
+    { "title": "Lookbook filters", "location": "MyYangaX" },
+    { "title": "Creator storefronts", "location": "MyYangaX" }
   ],
   "ingestHint": {
     "push": "POST ${ZONICME_INGEST_URL} with X-Zonic-Api-Key",

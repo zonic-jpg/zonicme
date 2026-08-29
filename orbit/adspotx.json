@@ -1,17 +1,20 @@
 {
   "appId": "adspot",
   "name": "AdSpot",
-  "version": "1.0",
+  "version": "1.1",
   "tagline": "Media & partner ad network",
   "description": "Rewarded attention network for brands and audiences across Africa.",
   "url": "https://adspotx.netlify.app",
-  "updatedAt": "2026-08-23T00:00:00.000Z",
+  "updatedAt": "2026-08-29T12:00:00.000Z",
   "metrics": {
-    "activeUsers7d": 24100,
-    "sessions24h": 9800,
-    "adWatches": 910000,
-    "partnerCampaigns": 86,
-    "events": 910000
+    "activeUsers7d": 26800,
+    "returningUsers7d": 18420,
+    "sessions24h": 11240,
+    "avgSessionSec": 186,
+    "adWatches": 1040000,
+    "partnerCampaigns": 94,
+    "completionRatePct": 71,
+    "events": 1040000
   },
   "mock": true,
   "demographics": {
@@ -35,10 +38,15 @@
       { "label": "Other", "pct": 8 }
     ]
   },
+  "series7d": {
+    "activeUsers": [22100, 22940, 23800, 24620, 25480, 26120, 26800],
+    "sessions": [9200, 9580, 9920, 10340, 10680, 10960, 11240]
+  },
   "featured": [
     { "title": "Partner network campaigns", "location": "AdSpotX" },
     { "title": "Rewarded ad reviews", "location": "AdSpotX" },
-    { "title": "Brand analytics", "location": "AdSpotX" }
+    { "title": "Brand analytics", "location": "AdSpotX" },
+    { "title": "Weekly payouts", "location": "AdSpotX" }
   ],
   "ingestHint": {
     "push": "POST ${ZONICME_INGEST_URL} with X-Zonic-Api-Key",

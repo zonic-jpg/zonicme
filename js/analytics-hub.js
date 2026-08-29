@@ -6,10 +6,11 @@
   const MOCK_DISABLED_KEY = "zonicme_mock_disabled_v1";
 
   const DEMO_METRICS = {
-    myyanga: { activeUsers7d: 12840, sessions24h: 3120, events: 412000 },
-    myafriart: { activeUsers7d: 6200, sessions24h: 980, events: 228000 },
-    rubba: { activeUsers7d: 4100, sessions24h: 720, events: 142000 },
-    adspot: { activeUsers7d: 24100, sessions24h: 9800, events: 910000 },
+    myyanga: { activeUsers7d: 14820, sessions24h: 3640, events: 486000 },
+    myafriart: { activeUsers7d: 7340, sessions24h: 1180, events: 268000 },
+    rubba: { activeUsers7d: 5120, sessions24h: 890, events: 176000 },
+    adspot: { activeUsers7d: 26800, sessions24h: 11240, events: 1040000 },
+    owanbex: { activeUsers7d: 4180, sessions24h: 780, events: 124000 },
   };
 
   const DEMO_DEMOGRAPHICS = {
@@ -28,11 +29,12 @@
       { label: "45+", pct: 12 },
     ],
     interests: [
-      { label: "Fashion & style", pct: 34 },
-      { label: "Art & culture", pct: 22 },
-      { label: "Media & ads", pct: 18 },
+      { label: "Fashion & style", pct: 30 },
+      { label: "Art & culture", pct: 18 },
+      { label: "Media & ads", pct: 16 },
       { label: "Life planning", pct: 14 },
-      { label: "Other", pct: 12 },
+      { label: "Celebrations", pct: 12 },
+      { label: "Other", pct: 10 },
     ],
   };
 

@@ -1,17 +1,20 @@
 {
   "appId": "rubba",
   "name": "Rubba",
-  "version": "1.0",
+  "version": "1.1",
   "tagline": "AI life-planning",
   "description": "Goals, savings and milestones — Genie-assisted life planning for African cities.",
-  "url": "https://rubba.app",
-  "updatedAt": "2026-08-23T00:00:00.000Z",
+  "url": "https://rubba.netlify.app",
+  "updatedAt": "2026-08-29T12:00:00.000Z",
   "metrics": {
-    "activeUsers7d": 4100,
-    "sessions24h": 720,
-    "plansCreated": 9800,
-    "aiCalls": 3100,
-    "events": 142000
+    "activeUsers7d": 5120,
+    "returningUsers7d": 3380,
+    "sessions24h": 890,
+    "avgSessionSec": 540,
+    "plansCreated": 11240,
+    "aiCalls": 4860,
+    "milestonesHit": 2740,
+    "events": 176000
   },
   "mock": true,
   "demographics": {
@@ -35,8 +38,18 @@
       { "label": "Other", "pct": 10 }
     ]
   },
+  "series7d": {
+    "activeUsers": [4200, 4380, 4560, 4720, 4880, 5010, 5120],
+    "sessions": [700, 740, 780, 810, 840, 870, 890]
+  },
   "featured": [
     { "title": "Wish → plan with Genie", "location": "Rubba" },
-    { "title": "City-aware cost goals", "location": "Rubba" }
-  ]
+    { "title": "City-aware cost goals", "location": "Rubba" },
+    { "title": "Savings milestones", "location": "Rubba" },
+    { "title": "Check-in reminders", "location": "Rubba" }
+  ],
+  "ingestHint": {
+    "push": "POST ${ZONICME_INGEST_URL} with X-Zonic-Api-Key",
+    "contract": "zonic-hub-ingest records[]"
+  }
 }

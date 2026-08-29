@@ -11,6 +11,14 @@
       "name": "MyYanga",
       "summary": "African fashion discovery, Virtual Wear, and Runway.\nCreators and shoppers meet in one orbit.",
       "detail": "MyYanga is ZonicMe’s fashion platform — browse looks, try Virtual Wear, and follow Runway drops from African designers and the diaspora. Discovery meets commerce so creators earn and audiences find style that feels like home.",
+      "features": [
+        "Virtual Wear studio — try looks on your photo without leaving discovery",
+        "Designer Runway drops with lookbooks, fabric filters and save-to-wishlist",
+        "Separate Studio, Runway and Virtual Wear flows so each job stays clear",
+        "Creator storefronts with WhatsApp-ready ordering for shoppers",
+        "Style reels and curated African fashion collections for diaspora + home",
+        "Orbit-ready analytics spans for renders, runway views and sessions"
+      ],
       "url": "https://myyangax.netlify.app",
       "thumbnail": "./assets/thumb-myyanga.jpg",
       "orbit": "./orbit/myyangax.json",
@@ -22,6 +30,14 @@
       "name": "MyAfriArt",
       "summary": "African art marketplace — discover, stage, collect.\nGalleries and collectors in one place.",
       "detail": "MyAfriArt connects artists, galleries, and collectors across Africa and the diaspora. Discover original work, stage digital exhibitions, and collect with confidence — a marketplace built for the continent’s creative voice.",
+      "features": [
+        "Artist and gallery storefronts with provenance-ready listings",
+        "AI room / wall staging so collectors preview art in a real space",
+        "Curated collections and digital exhibition staging for galleries",
+        "Multi-currency checkout paths tuned for Africa and diaspora buyers",
+        "Collector wishlists, shortlists and enquiry flows",
+        "Marketplace metrics for pieces listed, stagings and active collectors"
+      ],
       "url": "https://myafriartx.netlify.app",
       "thumbnail": "./assets/thumb-afriart.jpg",
       "orbit": "./orbit/myafriart.json",
@@ -33,6 +49,14 @@
       "name": "Rubba",
       "summary": "Life-planning for goals, savings, milestones.\nTurn ambition into a clear next step.",
       "detail": "Rubba helps people plan life with clarity — goals, savings targets, and milestones in one calm workspace. Built for everyday Africans who want structure without complexity, and progress they can see.",
+      "features": [
+        "Goal categories with milestones you can track week by week",
+        "Savings targets with progress bars and check-in reminders",
+        "City-aware cost planning for African metros and diaspora moves",
+        "Genie-assisted plans — turn a wish into a concrete next step",
+        "Personal insights dashboard without overwhelming finance jargon",
+        "Orbit metrics for plans created, AI assists and returning planners"
+      ],
       "url": "https://rubba.netlify.app",
       "thumbnail": "./assets/thumb-rubba.jpg",
       "orbit": "./orbit/rubba.json",
@@ -44,6 +68,14 @@
       "name": "AdSpot",
       "summary": "Media & partner ads with rewarded attention.\nBrands reach real people, audiences earn.",
       "detail": "AdSpot is the orbit’s media and partner network. Rewarded attention means brands reach consented audiences while users earn value — transparent, fair, and tuned for African markets and diaspora reach.",
+      "features": [
+        "Rewarded video / ad feed with quizzes for engaged attention",
+        "XP, leaderboards and weekly payouts for consented viewers",
+        "Partner brand campaigns with transparent performance analytics",
+        "Consent-first audience reach across African markets and diaspora",
+        "Brand dashboards for watches, completion and campaign health",
+        "Orbit ingest for ad watches, partner campaigns and session volume"
+      ],
       "url": "https://adspotx.netlify.app",
       "thumbnail": "./assets/thumb-adspot.jpg",
       "orbit": "./orbit/adspotx.json",
@@ -55,6 +87,14 @@
       "name": "OwanbeX",
       "summary": "Plan Nigerian celebrations end-to-end.\nVendors, budgets, aso ebi, guest lists.",
       "detail": "OwanbeX helps families and brands plan weddings, birthdays, and milestone events across Nigeria — vetted vendors, live Naira budgets, aso ebi coordination, and brand analytics in one planner.",
+      "features": [
+        "End-to-end event builder for weddings, birthdays and milestones",
+        "Vetted vendor directory with shortlists and comparison notes",
+        "Live Naira budgets that stay visible as plans change",
+        "Aso ebi coordination for fabrics, colours and group orders",
+        "Guest lists, RSVPs and day-of planning checklists",
+        "Brand / sponsorship analytics for celebration partners"
+      ],
       "url": "https://owanbex.netlify.app",
       "thumbnail": "./assets/thumb-owanbe.jpg",
       "orbit": "./orbit/owanbex.json",

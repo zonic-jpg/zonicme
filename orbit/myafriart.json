@@ -1,17 +1,20 @@
 {
   "appId": "myafriart",
   "name": "MyAfriArt",
-  "version": "1.0",
+  "version": "1.1",
   "tagline": "African art marketplace / creative",
   "description": "Discover and collect African art with AI room staging.",
   "url": "https://myafriartx.netlify.app",
-  "updatedAt": "2026-08-23T00:00:00.000Z",
+  "updatedAt": "2026-08-29T12:00:00.000Z",
   "metrics": {
-    "activeUsers7d": 6200,
-    "sessions24h": 980,
-    "piecesListed": 1840,
-    "roomStagings": 15200,
-    "events": 228000
+    "activeUsers7d": 7340,
+    "returningUsers7d": 4120,
+    "sessions24h": 1180,
+    "avgSessionSec": 428,
+    "piecesListed": 2140,
+    "roomStagings": 18640,
+    "collectorEnquiries": 960,
+    "events": 268000
   },
   "mock": true,
   "demographics": {
@@ -35,8 +38,18 @@
       { "label": "Other", "pct": 10 }
     ]
   },
+  "series7d": {
+    "activeUsers": [6100, 6340, 6580, 6820, 7010, 7180, 7340],
+    "sessions": [920, 960, 1010, 1060, 1100, 1140, 1180]
+  },
   "featured": [
     { "title": "Artist storefronts", "location": "MyAfriArt" },
-    { "title": "AI wall staging", "location": "MyAfriArt" }
-  ]
+    { "title": "AI wall staging", "location": "MyAfriArt" },
+    { "title": "Curated collections", "location": "MyAfriArt" },
+    { "title": "Collector enquiries", "location": "MyAfriArt" }
+  ],
+  "ingestHint": {
+    "push": "POST ${ZONICME_INGEST_URL} with X-Zonic-Api-Key",
+    "contract": "zonic-hub-ingest records[]"
+  }
 }
