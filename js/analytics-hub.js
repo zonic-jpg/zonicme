@@ -4,6 +4,10 @@
  */
 (function (global) {
   const MOCK_DISABLED_KEY = "zonicme_mock_disabled_v1";
+  const ORBIT_CACHE_KEY = "zonicme_orbit_lastgood_v1";
+  const ORBIT_TIMEOUT_MS = 4500;
+  /** Child apps publish at different paths; try each before giving up. */
+  const MANIFEST_PATHS = ["/orbit-manifest.json", "/orbit/manifest.json"];
 
   const DEMO_METRICS = {
     myyanga: { activeUsers7d: 14820, sessions24h: 3640, events: 486000 },
@@ -76,13 +80,191 @@
     return DEMO_METRICS[appId] || null;
   }
 
+  /** Last-known-good orbit feeds survive a child app going offline. */
+  function readLastGood() {
+    try {
+      const raw = localStorage.getItem(ORBIT_CACHE_KEY);
+      const parsed = raw ? JSON.parse(raw) : null;
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function writeLastGood(map) {
+    try {
+      localStorage.setItem(ORBIT_CACHE_KEY, JSON.stringify(map));
+    } catch (_) {}
+  }
+
+  function rememberLastGood(appId, feed, url) {
+    if (!appId || !feed?.metrics) return;
+    const map = readLastGood();
+    map[appId] = { feed, url, savedAt: Date.now() };
+    writeLastGood(map);
+  }
+
+  function clearLastGood() {
+    try {
+      localStorage.removeItem(ORBIT_CACHE_KEY);
+    } catch (_) {}
+  }
+
+  /** Fetch JSON with a hard timeout so one slow app can never stall the hub. */
+  async function fetchJson(url, timeoutMs = ORBIT_TIMEOUT_MS) {
+    if (!url) return null;
+    const ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
+    const timer = ctl ? setTimeout(() => ctl.abort(), timeoutMs) : null;
+    try {
+      const res = await fetch(url, {
+        mode: "cors",
+        cache: "no-store",
+        signal: ctl ? ctl.signal : undefined,
+      });
+      if (!res.ok) return null;
+      const json = await res.json();
+      return json && typeof json === "object" ? json : null;
+    } catch (_) {
+      return null;
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  }
+
+  /**
+   * Candidate live manifest URLs for an app: the configured one first, then the
+   * conventional paths derived from the app's own origin.
+   */
+  function manifestCandidates(app, lastGood) {
+    const urls = [];
+    // A URL that worked before is the most likely to work again.
+    const proven = lastGood?.[app?.id]?.url;
+    if (proven) urls.push(proven);
+    if (app?.orbitLive) urls.push(app.orbitLive);
+    if (app?.url) {
+      try {
+        const origin = new URL(app.url).origin;
+        MANIFEST_PATHS.forEach((p) => urls.push(origin + p));
+      } catch (_) {}
+    }
+    return [...new Set(urls)];
+  }
+
+  function hasMetrics(feed) {
+    return !!feed?.metrics && Object.keys(feed.metrics).length > 0;
+  }
+
+  /**
+   * Resolve one app's orbit feed through the full fallback chain:
+   * live manifest -> local fixture -> last-known-good -> mock seed.
+   * Always resolves; never throws.
+   */
+  async function resolveAppOrbit(app, options = {}) {
+    const timeoutMs = options.timeoutMs || ORBIT_TIMEOUT_MS;
+    const lastGood = options.lastGood || readLastGood();
+    const mockOff = isMockDisabled();
+
+    for (const url of manifestCandidates(app, lastGood)) {
+      const feed = await fetchJson(url, timeoutMs);
+      if (hasMetrics(feed)) {
+        const entry = { ...feed, _source: "live", _url: url, mock: !!feed.mock };
+        if (!feed.mock) rememberLastGood(app.id, feed, url);
+        return entry;
+      }
+    }
+
+    const local = await fetchJson(app?.orbit, timeoutMs);
+    if (hasMetrics(local)) {
+      return { ...local, _source: "local", _url: app.orbit, mock: !!local.mock };
+    }
+
+    const saved = lastGood[app?.id]?.feed;
+    if (hasMetrics(saved)) {
+      return {
+        ...saved,
+        _source: "last-good",
+        _savedAt: lastGood[app.id].savedAt,
+        mock: !!saved.mock,
+      };
+    }
+
+    const seed = app?._demo || DEMO_METRICS[app?.id];
+    if (seed && !mockOff) {
+      return { metrics: seed, demo: true, mock: true, _source: "mock-seed" };
+    }
+    return null;
+  }
+
+  /**
+   * Populate `cache` (keyed by app id) for every app in parallel.
+   * Returns the same cache object so callers can render immediately after.
+   */
+  async function ingestOrbit(apps, cache = {}, options = {}) {
+    await Promise.all(
+      (apps || []).map(async (app) => {
+        if (!app?.id) return;
+        const entry = await resolveAppOrbit(app, options);
+        if (entry) {
+          cache[app.id] = entry;
+          try {
+            global.ZonicTrack?.span?.("orbit_ingest", {
+              app: app.id,
+              source: entry._source,
+              mock: !!entry.mock,
+            });
+          } catch (_) {}
+        }
+      })
+    );
+    return cache;
+  }
+
+  /** Seed the cache so charts are never empty on first paint (last-good, then mock). */
+  function seedCache(apps, cache = {}) {
+    const lastGood = readLastGood();
+    (apps || []).forEach((app) => {
+      if (!app?.id || cache[app.id]) return;
+      const saved = lastGood[app.id]?.feed;
+      if (hasMetrics(saved)) {
+        cache[app.id] = {
+          ...saved,
+          _source: "last-good",
+          _savedAt: lastGood[app.id].savedAt,
+          mock: !!saved.mock,
+        };
+        return;
+      }
+      if (isMockDisabled()) return;
+      const seed = app._demo || DEMO_METRICS[app.id];
+      if (seed) {
+        cache[app.id] = {
+          metrics: seed,
+          demographics: structuredClone(DEMO_DEMOGRAPHICS),
+          demo: true,
+          mock: true,
+          _source: "mock-seed",
+        };
+      }
+    });
+    return cache;
+  }
+
   function mergeDemographics(feeds) {
-    const buckets = { regions: {}, ageBands: {}, interests: {} };
-    let count = 0;
+    const live = [];
+    const mockOnly = [];
     (feeds || []).forEach((f) => {
       const d = f?.demographics;
-      if (!d || d.mock) return;
-      count++;
+      if (!d) return;
+      if (d.mock) mockOnly.push(d);
+      else live.push(d);
+    });
+    // Prefer live demographics; otherwise average the orbit mock fixtures
+    // so Analytics still reflects the richer per-app seed data.
+    const use = live.length ? live : mockOnly;
+    if (!use.length) return structuredClone(DEMO_DEMOGRAPHICS);
+
+    const buckets = { regions: {}, ageBands: {}, interests: {} };
+    use.forEach((d) => {
       ["regions", "ageBands", "interests"].forEach((key) => {
         (d[key] || []).forEach((row) => {
           if (!row?.label) return;
@@ -90,7 +272,7 @@
         });
       });
     });
-    if (!count) return structuredClone(DEMO_DEMOGRAPHICS);
+    const count = use.length;
     function normalize(map) {
       const entries = Object.entries(map).map(([label, sum]) => ({
         label,
@@ -100,7 +282,7 @@
       return entries;
     }
     return {
-      mock: false,
+      mock: !live.length,
       regions: normalize(buckets.regions),
       ageBands: normalize(buckets.ageBands),
       interests: normalize(buckets.interests),
@@ -118,12 +300,9 @@
       let source = "none";
       let mock = false;
 
-      if (cached && !cached.demo) {
-        source = cached._source || "orbit";
-        mock = !!cached.mock;
-      } else if (cached?.demo) {
-        source = "mock-fallback";
-        mock = true;
+      if (cached?.metrics) {
+        source = cached._source || (cached.demo ? "mock-seed" : "orbit");
+        mock = !!cached.mock || !!cached.demo;
         metrics = cached.metrics;
       } else if (!mockOff && a._demo) {
         source = "mock-seed";
@@ -140,6 +319,26 @@
         mock,
       };
     });
+  }
+
+  /** Short status word for a row, used by the ingest pills. */
+  function sourceLabel(row) {
+    if (!row) return "no data";
+    switch (row.source) {
+      case "live":
+        return row.mock ? "live (mock feed)" : "live orbit";
+      case "local":
+        return row.mock ? "mock fixture" : "local manifest";
+      case "last-good":
+        return "cached orbit";
+      case "mock-seed":
+      case "mock-fallback":
+        return "mock seed";
+      case "none":
+        return "no data";
+      default:
+        return row.mock ? "mock" : "orbit ok";
+    }
   }
 
   function aggregateTotals(rows) {
@@ -227,6 +426,8 @@
 
   global.ZonicAnalyticsHub = {
     MOCK_DISABLED_KEY,
+    ORBIT_CACHE_KEY,
+    ORBIT_TIMEOUT_MS,
     DEMO_METRICS,
     DEMO_DEMOGRAPHICS,
     fmt,
@@ -236,7 +437,15 @@
     enableMockSeed,
     getDemoMetrics,
     mergeDemographics,
+    fetchJson,
+    manifestCandidates,
+    resolveAppOrbit,
+    ingestOrbit,
+    seedCache,
+    readLastGood,
+    clearLastGood,
     buildOrbitRows,
+    sourceLabel,
     aggregateTotals,
     barChartHtml,
     appCompareChart,

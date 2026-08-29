@@ -42,3 +42,22 @@
   force = true
 
 # No /* to index.html catch-all - it breaks /js/*.js and /config/*.json on the static hub.
+
+# Orbit feeds are read cross-origin by sibling Zonic apps, so they need CORS.
+# Child apps must mirror this block for their own /orbit-manifest.json.
+[[headers]]
+  for = "/orbit/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Cache-Control = "public, max-age=60, must-revalidate"
+
+[[headers]]
+  for = "/orbit-manifest.json"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Cache-Control = "public, max-age=60, must-revalidate"
+
+[[headers]]
+  for = "/config/apps.json"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"

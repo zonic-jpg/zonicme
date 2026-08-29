@@ -229,39 +229,19 @@ let state = null;
 let googleCleanup = null;
 const adminOrbitCache = {};
 
-async function fetchOrbitAdmin(url) {
-  if (!url) return null;
-  try {
-    const res = await fetch(url, { mode: "cors", cache: "no-store" });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (_) {
-    return null;
-  }
-}
-
 async function ingestOrbitAdmin(apps) {
-  const demo = ZonicAnalyticsHub.DEMO_METRICS;
-  await Promise.all(
-    apps.map(async (a) => {
-      let feed = await fetchOrbitAdmin(a.orbitLive);
-      let source = "live";
-      if (!feed) {
-        feed = await fetchOrbitAdmin(a.orbit);
-        source = "local";
-      }
-      if (feed) {
-        adminOrbitCache[a.id] = { ...feed, _source: source, mock: !!feed.mock };
-      } else if (demo[a.id] && !ZonicAnalyticsHub.isMockDisabled()) {
-        adminOrbitCache[a.id] = { metrics: demo[a.id], demo: true, mock: true, _source: "mock-seed" };
-      }
-    })
-  );
+  try {
+    await ZonicAnalyticsHub.ingestOrbit(apps, adminOrbitCache);
+  } catch (err) {
+    console.warn("[ZonicMe admin orbit] ingest degraded", err);
+  }
+  return adminOrbitCache;
 }
 
 async function renderAdminAnalytics() {
   if (!state?.apps) return;
   const H = ZonicAnalyticsHub;
+  H.seedCache(state.apps, adminOrbitCache);
   await ingestOrbitAdmin(state.apps);
   const rows = H.buildOrbitRows(state.apps, adminOrbitCache);
   const totals = H.aggregateTotals(rows);
@@ -285,7 +265,7 @@ async function renderAdminAnalytics() {
   const pills = [`<span class="pill ${ready ? "ok" : "warn"}">ingest: ${ready ? "configured" : "fail-open"}</span>`];
   if (totals.mockCount) pills.push(`<span class="pill warn">${totals.mockCount} mock app(s)</span>`);
   rows.forEach((r) => {
-    pills.push(`<span class="pill ${r.mock ? "warn" : "ok"}">${esc(r.name)}: ${r.mock ? "mock" : "live"}</span>`);
+    pills.push(`<span class="pill ${r.mock ? "warn" : "ok"}">${esc(r.name)}: ${esc(H.sourceLabel(r))}</span>`);
   });
   document.getElementById("adminIngestPills").innerHTML = pills.join("");
 }

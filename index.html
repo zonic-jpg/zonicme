@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ZonicMe — empower Africans through the creative economy</title>
-<!-- deploy:2026-08-29-hero50-features -->
+<!-- deploy:2026-08-29-orbit-mocks-qa -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
@@ -38,6 +38,7 @@ body::before{
 }
 a{color:inherit;text-decoration:none}
 button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
+.hidden{display:none !important}
 .page > *{position:relative;z-index:1}
 
 /* —— Header (REGNA-style over hero) —— */
@@ -80,7 +81,7 @@ button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
   height:50vh;min-height:280px;max-height:50vh;
   display:flex;align-items:flex-start;justify-content:flex-start;
   text-align:left;color:#fff;position:relative;
-  padding:88px 24px 28px;overflow:hidden;
+  padding:84px 24px 24px;overflow:hidden;
   background-color:#0c1614;
   background-image:
     linear-gradient(180deg,rgba(8,14,16,.28) 0%,rgba(12,22,20,.12) 42%,rgba(10,16,14,.36) 100%),
@@ -99,17 +100,17 @@ button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
   content:none;
 }
 .hero-inner{
-  max-width:640px;width:100%;position:relative;z-index:1;
+  max-width:720px;width:100%;position:relative;z-index:1;
   margin:0;align-self:flex-start;
 }
 .hero h1{
-  font-family:var(--display);font-weight:800;font-size:clamp(1.55rem,4.2vw,2.55rem);
-  letter-spacing:.06em;text-transform:uppercase;line-height:1.15;margin-bottom:14px;
+  font-family:var(--display);font-weight:800;font-size:clamp(1.5rem,3.6vw,2.4rem);
+  letter-spacing:.05em;text-transform:uppercase;line-height:1.14;margin-bottom:10px;
   text-shadow:0 2px 18px rgba(0,0,0,.55), 0 1px 2px rgba(0,0,0,.4);
 }
 .hero p{
-  font-size:clamp(.95rem,1.8vw,1.1rem);line-height:1.6;opacity:.98;
-  max-width:34em;margin:0 0 22px;font-weight:400;
+  font-size:clamp(.92rem,1.55vw,1.05rem);line-height:1.55;opacity:.98;
+  max-width:46em;margin:0 0 16px;font-weight:400;
   text-shadow:0 2px 12px rgba(0,0,0,.5);
 }
 .btn-cta{
@@ -695,33 +696,18 @@ function renderAnalytics(apps) {
   const pills = [`<span class="pill ${ready ? "ok" : "warn"}">ingest: ${ready ? "URL set" : "fail-open (local spans)"}</span>`];
   rows.forEach((r) => {
     const cls = r.mock ? "warn" : r.metrics?.activeUsers7d ? "ok" : "warn";
-    const tag = r.mock ? "mock" : r.source === "none" ? "no data" : "orbit ok";
-    pills.push(`<span class="pill ${cls}">${esc(r.name)}: ${tag}</span>`);
+    pills.push(`<span class="pill ${cls}">${esc(r.name)}: ${esc(H.sourceLabel(r))}</span>`);
   });
   document.getElementById("ingestStatus").innerHTML = pills.join("");
 }
 
-async function fetchOrbit(url) {
-  if (!url) return null;
-  try {
-    const res = await fetch(url, { mode: "cors", cache: "no-store" });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (_) { return null; }
-}
-
 async function ingestOrbit(apps) {
-  await Promise.all(apps.map(async (a) => {
-    let feed = await fetchOrbit(a.orbitLive);
-    let source = "live";
-    if (!feed) { feed = await fetchOrbit(a.orbit); source = "local"; }
-    if (feed) {
-      orbitCache[a.id] = { ...feed, _source: source, mock: !!feed.mock };
-      ZonicTrack.span("orbit_ingest", { app: a.id, source, metrics: feed.metrics || {} });
-    } else if (a._demo && !ZonicAnalyticsHub.isMockDisabled()) {
-      orbitCache[a.id] = { metrics: a._demo, demo: true, mock: true, _source: "mock-seed" };
-    }
-  }));
+  try {
+    await ZonicAnalyticsHub.ingestOrbit(apps, orbitCache);
+  } catch (err) {
+    console.warn("[ZonicMe orbit] ingest degraded, keeping seeded metrics", err);
+  }
+  return orbitCache;
 }
 
 async function boot() {
@@ -749,9 +735,15 @@ async function boot() {
 
   renderNavApps(apps);
   renderDeck(apps);
-  await ingestOrbit(apps);
-  renderDeck(apps);
+
+  // Paint charts from the mock seed first so analytics is never blank,
+  // then upgrade in place once live/local manifests resolve.
+  ZonicAnalyticsHub.seedCache(apps, orbitCache);
   renderAnalytics(apps);
+
+  await ingestOrbit(apps);
+  renderAnalytics(apps);
+
   await ZonicTrack.flush();
   ZonicTrack.span("hub_boot", { apps: apps.length });
 }
@@ -766,11 +758,18 @@ document.addEventListener("click", () => {
   document.getElementById("appsDrop").classList.remove("open");
 });
 
-document.getElementById("refreshAnalytics").addEventListener("click", async () => {
-  if (!CONFIG) return;
-  await ingestOrbit(CONFIG.apps);
-  renderDeck(CONFIG.apps);
-  renderAnalytics(CONFIG.apps);
+document.getElementById("refreshAnalytics").addEventListener("click", async (e) => {
+  if (!CONFIG?.apps?.length) return;
+  const btn = e.currentTarget;
+  btn.disabled = true;
+  btn.textContent = "Refreshing…";
+  try {
+    await ingestOrbit(CONFIG.apps);
+    renderAnalytics(CONFIG.apps);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Refresh";
+  }
 });
 
 window.addEventListener("scroll", () => {
@@ -782,8 +781,11 @@ boot().catch((err) => {
   const apps = (window.ZonicMeAppsStore?.FALLBACK?.apps) || [];
   if (apps.length) {
     CONFIG = { apps, mission: document.getElementById("missionText")?.textContent || "" };
+    apps.forEach((a) => { a._demo = ZonicAnalyticsHub.getDemoMetrics(a.id); });
     renderNavApps(apps);
     renderDeck(apps);
+    ZonicAnalyticsHub.seedCache(apps, orbitCache);
+    renderAnalytics(apps);
   } else {
     document.getElementById("appDetail").innerHTML =
       `<p class="detail-empty">Could not load applications. <a href="./config/apps.json">Check config</a>.</p>`;
