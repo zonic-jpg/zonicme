@@ -117,7 +117,10 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
   <label for="loginEmail">Email / username</label>
   <input id="loginEmail" type="text" autocomplete="username" placeholder="you@example.com or any username" value="oadeagbo@gmail.com" />
   <label for="loginPass">Password</label>
-  <input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••" />
+  <div style="position:relative">
+    <input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••" style="padding-right:64px" />
+    <button type="button" id="togglePass" class="secondary" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);margin:0;padding:6px 10px;font-size:12px" aria-label="Show password">Show</button>
+  </div>
   <button type="button" id="loginBtn" style="width:100%;margin-top:4px">Sign in</button>
   <p class="hint" style="margin-top:14px">Admin passwords (<code>ADMINTESTER1</code>, <code>admin123</code>, <code>rubbaxadmin1</code>) require owner approval on first login. Owner: <code>oadeagbo@gmail.com</code></p>
   <p class="err" id="loginErr"></p>
@@ -500,6 +503,16 @@ document.getElementById("loginBtn").addEventListener("click", () => {
   }
   document.getElementById("loginErr").textContent = "";
   enterAdmin();
+});
+
+document.getElementById("togglePass")?.addEventListener("click", () => {
+  const input = document.getElementById("loginPass");
+  const btn = document.getElementById("togglePass");
+  if (!input || !btn) return;
+  const show = input.type === "password";
+  input.type = show ? "text" : "password";
+  btn.textContent = show ? "Hide" : "Show";
+  btn.setAttribute("aria-label", show ? "Hide password" : "Show password");
 });
 
 document.getElementById("loginPass").addEventListener("keydown", (e) => {
