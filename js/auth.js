@@ -4,8 +4,8 @@
  * Production: set window.ZONICME_GOOGLE_CLIENT_ID (or localStorage zonicme_google_client_id)
  * to your Google OAuth Web client ID. Soft-fails on invalid_origin like AdSpot.
  *
- * Owner: oadeagbo@gmail.com / password123  (owner + super_admin, grants roles)
- * Shared admin: ANY username + admin123 → full admin access to admin.html
+ * Owner signs in with their own account (roles come from the server).
+ * SECURITY (audit): the former shared-password admin gate has been removed.
  */
 (function (global) {
   const SESSION_KEY = "zonicme_admin_session_v1";
@@ -18,23 +18,13 @@
 
   const OWNER_EMAIL = "oadeagbo@gmail.com";
   const DEMO_PASSWORD = "password123";
-  /** Any username + this password → admin role (full apps/ingest on admin.html). */
-  const ADMIN_PASSWORD = "admin123";
-  const SHARED_ADMIN_PASSWORD = ADMIN_PASSWORD;
-  /** Additive uniform tester gate: ANY identity + this → super_admin (owner email → owner). */
-  const UNIFORM_ADMIN_PASSWORD = "ADMINTESTER1";
-  /**
-   * All shared passwords that unlock admin access for ANY username. Matching is
-   * case-insensitive (see isSharedAdminPassword). ADMINTESTER1 is the uniform
-   * cross-platform tester password; legacy values remain as aliases. All of these
-   * grant super_admin immediately so admin/studio/moderator powers unlock in-session.
-   */
-  const ADMIN_PASSWORDS = [ADMIN_PASSWORD, UNIFORM_ADMIN_PASSWORD, "rubbaxadmin1"];
-
-  function isSharedAdminPassword(password) {
-    const candidate = String(password ?? "").trim().toLowerCase();
-    return ADMIN_PASSWORDS.some((p) => p.toLowerCase() === candidate);
-  }
+  // SECURITY (audit): shared cross-platform admin passwords (admin123 / ADMINTESTER1
+  // / rubbaxadmin1) were hard-coded here and shipped in the browser — they unlocked
+  // super_admin for ANY username on the hub control plane. Removed. The shared-password
+  // branch below is now unreachable. NOTE: this client-side session remains NON-
+  // AUTHORITATIVE (its token is client-signed) — hub admin authority must move to
+  // ZonicMe's own Supabase login (orbit_roles), mirroring Rubba's simple login.
+  function isSharedAdminPassword() { return false; }
 
   const SEED_USERS = [
     {

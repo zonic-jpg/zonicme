@@ -5,14 +5,11 @@
 (function (global) {
   const OWNER_EMAIL = "oadeagbo@gmail.com";
   const APPROVAL_STORE_KEY = "zonic_admintester_approval_v1";
-  const ADMIN_PASSWORDS = ["admin123", "ADMINTESTER1", "rubbaxadmin1"];
   const AWAITING_MSG =
     "Awaiting approval — the owner must approve your admin access before you can sign in. You will be notified once approved.";
 
-  function isSharedAdminPassword(password) {
-    const candidate = String(password ?? "").trim().toLowerCase();
-    return ADMIN_PASSWORDS.some((p) => p.toLowerCase() === candidate);
-  }
+  // SECURITY (audit): shared admin passwords removed; no client password grants admin.
+  function isSharedAdminPassword() { return false; }
 
   function isOwnerEmail(email) {
     return String(email ?? "").trim().toLowerCase() === OWNER_EMAIL;

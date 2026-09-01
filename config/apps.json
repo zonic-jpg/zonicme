@@ -2,7 +2,7 @@
   "version": "1.0",
   "mission": "ZonicMe empowers Africans through the creative economy — building apps that turn fashion, art, media and everyday planning into real opportunity across the continent and diaspora.",
   "ingest": {
-    "ZONICME_INGEST_URL": "https://YOUR-SUPABASE-PROJECT.supabase.co/functions/v1/zonic-hub-ingest",
+    "ZONICME_INGEST_URL": "https://qdhlbplzdblcvvaaluwu.supabase.co/functions/v1/zonic-hub-ingest",
     "note": "Set window.ZONICME_INGEST_URL or localStorage zonicme_ingest_url to override."
   },
   "apps": [
