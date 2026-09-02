@@ -244,6 +244,38 @@
     return { ok: true, session };
   }
 
+  /**
+   * LocalStorage-only password reset (no email provider on the hub).
+   * Confirms the account exists, then sets a new password on-device.
+   * Orbit shared passwords are unrelated — this only updates the stored user password.
+   */
+  function resetLocalPassword(email, newPassword, confirmPassword) {
+    const e = normalizeEmail(email);
+    if (!e || !e.includes("@")) return { ok: false, error: "Enter the account email" };
+    const pass = String(newPassword || "");
+    const confirm = String(confirmPassword || "");
+    if (pass.length < 8) return { ok: false, error: "Password must be at least 8 characters" };
+    if (pass !== confirm) return { ok: false, error: "Passwords don't match" };
+    if (isSharedAdminPassword(pass)) {
+      return { ok: false, error: "Choose a personal password — not an orbit admin password" };
+    }
+    let users = ensureOwnerBootstrap(loadUsers());
+    let user = users.find((u) => normalizeEmail(u.email) === e);
+    if (!user) {
+      user = {
+        email: e,
+        name: e.split("@")[0],
+        roles: e === OWNER_EMAIL ? ["owner", "super_admin"] : ["viewer"],
+        password: pass,
+      };
+      users.push(user);
+    } else {
+      user.password = pass;
+    }
+    saveUsers(users);
+    return { ok: true, message: "Password updated on this device. Sign in with the new password." };
+  }
+
   function loginGoogleProfile(profile) {
     const email = normalizeEmail(profile.email);
     if (!email) return { ok: false, error: "Google did not return an email" };
@@ -476,6 +508,7 @@
     clearSession,
     loginEmailPassword,
     loginGoogleProfile,
+    resetLocalPassword,
     canAccessAdmin,
     canManageRoles,
     isOwner,

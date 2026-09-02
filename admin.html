@@ -122,9 +122,25 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
     <button type="button" id="togglePass" class="secondary" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);margin:0;padding:6px 10px;font-size:12px" aria-label="Show password">Show</button>
   </div>
   <button type="button" id="loginBtn" style="width:100%;margin-top:4px">Sign in</button>
-  <p class="hint" style="margin-top:14px">Admin passwords (<code>ADMINTESTER1</code>, <code>admin123</code>, <code>rubbaxadmin1</code>) require owner approval on first login. Owner: <code>oadeagbo@gmail.com</code></p>
+  <p style="margin-top:10px;text-align:center"><a href="#forgot" id="forgotLink" style="font-size:13px">Forgot password?</a></p>
+  <p class="hint" style="margin-top:14px">Admin passwords (<code>ADMINTESTER1</code>, <code>admin123</code>, <code>rubbaxadmin1</code>) require owner approval on first login. Owner: <code>oadeagbo@gmail.com</code>. Hub auth is localStorage (no email SMTP) — reset updates the password on this device only.</p>
   <p class="err" id="loginErr"></p>
   <p style="margin-top:18px;font-size:13px"><a class="back" href="./zonicme-hub.html">← Back to hub</a></p>
+</div>
+
+<div id="forgotPanel" class="card hidden" style="max-width:420px;margin:40px auto;padding:24px">
+  <h2 style="margin-top:0;font-size:1.25rem">Reset hub password</h2>
+  <p class="hint">ZonicMe website uses on-device accounts (not Supabase email). Set a new password for your email below. Orbit tester passwords still work separately.</p>
+  <label for="forgotEmail">Email</label>
+  <input id="forgotEmail" type="email" autocomplete="email" placeholder="you@example.com" />
+  <label for="forgotPass">New password</label>
+  <input id="forgotPass" type="password" autocomplete="new-password" placeholder="Min 8 characters" />
+  <label for="forgotPass2">Confirm</label>
+  <input id="forgotPass2" type="password" autocomplete="new-password" />
+  <button type="button" id="forgotBtn" style="width:100%;margin-top:12px">Update password</button>
+  <button type="button" id="forgotCancel" class="secondary" style="width:100%;margin-top:8px">Back to sign in</button>
+  <p class="err" id="forgotErr"></p>
+  <p class="hint" id="forgotOk" style="color:#166534"></p>
 </div>
 
 <div id="adminApp" class="wrap hidden">
@@ -518,6 +534,44 @@ document.getElementById("togglePass")?.addEventListener("click", () => {
 document.getElementById("loginPass").addEventListener("keydown", (e) => {
   if (e.key === "Enter") document.getElementById("loginBtn").click();
 });
+
+function showForgot(on) {
+  document.getElementById("gate").classList.toggle("hidden", !!on);
+  document.getElementById("forgotPanel").classList.toggle("hidden", !on);
+  document.getElementById("forgotErr").textContent = "";
+  document.getElementById("forgotOk").textContent = "";
+  if (on) {
+    document.getElementById("forgotEmail").value = document.getElementById("loginEmail").value || "";
+  }
+}
+document.getElementById("forgotLink").addEventListener("click", (e) => {
+  e.preventDefault();
+  location.hash = "forgot";
+  showForgot(true);
+});
+document.getElementById("forgotCancel").addEventListener("click", () => {
+  location.hash = "";
+  showForgot(false);
+});
+document.getElementById("forgotBtn").addEventListener("click", () => {
+  const res = ZonicMeAuth.resetLocalPassword(
+    document.getElementById("forgotEmail").value,
+    document.getElementById("forgotPass").value,
+    document.getElementById("forgotPass2").value,
+  );
+  if (!res.ok) {
+    document.getElementById("forgotErr").textContent = res.error || "Reset failed";
+    document.getElementById("forgotOk").textContent = "";
+    return;
+  }
+  document.getElementById("forgotErr").textContent = "";
+  document.getElementById("forgotOk").textContent = res.message || "Updated";
+  setTimeout(() => {
+    showForgot(false);
+    document.getElementById("loginErr").textContent = "";
+  }, 1200);
+});
+if (location.hash.replace(/^#/, "") === "forgot") showForgot(true);
 
 document.getElementById("logoutBtn").addEventListener("click", () => {
   ZonicMeAuth.clearSession();
