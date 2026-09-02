@@ -321,23 +321,21 @@
     });
   }
 
-  /** Short status word for a row, used by the ingest pills. */
+  /** Short, human-readable status for an app row (operator-facing). */
   function sourceLabel(row) {
-    if (!row) return "no data";
+    if (!row) return "not reporting";
+    if (row.mock) return "sample data";
     switch (row.source) {
       case "live":
-        return row.mock ? "live (mock feed)" : "live orbit";
+        return "reporting live";
       case "local":
-        return row.mock ? "mock fixture" : "local manifest";
+        return "reporting live";
       case "last-good":
-        return "cached orbit";
-      case "mock-seed":
-      case "mock-fallback":
-        return "mock seed";
+        return "last known figures";
       case "none":
-        return "no data";
+        return "not reporting";
       default:
-        return row.mock ? "mock" : "orbit ok";
+        return "reporting live";
     }
   }
 
@@ -380,11 +378,12 @@
       </div>`;
   }
 
-  function appCompareChart(rows, metricKey, title) {
+  /** `markMock` flags sample-data apps for operators; the public hub turns it off. */
+  function appCompareChart(rows, metricKey, title, { markMock = true } = {}) {
     const items = rows
       .filter((r) => r.metrics?.[metricKey] != null)
       .map((r) => ({
-        label: r.mock ? `${r.name} (mock)` : r.name,
+        label: markMock && r.mock ? `${r.name} (sample)` : r.name,
         value: r.metrics[metricKey],
         color: r.color,
       }))
@@ -396,9 +395,9 @@
     const mock = demo?.mock;
     const badge =
       showMockBadge && mock
-        ? `<span class="pill warn mock-badge">mock seed data</span>`
+        ? `<span class="pill warn mock-badge">sample data</span>`
         : showMockBadge && !mock
-          ? `<span class="pill ok mock-badge">live orbit</span>`
+          ? `<span class="pill ok mock-badge">reporting live</span>`
           : "";
     return `
       <div class="demo-section">

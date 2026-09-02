@@ -4,7 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ZonicMe — empower Africans through the creative economy</title>
-<!-- deploy:2026-08-29-orbit-mocks-qa -->
+<meta name="description" content="ZonicMe is the home of MyYangaX, MyAfriArt, Rubba, AdSpot and Owanbe — apps that turn fashion, art, media and everyday planning into real opportunity across Africa and the diaspora.">
+<link rel="canonical" href="https://zonicme.netlify.app/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ZonicMe">
+<meta property="og:title" content="ZonicMe — empower Africans through the creative economy">
+<meta property="og:description" content="One family of apps across fashion, art, media, life planning and celebrations — built for Africa and the diaspora.">
+<meta property="og:url" content="https://zonicme.netlify.app/">
+<meta property="og:image" content="https://zonicme.netlify.app/assets/zonicme-city-hero.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ZonicMe — empower Africans through the creative economy">
+<meta name="twitter:description" content="One family of apps across fashion, art, media, life planning and celebrations — built for Africa and the diaspora.">
+<meta name="twitter:image" content="https://zonicme.netlify.app/assets/zonicme-city-hero.png">
+<!-- deploy:2026-09-02-hub-audit -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
@@ -266,6 +278,65 @@ button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
 }
 .detail-empty{color:var(--muted);font-size:14px;margin:auto}
 
+/* —— Skeletons (same box model as the real cards, so no layout shift) —— */
+.visually-hidden{
+  position:absolute;width:1px;height:1px;margin:-1px;padding:0;
+  overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;
+}
+.sk{
+  display:block;border-radius:6px;
+  background:linear-gradient(90deg,rgba(15,20,18,.07) 25%,rgba(15,20,18,.13) 37%,rgba(15,20,18,.07) 63%);
+  background-size:400% 100%;
+  animation:sk-shimmer 1.4s ease-in-out infinite;
+}
+.sk-title{height:13px;width:52%;margin-bottom:8px}
+.sk-line{height:10px;width:100%;margin-bottom:6px}
+.sk-short{width:64%}
+.sk-kicker{height:10px;width:88px;margin-bottom:12px}
+.sk-heading{height:26px;width:46%;margin-bottom:16px;border-radius:8px}
+.sk-cta{height:40px;width:150px;margin-top:18px;border-radius:4px}
+.deck-card.is-skeleton{cursor:default;opacity:1;border-color:rgba(13,148,136,.14)}
+.deck-card.is-skeleton .deck-thumb{
+  background:linear-gradient(90deg,rgba(15,20,18,.10) 25%,rgba(15,20,18,.16) 37%,rgba(15,20,18,.10) 63%);
+  background-size:400% 100%;
+  animation:sk-shimmer 1.4s ease-in-out infinite;
+}
+.deck-card.is-skeleton .deck-thumb::after{content:none}
+/* The detail pane is a flex column with its own gap — let that do the spacing. */
+.apps-detail > .sk{margin-bottom:0}
+.apps-detail > .sk-cta{margin-top:4px}
+@keyframes sk-shimmer{0%{background-position:100% 50%}100%{background-position:0 50%}}
+@media(prefers-reduced-motion:reduce){
+  .sk,.deck-card.is-skeleton .deck-thumb{animation:none}
+}
+
+/* —— Roadmap —— */
+.roadmap-grid{
+  display:grid;gap:16px;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+}
+.roadmap-card{
+  border:1px solid rgba(13,148,136,.18);border-radius:12px;
+  background:linear-gradient(165deg,rgba(255,255,255,.9),rgba(255,248,240,.82));
+  padding:20px 18px;display:flex;flex-direction:column;gap:8px;
+  box-shadow:0 6px 18px rgba(15,20,18,.05);
+  transition:transform .2s, box-shadow .2s, border-color .2s;
+}
+.roadmap-card:hover{
+  transform:translateY(-2px);border-color:rgba(232,160,23,.45);
+  box-shadow:0 12px 28px rgba(232,93,4,.12);
+}
+.roadmap-tag{
+  align-self:flex-start;font-family:var(--display);font-size:10px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--accent-deep);
+  background:rgba(232,93,4,.1);border-radius:999px;padding:4px 10px;
+}
+.roadmap-card h3{
+  font-family:var(--display);font-size:1.02rem;font-weight:700;
+  letter-spacing:.01em;line-height:1.25;
+}
+.roadmap-card p{font-size:13.5px;line-height:1.6;color:var(--muted);margin:0}
+
 /* About + reveal */
 .about-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:36px;align-items:start}
 .about-grid > div > p{color:var(--muted);line-height:1.7;margin-bottom:14px}
@@ -348,10 +419,11 @@ button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
 .demo-head h3{margin:0;font-family:var(--display);font-size:1.15rem}
 .demo-lead{font-size:13px;color:var(--muted);margin:0 0 16px;line-height:1.5}
 .mock-badge{font-size:10px!important}
-.mock-banner{
+.data-notice{
   max-width:720px;margin:0 auto 20px;padding:12px 16px;border-radius:8px;
   background:#fff8f0;border:1px solid rgba(232,93,4,.35);font-size:13px;color:var(--muted);text-align:center;
 }
+.data-notice strong{color:var(--ink)}
 
 /* Contact / footer */
 .contact{text-align:center}
@@ -391,10 +463,17 @@ footer a:hover{color:var(--teal-bright)}
 }
 @media(max-width:560px){
   .metrics{grid-template-columns:1fr}
-  .nav > a,.nav > .drop > button{padding:8px 8px;font-size:11px}
-  .hero{height:50vh;min-height:260px;max-height:50vh;padding:76px 18px 20px}
+  /* Keep the header on one line on phones — a wrapped nav pushes into the hero. */
+  .header-inner{padding:12px 16px;gap:10px}
+  .logo img{height:30px}
+  .nav{flex-wrap:nowrap;gap:2px}
+  .nav > a,.nav > .drop > button{padding:6px 6px;font-size:10px;letter-spacing:.05em}
+  .nav > a[href="#roadmap"]{display:none} /* still reachable from the footer */
+  .drop-menu{left:auto;right:0}
+  .hero{height:50vh;min-height:260px;max-height:50vh;padding:72px 18px 20px}
   .hero h1{font-size:clamp(1.35rem,6vw,1.85rem)}
   .deck-card{grid-template-columns:76px minmax(0,1fr);min-height:80px}
+  .roadmap-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -412,6 +491,7 @@ footer a:hover{color:var(--teal-bright)}
         <button type="button" aria-expanded="false" aria-haspopup="true" id="appsBtn">Applications</button>
         <div class="drop-menu" id="appsMenu" role="menu"></div>
       </div>
+      <a href="#roadmap">Roadmap</a>
       <a href="#contact">Contact</a>
     </nav>
   </div>
@@ -427,13 +507,62 @@ footer a:hover{color:var(--teal-bright)}
 
 <section class="section" id="applications">
   <h2 class="section-title">ZonicMe Applications</h2>
-  <p class="section-lead">Five apps in the Zonic orbit — select a card to open its story and live site.</p>
+  <p class="section-lead" id="appsLead">Select a card to open its story and live site.</p>
   <div class="divider"></div>
   <div class="apps-deck-layout">
-    <div class="apps-deck" id="appDeck" role="listbox" aria-label="Application cards" tabindex="0"></div>
-    <aside class="apps-detail" id="appDetail" aria-live="polite">
-      <p class="detail-empty">Loading applications…</p>
+    <!-- Skeletons mirror the real card/detail shape so nothing jumps when config lands. -->
+    <div class="apps-deck" id="appDeck" role="listbox" aria-label="Application cards" tabindex="0" aria-busy="true">
+      <div class="deck-card is-skeleton" aria-hidden="true"><div class="deck-thumb"></div><div class="deck-body"><span class="sk sk-title"></span><span class="sk sk-line"></span><span class="sk sk-line sk-short"></span></div></div>
+      <div class="deck-card is-skeleton" aria-hidden="true"><div class="deck-thumb"></div><div class="deck-body"><span class="sk sk-title"></span><span class="sk sk-line"></span><span class="sk sk-line sk-short"></span></div></div>
+      <div class="deck-card is-skeleton" aria-hidden="true"><div class="deck-thumb"></div><div class="deck-body"><span class="sk sk-title"></span><span class="sk sk-line"></span><span class="sk sk-line sk-short"></span></div></div>
+      <div class="deck-card is-skeleton" aria-hidden="true"><div class="deck-thumb"></div><div class="deck-body"><span class="sk sk-title"></span><span class="sk sk-line"></span><span class="sk sk-line sk-short"></span></div></div>
+      <div class="deck-card is-skeleton" aria-hidden="true"><div class="deck-thumb"></div><div class="deck-body"><span class="sk sk-title"></span><span class="sk sk-line"></span><span class="sk sk-line sk-short"></span></div></div>
+    </div>
+    <aside class="apps-detail" id="appDetail" aria-live="polite" aria-busy="true">
+      <span class="sk sk-kicker" aria-hidden="true"></span>
+      <span class="sk sk-heading" aria-hidden="true"></span>
+      <span class="sk sk-line" aria-hidden="true"></span>
+      <span class="sk sk-line" aria-hidden="true"></span>
+      <span class="sk sk-line sk-short" aria-hidden="true"></span>
+      <span class="sk sk-line" aria-hidden="true"></span>
+      <span class="sk sk-line" aria-hidden="true"></span>
+      <span class="sk sk-line sk-short" aria-hidden="true"></span>
+      <span class="sk sk-cta" aria-hidden="true"></span>
+      <span class="visually-hidden">Loading applications…</span>
     </aside>
+  </div>
+</section>
+
+<section class="section" id="roadmap">
+  <h2 class="section-title">Next in the orbit</h2>
+  <p class="section-lead">Five products in build for 2027, each aimed at a gap people keep running into.</p>
+  <div class="divider"></div>
+  <div class="roadmap-grid">
+    <article class="roadmap-card">
+      <span class="roadmap-tag">2027</span>
+      <h3>Confirmahead</h3>
+      <p>Booking clarity and appointment verification, so you know an appointment is real and confirmed before you travel for it.</p>
+    </article>
+    <article class="roadmap-card">
+      <span class="roadmap-tag">2027</span>
+      <h3>CAC Verify</h3>
+      <p>Company registration status monitoring — check that a business is properly registered, and get told when its status changes.</p>
+    </article>
+    <article class="roadmap-card">
+      <span class="roadmap-tag">2027</span>
+      <h3>Notify Me</h3>
+      <p>Bank login alerts that tell you the moment someone signs in to your account, so nothing happens without you knowing.</p>
+    </article>
+    <article class="roadmap-card">
+      <span class="roadmap-tag">2027</span>
+      <h3>InfluencerMatch</h3>
+      <p>Brand and influencer matching with a risk rating, so partnerships start with an honest read on both sides.</p>
+    </article>
+    <article class="roadmap-card">
+      <span class="roadmap-tag">2027</span>
+      <h3>EduChatrooms</h3>
+      <p>Tiered subject rooms that connect learners across borders, grouped by level so conversations stay useful.</p>
+    </article>
   </div>
 </section>
 
@@ -481,11 +610,15 @@ footer a:hover{color:var(--teal-bright)}
     ZonicMe Analytics is designed for compliance with applicable privacy laws, including Nigeria’s NDPA and GDPR-aligned principles where they apply.
     Metrics and disclosures use <strong>anonymised data</strong> only — aggregated, consented signals without personal identifiers — so partners and operators can understand the orbit without exposing individuals.
   </div>
-  <div class="metrics" id="metricGrid"></div>
-  <div id="mockBanner" class="mock-banner hidden"></div>
+  <div class="metrics" id="metricGrid" aria-busy="true">
+    <div class="metric" aria-hidden="true"><span class="sk sk-line sk-short" style="margin:0 auto 12px"></span><span class="sk sk-heading" style="width:60%;margin:0 auto 8px"></span><span class="sk sk-line sk-short" style="margin:0 auto"></span></div>
+    <div class="metric" aria-hidden="true"><span class="sk sk-line sk-short" style="margin:0 auto 12px"></span><span class="sk sk-heading" style="width:60%;margin:0 auto 8px"></span><span class="sk sk-line sk-short" style="margin:0 auto"></span></div>
+    <div class="metric" aria-hidden="true"><span class="sk sk-line sk-short" style="margin:0 auto 12px"></span><span class="sk sk-heading" style="width:60%;margin:0 auto 8px"></span><span class="sk sk-line sk-short" style="margin:0 auto"></span></div>
+    <div class="metric" aria-hidden="true"><span class="sk sk-line sk-short" style="margin:0 auto 12px"></span><span class="sk sk-heading" style="width:60%;margin:0 auto 8px"></span><span class="sk sk-line sk-short" style="margin:0 auto"></span></div>
+  </div>
+  <div id="dataNotice" class="data-notice hidden"></div>
   <div class="chart-grid" id="orbitCharts"></div>
   <div id="demographicsPanel"></div>
-  <div class="status-row" id="ingestStatus"></div>
   <div class="refresh-row">
     <button type="button" class="btn-ghost" id="refreshAnalytics">Refresh</button>
   </div>
@@ -500,17 +633,15 @@ footer a:hover{color:var(--teal-bright)}
 
 <footer>
   <nav class="footer-nav" aria-label="Secondary">
+    <a href="#applications">Applications</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="#about">About</a>
     <a href="#analytics">Analytics</a>
-    <a href="./config/apps.json">Config</a>
+    <a href="#contact">Contact</a>
   </nav>
-  <p class="footer-sib-label">Other ZonicMe products</p>
-  <nav class="footer-nav footer-siblings" aria-label="ZonicMe products">
-    <a href="https://myyangax.netlify.app" target="_blank" rel="noopener noreferrer">MyYangaX</a>
-    <a href="https://myafriartx.netlify.app" target="_blank" rel="noopener noreferrer">MyAfriArt</a>
-    <a href="https://rubba.netlify.app" target="_blank" rel="noopener noreferrer">Rubba</a>
-    <a href="https://adspotx.netlify.app" target="_blank" rel="noopener noreferrer">AdSpot</a>
-    <a href="https://owanbex.netlify.app" target="_blank" rel="noopener noreferrer">Owanbe</a>
-  </nav>
+  <p class="footer-sib-label">ZonicMe products</p>
+  <!-- Built from the same config as the app cards so the two can never disagree. -->
+  <nav class="footer-nav footer-siblings" id="footerSiblings" aria-label="ZonicMe products"></nav>
   © <span id="yr"></span> ZonicMe Limited · Floor M2, Transcorp Hilton, Abuja
 </footer>
 
@@ -562,6 +693,22 @@ function renderNavApps(apps) {
   });
 }
 
+const COUNT_WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+
+function renderAppsLead(apps) {
+  const n = apps.length;
+  const word = COUNT_WORDS[n] || String(n);
+  document.getElementById("appsLead").textContent =
+    `${word} app${n === 1 ? "" : "s"} in the ZonicMe orbit — select a card to open its story and live site.`;
+}
+
+function renderFooterSiblings(apps) {
+  document.getElementById("footerSiblings").innerHTML = apps
+    .filter((a) => a.url)
+    .map((a) => `<a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer">${esc(a.name)}</a>`)
+    .join("");
+}
+
 function summaryLines(app) {
   const raw = (app.summary || "").trim();
   return raw || "Part of the ZonicMe orbit.\nCreative economy tools for Africa.";
@@ -569,6 +716,7 @@ function summaryLines(app) {
 
 function renderDeck(apps) {
   const deck = document.getElementById("appDeck");
+  deck.removeAttribute("aria-busy");
   deck.innerHTML = apps.map((a, i) => {
     const isActive = a.id === activeAppId || (!activeAppId && i === 0);
     return `
@@ -593,6 +741,7 @@ function renderDeck(apps) {
 
 function renderDetail(app) {
   const pane = document.getElementById("appDetail");
+  pane.removeAttribute("aria-busy");
   if (!app) {
     pane.innerHTML = `<p class="detail-empty">No applications configured.</p>`;
     return;
@@ -677,38 +826,34 @@ function renderAnalytics(apps) {
   const H = ZonicAnalyticsHub;
   const rows = H.buildOrbitRows(apps, orbitCache);
   const totals = H.aggregateTotals(rows);
-  const spanInfo = H.spanSummary();
 
-  document.getElementById("metricGrid").innerHTML = `
-    <div class="metric"><div class="label">Orbit live</div><div class="value">${totals.live}/${apps.length}</div><div class="sub">manifests</div></div>
-    <div class="metric"><div class="label">Users (7d)</div><div class="value">${H.fmt(totals.users)}</div><div class="sub">across apps</div></div>
-    <div class="metric"><div class="label">Sessions (24h)</div><div class="value">${H.fmt(totals.sessions)}</div><div class="sub">orbit metrics</div></div>
-    <div class="metric"><div class="label">Local spans</div><div class="value">${H.fmt(spanInfo.total)}</div><div class="sub">zonic-track</div></div>`;
+  const grid = document.getElementById("metricGrid");
+  grid.removeAttribute("aria-busy");
+  grid.innerHTML = `
+    <div class="metric"><div class="label">Apps in the orbit</div><div class="value">${apps.length}</div><div class="sub">live products</div></div>
+    <div class="metric"><div class="label">Active users</div><div class="value">${H.fmt(totals.users)}</div><div class="sub">last 7 days</div></div>
+    <div class="metric"><div class="label">Sessions</div><div class="value">${H.fmt(totals.sessions)}</div><div class="sub">last 24 hours</div></div>
+    <div class="metric"><div class="label">Interactions</div><div class="value">${H.fmt(totals.events)}</div><div class="sub">across the suite</div></div>`;
 
-  const mockBanner = document.getElementById("mockBanner");
+  // Some apps are still being wired up to orbit reporting. Say so plainly rather
+  // than presenting illustrative figures as if they were measured.
+  const notice = document.getElementById("dataNotice");
   if (totals.mockCount > 0) {
-    mockBanner.classList.remove("hidden");
-    mockBanner.innerHTML = `<strong>Mock data active</strong> — ${totals.mockCount} app(s) showing seed metrics until live orbit manifests respond. Admin can clear mock seed.`;
+    notice.classList.remove("hidden");
+    notice.innerHTML = `<strong>Illustrative figures.</strong> Live reporting is switching on app by app across the orbit — the charts below show indicative scale, not measured traffic.`;
   } else {
-    mockBanner.classList.add("hidden");
-    mockBanner.innerHTML = "";
+    notice.classList.add("hidden");
+    notice.innerHTML = "";
   }
 
   document.getElementById("orbitCharts").innerHTML =
-    H.appCompareChart(rows, "activeUsers7d", "Active users (7d) by app") +
-    H.appCompareChart(rows, "sessions24h", "Sessions (24h) by app");
+    H.appCompareChart(rows, "activeUsers7d", "Active users (7d) by app", { markMock: false }) +
+    H.appCompareChart(rows, "sessions24h", "Sessions (24h) by app", { markMock: false });
 
   const feeds = apps.map((a) => orbitCache[a.id]).filter(Boolean);
-  document.getElementById("demographicsPanel").innerHTML = H.demographicsHtml(H.mergeDemographics(feeds));
-
-  const ingestUrl = ZonicMeAppsStore.getIngestUrl(CONFIG);
-  const ready = ingestUrl && !String(ingestUrl).includes("YOUR-SUPABASE");
-  const pills = [`<span class="pill ${ready ? "ok" : "warn"}">ingest: ${ready ? "URL set" : "fail-open (local spans)"}</span>`];
-  rows.forEach((r) => {
-    const cls = r.mock ? "warn" : r.metrics?.activeUsers7d ? "ok" : "warn";
-    pills.push(`<span class="pill ${cls}">${esc(r.name)}: ${esc(H.sourceLabel(r))}</span>`);
-  });
-  document.getElementById("ingestStatus").innerHTML = pills.join("");
+  // Operator-facing source badges stay in the admin console, not on the public hub.
+  document.getElementById("demographicsPanel").innerHTML =
+    H.demographicsHtml(H.mergeDemographics(feeds), { showMockBadge: false });
 }
 
 async function ingestOrbit(apps) {
@@ -745,6 +890,8 @@ async function boot() {
 
   renderNavApps(apps);
   renderDeck(apps);
+  renderFooterSiblings(apps);
+  renderAppsLead(apps);
 
   // Paint charts from the mock seed first so analytics is never blank,
   // then upgrade in place once live/local manifests resolve.
@@ -794,11 +941,14 @@ boot().catch((err) => {
     apps.forEach((a) => { a._demo = ZonicAnalyticsHub.getDemoMetrics(a.id); });
     renderNavApps(apps);
     renderDeck(apps);
+    renderFooterSiblings(apps);
+    renderAppsLead(apps);
     ZonicAnalyticsHub.seedCache(apps, orbitCache);
     renderAnalytics(apps);
   } else {
+    document.getElementById("appDeck").innerHTML = "";
     document.getElementById("appDetail").innerHTML =
-      `<p class="detail-empty">Could not load applications. <a href="./config/apps.json">Check config</a>.</p>`;
+      `<p class="detail-empty">We couldn’t load the app list just now. Please refresh the page.</p>`;
   }
 });
 </script>

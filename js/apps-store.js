@@ -17,18 +17,18 @@
     apps: [
       {
         id: "myyanga",
-        name: "MyYanga",
+        name: "MyYangaX",
         summary:
-          "African fashion discovery, Virtual Wear, and Runway.\nCreators and shoppers meet in one orbit.",
+          "African fashion discovery, styling and Runway.\nCreators and shoppers meet in one place.",
         detail:
-          "MyYanga is ZonicMe’s fashion platform — browse looks, try Virtual Wear, and follow Runway drops from African designers and the diaspora. Discovery meets commerce so creators earn and audiences find style that feels like home.",
+          "MyYangaX is ZonicMe’s fashion platform — browse looks, style them your way, and follow Runway drops from African designers and the diaspora. Discovery meets commerce so creators earn and audiences find style that feels like home.",
         features: [
-          "Virtual Wear studio — try looks on your photo without leaving discovery",
+          "Post your look, collect likes and wait for the reveal",
           "Designer Runway drops with lookbooks, fabric filters and save-to-wishlist",
-          "Separate Studio, Runway and Virtual Wear flows so each job stays clear",
+          "A styling studio that lets you see a piece on you before you buy",
           "Creator storefronts with WhatsApp-ready ordering for shoppers",
           "Style reels and curated African fashion collections for diaspora + home",
-          "Orbit-ready analytics spans for renders, runway views and sessions",
+          "Specials for his and hers, plus fashion events",
         ],
         url: "https://myyangax.netlify.app",
         thumbnail: "./assets/thumb-myyanga.jpg",
@@ -49,7 +49,7 @@
           "Curated collections and digital exhibition staging for galleries",
           "Multi-currency checkout paths tuned for Africa and diaspora buyers",
           "Collector wishlists, shortlists and enquiry flows",
-          "Marketplace metrics for pieces listed, stagings and active collectors",
+          "Gallery insights on pieces listed, stagings and collector interest",
         ],
         url: "https://myafriartx.netlify.app",
         thumbnail: "./assets/thumb-afriart.jpg",
@@ -70,7 +70,7 @@
           "City-aware cost planning for African metros and diaspora moves",
           "Genie-assisted plans — turn a wish into a concrete next step",
           "Personal insights dashboard without overwhelming finance jargon",
-          "Orbit metrics for plans created, AI assists and returning planners",
+          "A progress view of plans created, assists used and milestones hit",
         ],
         url: "https://rubba.netlify.app",
         thumbnail: "./assets/thumb-rubba.jpg",
@@ -91,7 +91,7 @@
           "Partner brand campaigns with transparent performance analytics",
           "Consent-first audience reach across African markets and diaspora",
           "Brand dashboards for watches, completion and campaign health",
-          "Orbit ingest for ad watches, partner campaigns and session volume",
+          "Clear reporting on ad watches, campaign reach and viewer activity",
         ],
         url: "https://adspotx.netlify.app",
         thumbnail: "./assets/thumb-adspot.jpg",
@@ -101,11 +101,11 @@
       },
       {
         id: "owanbex",
-        name: "OwanbeX",
+        name: "Owanbe",
         summary:
           "Plan Nigerian celebrations end-to-end.\nVendors, budgets, aso ebi, guest lists.",
         detail:
-          "OwanbeX helps families and brands plan weddings, birthdays, and milestone events across Nigeria — vetted vendors, live Naira budgets, aso ebi coordination, and brand analytics in one planner.",
+          "Owanbe helps families and brands plan weddings, birthdays, and milestone events across Nigeria — vetted vendors, live Naira budgets, aso ebi coordination, and brand analytics in one planner.",
         features: [
           "End-to-end event builder for weddings, birthdays and milestones",
           "Vetted vendor directory with shortlists and comparison notes",

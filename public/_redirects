@@ -1,4 +1,6 @@
-# Static assets must not SPA-fallback to index.html (breaks hub boot).
-/admin    /admin.html   200
-/config   /admin.html   302
-/hub      /zonicme-hub.html   200
+# Not the publish root (netlify.toml publishes "."). Kept in sync with /_redirects
+# so nobody edits this copy and expects it to take effect.
+/admin             /admin.html   200
+/config            /admin.html   302
+/hub               /             301
+/zonicme-hub.html  /             301

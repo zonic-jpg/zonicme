@@ -245,9 +245,9 @@
   }
 
   /**
-   * LocalStorage-only password reset (no email provider on the hub).
-   * Confirms the account exists, then sets a new password on-device.
-   * Orbit shared passwords are unrelated — this only updates the stored user password.
+   * Password reset for the hub's on-device accounts. There is no mail provider,
+   * so nothing is sent anywhere — the new password is written to this browser only.
+   * Refuses unknown emails so the confirmation message is never a lie.
    */
   function resetLocalPassword(email, newPassword, confirmPassword) {
     const e = normalizeEmail(email);
@@ -257,23 +257,22 @@
     if (pass.length < 8) return { ok: false, error: "Password must be at least 8 characters" };
     if (pass !== confirm) return { ok: false, error: "Passwords don't match" };
     if (isSharedAdminPassword(pass)) {
-      return { ok: false, error: "Choose a personal password — not an orbit admin password" };
+      return { ok: false, error: "Choose a personal password — not a shared team password" };
     }
-    let users = ensureOwnerBootstrap(loadUsers());
-    let user = users.find((u) => normalizeEmail(u.email) === e);
+    const users = ensureOwnerBootstrap(loadUsers());
+    const user = users.find((u) => normalizeEmail(u.email) === e);
     if (!user) {
-      user = {
-        email: e,
-        name: e.split("@")[0],
-        roles: e === OWNER_EMAIL ? ["owner", "super_admin"] : ["viewer"],
-        password: pass,
+      return {
+        ok: false,
+        error: "No account for that email in this browser. Sign in once on this device first.",
       };
-      users.push(user);
-    } else {
-      user.password = pass;
     }
+    user.password = pass;
     saveUsers(users);
-    return { ok: true, message: "Password updated on this device. Sign in with the new password." };
+    return {
+      ok: true,
+      message: "Password updated in this browser. Sign in with the new password.",
+    };
   }
 
   function loginGoogleProfile(profile) {
@@ -499,10 +498,7 @@
     ROLES,
     OWNER_EMAIL,
     DEMO_PASSWORD,
-    ADMIN_PASSWORD,
-    SHARED_ADMIN_PASSWORD,
-    UNIFORM_ADMIN_PASSWORD,
-    ADMIN_PASSWORDS,
+    ORBIT_ADMIN_PASSWORDS,
     isSharedAdminPassword,
     getSession,
     clearSession,

@@ -5,8 +5,13 @@
 (function (global) {
   const OWNER_EMAIL = "oadeagbo@gmail.com";
   const APPROVAL_STORE_KEY = "zonic_admintester_approval_v1";
+  /**
+   * The approval store is localStorage, so a request only exists in the browser it
+   * was made from and nothing is emailed. Say exactly that — do not promise a
+   * notification or a central queue this implementation cannot deliver.
+   */
   const AWAITING_MSG =
-    "Awaiting approval — the owner must approve your admin access before you can sign in. You will be notified once approved.";
+    "Access request recorded on this device. Approvals are stored per browser and nothing is sent automatically, so ask the ZonicMe owner to approve you on this computer.";
 
   /** Zonic orbit standard (AUTH.md) — case-insensitive; owner immediate, others pending. */
   const ORBIT_ADMIN_PASSWORDS = ["admintester1", "admin123", "rubbaxadmin1"];

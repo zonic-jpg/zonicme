@@ -109,13 +109,13 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
 <!-- Sign-in gate (hidden route — not linked from public nav) -->
 <div id="gate" class="gate hidden">
   <h1>ZonicMe Admin</h1>
-  <p class="sub">Sign in to manage apps, ingest, and roles. This page is not linked from the public hub.</p>
+  <p class="sub">Sign in to manage the app listings, analytics and team access.</p>
   <div id="googleWrap">
     <div id="googleBtn"></div>
   </div>
   <div class="divider-or" id="orDivider">or username / password</div>
   <label for="loginEmail">Email / username</label>
-  <input id="loginEmail" type="text" autocomplete="username" placeholder="you@example.com or any username" value="oadeagbo@gmail.com" />
+  <input id="loginEmail" type="text" autocomplete="username" placeholder="you@example.com or your username" />
   <label for="loginPass">Password</label>
   <div style="position:relative">
     <input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••" style="padding-right:64px" />
@@ -123,14 +123,14 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
   </div>
   <button type="button" id="loginBtn" style="width:100%;margin-top:4px">Sign in</button>
   <p style="margin-top:10px;text-align:center"><a href="#forgot" id="forgotLink" style="font-size:13px">Forgot password?</a></p>
-  <p class="hint" style="margin-top:14px">Admin passwords (<code>ADMINTESTER1</code>, <code>admin123</code>, <code>rubbaxadmin1</code>) require owner approval on first login. Owner: <code>oadeagbo@gmail.com</code>. Hub auth is localStorage (no email SMTP) — reset updates the password on this device only.</p>
+  <p class="hint" style="margin-top:14px">New team members need the owner to approve them on first sign-in. Sign-in details are kept in this browser only — they do not follow you to another computer.</p>
   <p class="err" id="loginErr"></p>
-  <p style="margin-top:18px;font-size:13px"><a class="back" href="./zonicme-hub.html">← Back to hub</a></p>
+  <p style="margin-top:18px;font-size:13px"><a class="back" href="./index.html">← Back to hub</a></p>
 </div>
 
-<div id="forgotPanel" class="card hidden" style="max-width:420px;margin:40px auto;padding:24px">
-  <h2 style="margin-top:0;font-size:1.25rem">Reset hub password</h2>
-  <p class="hint">ZonicMe website uses on-device accounts (not Supabase email). Set a new password for your email below. Orbit tester passwords still work separately.</p>
+<div id="forgotPanel" class="gate hidden">
+  <h2 style="margin-top:0;font-size:1.25rem">Reset your password</h2>
+  <p class="hint">No reset email is sent. ZonicMe admin accounts are stored in this browser, so the new password below applies on this device only — you will need to reset again on another computer.</p>
   <label for="forgotEmail">Email</label>
   <input id="forgotEmail" type="email" autocomplete="email" placeholder="you@example.com" />
   <label for="forgotPass">New password</label>
@@ -147,11 +147,11 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
   <header>
     <div>
       <h1>ZonicMe Admin</h1>
-      <p class="sub">Edit application cards, ingest URL, and user roles. Saved to <code>localStorage</code>; seed from <code>config/apps.json</code>.</p>
+      <p class="sub">Edit the application cards, analytics settings and team roles. Changes are saved in this browser — use <strong>Download JSON</strong> to ship them as the site default.</p>
       <div class="session-bar" id="sessionBar"></div>
     </div>
     <div class="actions" style="margin:0">
-      <a class="back" href="./zonicme-hub.html">← Landing</a>
+      <a class="back" href="./index.html">← Landing</a>
       <button type="button" class="secondary" id="logoutBtn">Sign out</button>
     </div>
   </header>
@@ -167,12 +167,12 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
     <div class="panel">
       <label for="mission">Mission statement</label>
       <textarea id="mission"></textarea>
-      <label for="ingestUrl">ZONICME_INGEST_URL</label>
+      <label for="ingestUrl">Analytics ingest endpoint</label>
       <input id="ingestUrl" placeholder="https://….supabase.co/functions/v1/zonic-hub-ingest" />
-      <p class="hint">Child apps and the hub analytics section POST / fetch against this URL when set. Leave the placeholder to keep demo-only mode.</p>
-      <label for="googleClientId">GOOGLE_CLIENT_ID (optional)</label>
+      <p class="hint">Where the hub and the sibling apps send analytics. Leave blank to keep everything on-device.</p>
+      <label for="googleClientId">Google sign-in client ID (optional)</label>
       <input id="googleClientId" placeholder="xxxx.apps.googleusercontent.com" />
-      <p class="hint">Production: set Authorized JavaScript origins for this host. Soft-fails on <code>invalid_origin</code> (same pattern as AdSpot). Also: <code>window.ZONICME_GOOGLE_CLIENT_ID</code>.</p>
+      <p class="hint">Add this host to the Authorized JavaScript origins in Google Cloud. If the ID is missing or the origin is not authorised, the Google button is simply hidden.</p>
     </div>
     <div id="appsEditor"></div>
     <div class="actions">
@@ -186,16 +186,16 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
   <div id="tab-analytics" class="hidden">
     <div class="panel">
       <h2 style="margin:0 0 8px;font-size:1.1rem">Orbit analytics</h2>
-      <p class="hint">Charts from orbit manifests, local <code>zonic-track</code> spans, and anonymised demographics. Ingest is fail-open when <code>ZONICME_INGEST_URL</code> is unset.</p>
+      <p class="hint">Charts from each app's published metrics plus anonymised demographics. Where an app has not reported yet, sample figures stand in — these are marked below and are never shown on the public hub.</p>
       <div class="stat-grid" id="adminStatGrid"></div>
       <div class="chart-grid" id="adminOrbitCharts"></div>
       <div id="adminDemographics"></div>
       <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:8px" id="adminIngestPills"></div>
       <div class="actions" style="margin-top:16px">
         <button type="button" class="secondary" id="refreshAdminAnalytics">Refresh analytics</button>
-        <button type="button" class="danger" id="deleteMockBtn">Delete mock seed data</button>
-        <button type="button" class="secondary" id="restoreMockBtn">Restore mock seed</button>
-        <button type="button" class="secondary" id="flushSpansBtn">Flush spans to ingest</button>
+        <button type="button" class="danger" id="deleteMockBtn">Hide sample data</button>
+        <button type="button" class="secondary" id="restoreMockBtn">Show sample data</button>
+        <button type="button" class="secondary" id="flushSpansBtn">Send pending activity</button>
       </div>
     </div>
   </div>
@@ -206,8 +206,8 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
 
   <div id="tab-users" class="hidden">
     <div class="panel" id="admintester-queue">
-      <h2 style="margin:0 0 8px;font-size:1.1rem">ADMINTESTER approvals</h2>
-      <p class="hint">First login with admin password requires owner approval. Queue is shared across Zonic apps.</p>
+      <h2 style="margin:0 0 8px;font-size:1.1rem">Access requests</h2>
+      <p class="hint">Anyone signing in with a shared team password for the first time lands here until you approve them. Requests are held in the browser they were made from, so this list shows people who signed in on <strong>this</strong> computer — it does not sync between devices, and no approval emails are sent.</p>
       <div id="approvalPending"></div>
       <div id="approvalApproved" style="margin-top:12px"></div>
     </div>
@@ -281,8 +281,8 @@ async function renderAdminAnalytics() {
 
   const ingestUrl = ZonicMeAppsStore.getIngestUrl(state);
   const ready = ingestUrl && !String(ingestUrl).includes("YOUR-SUPABASE");
-  const pills = [`<span class="pill ${ready ? "ok" : "warn"}">ingest: ${ready ? "configured" : "fail-open"}</span>`];
-  if (totals.mockCount) pills.push(`<span class="pill warn">${totals.mockCount} mock app(s)</span>`);
+  const pills = [`<span class="pill ${ready ? "ok" : "warn"}">Analytics endpoint: ${ready ? "connected" : "on-device only"}</span>`];
+  if (totals.mockCount) pills.push(`<span class="pill warn">${totals.mockCount} app(s) on sample data</span>`);
   rows.forEach((r) => {
     pills.push(`<span class="pill ${r.mock ? "warn" : "ok"}">${esc(r.name)}: ${esc(H.sourceLabel(r))}</span>`);
   });
@@ -399,7 +399,7 @@ function renderApps() {
 function renderApprovals() {
   const A = window.ZonicAdminApproval;
   const session = ZonicMeAuth.getSession();
-  const panel = document.getElementById("adminApprovalPanel");
+  const panel = document.getElementById("admintester-queue");
   if (!A || !panel) return;
   if (!ZonicMeAuth.isOwner(session)) {
     panel.classList.add("hidden");
@@ -411,26 +411,32 @@ function renderApprovals() {
   document.getElementById("approvalPending").innerHTML = pending.length
     ? pending.map((p) => `
       <div class="user-row">
-        <div><strong>${esc(p.identity || p.email)}</strong><div style="font-size:12px;color:var(--muted)">${esc(p.email)} · ${new Date(p.requestedAt).toLocaleString()}</div></div>
+        <div><strong>${esc(p.identity || p.email)}</strong><div style="font-size:12px;color:var(--muted)">${esc(p.email)}</div></div>
+        <div style="font-size:12px;color:var(--muted)">Requested ${esc(new Date(p.requestedAt).toLocaleString())}</div>
         <button type="button" data-approve="${esc(p.email)}">Approve</button>
       </div>`).join("")
-    : `<p class="hint">No pending requests.</p>`;
+    : `<p class="hint">No one is waiting for approval right now.</p>`;
   document.getElementById("approvalApproved").innerHTML = approved.length
-    ? `<strong>Approved</strong>` + approved.map((a) => `
+    ? `<h3 style="margin:0 0 4px;font-size:.95rem">Approved admins</h3>` + approved.map((a) => `
       <div class="user-row">
         <span>${esc(a.email)}</span>
+        <span></span>
         <button type="button" class="danger" data-revoke="${esc(a.email)}">Revoke</button>
       </div>`).join("")
     : "";
   panel.querySelectorAll("[data-approve]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      A.approveAdmin(ZonicMeAuth.OWNER_EMAIL, btn.getAttribute("data-approve"));
+      const email = btn.getAttribute("data-approve");
+      const res = A.approveAdmin(session.email, email);
+      if (res.ok) toast(`Approved ${email}`);
       renderApprovals();
     });
   });
   panel.querySelectorAll("[data-revoke]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      A.revokeAdmin(ZonicMeAuth.OWNER_EMAIL, btn.getAttribute("data-revoke"));
+      const email = btn.getAttribute("data-revoke");
+      const res = A.revokeAdmin(session.email, email);
+      if (res.ok) toast(`Revoked ${email}`);
       renderApprovals();
     });
   });
@@ -466,6 +472,12 @@ function renderUsers() {
 
 function normalize(e) { return String(e || "").trim().toLowerCase(); }
 
+/** Never surface the unconfigured placeholder as if it were a real endpoint. */
+function displayIngestUrl(config) {
+  const url = ZonicMeAppsStore.getIngestUrl(config) || "";
+  return url.includes("YOUR-SUPABASE") ? "" : url;
+}
+
 function collectMission() {
   state.mission = document.getElementById("mission").value;
   const url = document.getElementById("ingestUrl").value.trim();
@@ -487,7 +499,7 @@ async function enterAdmin() {
   showAdmin(session);
   state = await ZonicMeAppsStore.loadConfig("./config/apps.json");
   document.getElementById("mission").value = state.mission || "";
-  document.getElementById("ingestUrl").value = ZonicMeAppsStore.getIngestUrl(state);
+  document.getElementById("ingestUrl").value = displayIngestUrl(state);
   document.getElementById("googleClientId").value = ZonicMeAuth.getGoogleClientId();
   renderApps();
   renderUsers();
@@ -588,7 +600,7 @@ document.getElementById("tabs").addEventListener("click", (e) => {
   document.getElementById("tab-analytics").classList.toggle("hidden", id !== "analytics");
   document.getElementById("tab-pricing").classList.toggle("hidden", id !== "pricing");
   document.getElementById("tab-users").classList.toggle("hidden", id !== "users");
-  if (id === "users") renderUsers();
+  if (id === "users") { renderUsers(); renderApprovals(); }
   if (id === "analytics") renderAdminAnalytics();
   if (id === "pricing") window.__renderServicePricing?.();
 });
@@ -613,7 +625,7 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   }
   collectMission();
   ZonicMeAppsStore.saveLocal(state);
-  toast("Saved to localStorage — refresh the landing page.");
+  toast("Saved in this browser — refresh the hub to see the change.");
 });
 
 document.getElementById("exportBtn").addEventListener("click", () => {
@@ -631,9 +643,9 @@ document.getElementById("reloadBtn").addEventListener("click", async () => {
   const res = await fetch("./config/apps.json", { cache: "no-store" });
   state = await res.json();
   document.getElementById("mission").value = state.mission || "";
-  document.getElementById("ingestUrl").value = ZonicMeAppsStore.getIngestUrl(state);
+  document.getElementById("ingestUrl").value = displayIngestUrl(state);
   renderApps();
-  toast("Reloaded seed from config/apps.json");
+  toast("Reloaded the published app listings");
 });
 
 document.getElementById("resetBtn").addEventListener("click", async () => {
@@ -641,7 +653,7 @@ document.getElementById("resetBtn").addEventListener("click", async () => {
   localStorage.removeItem(ZonicMeAppsStore.INGEST_KEY);
   state = await ZonicMeAppsStore.loadConfig("./config/apps.json");
   document.getElementById("mission").value = state.mission || "";
-  document.getElementById("ingestUrl").value = ZonicMeAppsStore.getIngestUrl(state);
+  document.getElementById("ingestUrl").value = displayIngestUrl(state);
   renderApps();
   toast("Local overrides cleared");
 });
@@ -653,23 +665,34 @@ document.getElementById("refreshAdminAnalytics").addEventListener("click", () =>
 document.getElementById("deleteMockBtn").addEventListener("click", () => {
   ZonicAnalyticsHub.disableMockSeed();
   Object.keys(adminOrbitCache).forEach((k) => delete adminOrbitCache[k]);
-  renderAdminAnalytics().then(() => toast("Mock seed disabled — only live orbit data shown"));
+  renderAdminAnalytics().then(() => toast("Sample data hidden — showing reported figures only"));
 });
 
 document.getElementById("restoreMockBtn").addEventListener("click", () => {
   ZonicAnalyticsHub.enableMockSeed();
-  renderAdminAnalytics().then(() => toast("Mock seed restored"));
+  renderAdminAnalytics().then(() => toast("Sample data shown again"));
 });
 
 document.getElementById("flushSpansBtn").addEventListener("click", async () => {
   const res = await ZonicTrack.flush();
-  toast(res.remote ? `Flushed ${res.flushed} spans` : `Buffered locally (${res.buffered || 0} spans)`);
+  toast(res.remote
+    ? `Sent ${res.flushed} activity records`
+    : `Held on this device (${res.buffered || 0} records) — no analytics endpoint set`);
 });
 
 (function boot() {
-  const session = ZonicMeAuth.getSession();
-  if (session && ZonicMeAuth.canAccessAdmin(session)) enterAdmin();
-  else showGate();
+  // Every panel starts hidden, so an exception here would leave a blank page.
+  // Fail visibly instead: always end up on either the console or the sign-in gate.
+  try {
+    const session = ZonicMeAuth.getSession();
+    if (session && ZonicMeAuth.canAccessAdmin(session)) enterAdmin();
+    else showGate();
+  } catch (err) {
+    console.error("[ZonicMe admin boot]", err);
+    document.getElementById("gate")?.classList.remove("hidden");
+    const el = document.getElementById("loginErr");
+    if (el) el.textContent = "The admin console could not start. Reload the page, and if it keeps happening contact support.";
+  }
 })();
 </script>
 <script type="module">
