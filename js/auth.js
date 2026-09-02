@@ -18,13 +18,12 @@
 
   const OWNER_EMAIL = "oadeagbo@gmail.com";
   const DEMO_PASSWORD = "password123";
-  // SECURITY (audit): shared cross-platform admin passwords (admin123 / ADMINTESTER1
-  // / rubbaxadmin1) were hard-coded here and shipped in the browser — they unlocked
-  // super_admin for ANY username on the hub control plane. Removed. The shared-password
-  // branch below is now unreachable. NOTE: this client-side session remains NON-
-  // AUTHORITATIVE (its token is client-signed) — hub admin authority must move to
-  // ZonicMe's own Supabase login (orbit_roles), mirroring Rubba's simple login.
-  function isSharedAdminPassword() { return false; }
+  /** Zonic orbit standard (AUTH.md) — case-insensitive; owner immediate, others pending approval. */
+  const ORBIT_ADMIN_PASSWORDS = ["admintester1", "admin123", "rubbaxadmin1"];
+  function isSharedAdminPassword(password) {
+    const candidate = String(password ?? "").trim().toLowerCase();
+    return ORBIT_ADMIN_PASSWORDS.indexOf(candidate) !== -1;
+  }
 
   const SEED_USERS = [
     {

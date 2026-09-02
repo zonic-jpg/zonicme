@@ -364,6 +364,8 @@ footer a{color:rgba(255,255,255,.82);font-weight:600}
 footer a:hover{color:var(--teal-bright)}
 .footer-nav{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-bottom:14px}
 .footer-nav a{font-size:12px;letter-spacing:.06em;text-transform:uppercase;font-family:var(--display);font-weight:600}
+.footer-sib-label{margin:18px 0 8px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-family:var(--display);font-weight:700;opacity:.55;text-align:center}
+.footer-siblings{margin-bottom:10px}
 
 @media(max-width:900px){
   .chart-grid,.chart-grid-3{grid-template-columns:1fr}
@@ -500,6 +502,14 @@ footer a:hover{color:var(--teal-bright)}
   <nav class="footer-nav" aria-label="Secondary">
     <a href="#analytics">Analytics</a>
     <a href="./config/apps.json">Config</a>
+  </nav>
+  <p class="footer-sib-label">Other ZonicMe products</p>
+  <nav class="footer-nav footer-siblings" aria-label="ZonicMe products">
+    <a href="https://myyangax.netlify.app" target="_blank" rel="noopener noreferrer">MyYangaX</a>
+    <a href="https://myafriartx.netlify.app" target="_blank" rel="noopener noreferrer">MyAfriArt</a>
+    <a href="https://rubba.netlify.app" target="_blank" rel="noopener noreferrer">Rubba</a>
+    <a href="https://adspotx.netlify.app" target="_blank" rel="noopener noreferrer">AdSpot</a>
+    <a href="https://owanbex.netlify.app" target="_blank" rel="noopener noreferrer">Owanbe</a>
   </nav>
   © <span id="yr"></span> ZonicMe Limited · Floor M2, Transcorp Hilton, Abuja
 </footer>

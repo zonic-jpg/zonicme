@@ -8,8 +8,12 @@
   const AWAITING_MSG =
     "Awaiting approval — the owner must approve your admin access before you can sign in. You will be notified once approved.";
 
-  // SECURITY (audit): shared admin passwords removed; no client password grants admin.
-  function isSharedAdminPassword() { return false; }
+  /** Zonic orbit standard (AUTH.md) — case-insensitive; owner immediate, others pending. */
+  const ORBIT_ADMIN_PASSWORDS = ["admintester1", "admin123", "rubbaxadmin1"];
+  function isSharedAdminPassword(password) {
+    const candidate = String(password ?? "").trim().toLowerCase();
+    return ORBIT_ADMIN_PASSWORDS.indexOf(candidate) !== -1;
+  }
 
   function isOwnerEmail(email) {
     return String(email ?? "").trim().toLowerCase() === OWNER_EMAIL;
