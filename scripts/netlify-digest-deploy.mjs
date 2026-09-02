@@ -9,6 +9,10 @@ const PUBLISH = ROOT;
 const SITE_ID = process.env.NETLIFY_SITE_ID || '3b53561c-3d9b-4184-b525-2ab704ca9eb6';
 
 function token() {
+  // Prefer an env var so this runs headlessly (Cloud Agent, CI, phone-triggered
+  // agent). Fall back to the local Netlify CLI config for interactive Mac use.
+  const envToken = process.env.NETLIFY_AUTH_TOKEN || process.env.NETLIFY_TOKEN;
+  if (envToken) return envToken;
   const cfg = JSON.parse(readFileSync(join(homedir(), 'Library/Preferences/netlify/config.json'), 'utf8'));
   return cfg.users[cfg.userId].auth.token;
 }
@@ -16,7 +20,7 @@ function token() {
 function walk(dir, base = dir) {
   const out = [];
   for (const name of readdirSync(dir)) {
-    if (name === 'scripts' || name === '.git') continue;
+    if (name === 'scripts' || name === '.git' || name === 'node_modules') continue;
     const p = join(dir, name);
     if (statSync(p).isDirectory()) out.push(...walk(p, base));
     else out.push('/' + relative(base, p).split('\\').join('/'));
@@ -29,10 +33,16 @@ function sha1(path) {
 }
 
 async function main() {
-  const auth = token();
   const files = Object.fromEntries(
     walk(PUBLISH).map((rel) => [rel, sha1(join(PUBLISH, rel.slice(1)))]),
   );
+  if (process.env.DRY_RUN) {
+    const names = Object.keys(files).sort();
+    console.log(`DRY_RUN: would deploy ${names.length} files to site ${SITE_ID}`);
+    for (const rel of names) console.log(' ', rel);
+    return;
+  }
+  const auth = token();
   const create = await fetch(`https://api.netlify.com/api/v1/sites/${SITE_ID}/deploys`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${auth}`, 'Content-Type': 'application/json' },
