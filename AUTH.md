@@ -8,7 +8,8 @@ See MyYangaX `AUTH.md` for the full orbit standard.
 
 ## Rule 2 — ADMINTESTER queue
 
-Any other username/email + admin password → **PENDING** (awaiting-approval message).
+Any other username/email + orbit admin password → **PENDING** (awaiting-approval message).
+Passwords are rotated periodically and never appear in UI or docs.
 
 ## Rule 3 — Owner queue on login
 

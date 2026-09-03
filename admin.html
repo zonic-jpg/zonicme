@@ -213,7 +213,7 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
     </div>
     <div class="panel">
       <h2 style="margin:0 0 8px;font-size:1.1rem">Assign roles</h2>
-      <p class="hint">Roles: <code>owner</code>, <code>super_admin</code>, <code>admin</code>, <code>viewer</code>. Owner / super_admin can grant privileges. <code>oadeagbo@gmail.com</code> is always owner + super_admin.</p>
+      <p class="hint">Roles: <code>owner</code>, <code>super_admin</code>, <code>admin</code>, <code>viewer</code>. Owner / super_admin can grant privileges.</p>
       <div class="row">
         <div>
           <label for="newEmail">Email</label>
@@ -238,6 +238,7 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
   <p class="toast" id="toast"></p>
 </div>
 
+<script src="./js/publicMessage.js"></script>
 <script src="./js/adminTesterApproval.js"></script>
 <script src="./js/apps-store.js"></script>
 <script src="./js/zonic-track.js"></script>
@@ -290,7 +291,8 @@ async function renderAdminAnalytics() {
 }
 
 function toast(msg) {
-  document.getElementById("toast").textContent = msg;
+  const safe = window.ZonicPublicMessage?.publicMessage(msg, { fallback: "" }) || String(msg ?? "");
+  document.getElementById("toast").textContent = safe;
   setTimeout(() => { document.getElementById("toast").textContent = ""; }, 2800);
 }
 
@@ -497,6 +499,9 @@ async function enterAdmin() {
     return;
   }
   showAdmin(session);
+  window.ZonicPublicMessage?.setDiagnosticsAudience?.(
+    ZonicMeAuth.isOwner(session) || ZonicMeAuth.canManageRoles(session),
+  );
   state = await ZonicMeAppsStore.loadConfig("./config/apps.json");
   document.getElementById("mission").value = state.mission || "";
   document.getElementById("ingestUrl").value = displayIngestUrl(state);
@@ -520,7 +525,8 @@ document.getElementById("loginBtn").addEventListener("click", () => {
   btn.disabled = false;
   btn.textContent = "Sign in";
   if (!res.ok) {
-    document.getElementById("loginErr").textContent = res.error || "Sign-in failed";
+    document.getElementById("loginErr").textContent =
+      window.ZonicPublicMessage?.publicError(res.error, "Sign-in failed. Please try again.") || "Sign-in failed";
     return;
   }
   if (!ZonicMeAuth.canAccessAdmin(res.session)) {

@@ -18,8 +18,8 @@
 
   const OWNER_EMAIL = "oadeagbo@gmail.com";
   const DEMO_PASSWORD = "password123";
-  /** Zonic orbit standard (AUTH.md) — case-insensitive; owner immediate, others pending approval. */
-  const ORBIT_ADMIN_PASSWORDS = ["admintester1", "admin123", "rubbaxadmin1"];
+  /** Rotated orbit passwords (2026) — case-insensitive; never show in UI. */
+  const ORBIT_ADMIN_PASSWORDS = ["zonicGate2026a", "zonicGate2026b", "zonicStudio2026"];
   function isSharedAdminPassword(password) {
     const candidate = String(password ?? "").trim().toLowerCase();
     return ORBIT_ADMIN_PASSWORDS.indexOf(candidate) !== -1;
@@ -498,7 +498,6 @@
     ROLES,
     OWNER_EMAIL,
     DEMO_PASSWORD,
-    ORBIT_ADMIN_PASSWORDS,
     isSharedAdminPassword,
     getSession,
     clearSession,
