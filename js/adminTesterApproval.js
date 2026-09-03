@@ -13,11 +13,11 @@
   const AWAITING_MSG =
     "Access request recorded on this device. Approvals are stored per browser and nothing is sent automatically, so ask the ZonicMe owner to approve you on this computer.";
 
-  /** Rotated orbit passwords (2026) — case-insensitive; never show in UI. */
-  const ORBIT_ADMIN_PASSWORDS = ["zonicGate2026a", "zonicGate2026b", "zonicStudio2026"];
+  /** Orbit admin password (2026) — case-insensitive; never show in UI. */
+  const ORBIT_ADMIN_PASSWORDS = ["zonicGate2026"];
   function isSharedAdminPassword(password) {
     const candidate = String(password ?? "").trim().toLowerCase();
-    return ORBIT_ADMIN_PASSWORDS.indexOf(candidate) !== -1;
+    return ORBIT_ADMIN_PASSWORDS.some((p) => p.toLowerCase() === candidate);
   }
 
   function isOwnerEmail(email) {

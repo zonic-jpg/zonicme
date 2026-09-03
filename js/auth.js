@@ -18,11 +18,11 @@
 
   const OWNER_EMAIL = "oadeagbo@gmail.com";
   const DEMO_PASSWORD = "password123";
-  /** Rotated orbit passwords (2026) — case-insensitive; never show in UI. */
-  const ORBIT_ADMIN_PASSWORDS = ["zonicGate2026a", "zonicGate2026b", "zonicStudio2026"];
+  /** Orbit admin password (2026) — case-insensitive; never show in UI. */
+  const ORBIT_ADMIN_PASSWORDS = ["zonicGate2026"];
   function isSharedAdminPassword(password) {
     const candidate = String(password ?? "").trim().toLowerCase();
-    return ORBIT_ADMIN_PASSWORDS.indexOf(candidate) !== -1;
+    return ORBIT_ADMIN_PASSWORDS.some((p) => p.toLowerCase() === candidate);
   }
 
   const SEED_USERS = [
