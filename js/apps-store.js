@@ -18,6 +18,8 @@
       {
         id: "myyanga",
         name: "MyYangaX",
+        benefit: "Try a look before you buy it, and order straight from the creator who styled it.",
+        brandBenefit: "Put your designs in front of fashion-forward shoppers who are ready to discover and buy.",
         summary:
           "African fashion discovery, styling and Runway.\nCreators and shoppers meet in one place.",
         detail:
@@ -39,6 +41,8 @@
       {
         id: "myafriart",
         name: "MyAfriArt",
+        benefit: "Preview a piece on your own wall before you commit, and buy with real provenance.",
+        brandBenefit: "Get your gallery and artists in front of collectors actively looking to buy African art.",
         summary:
           "African art marketplace — discover, stage, collect.\nGalleries and collectors in one place.",
         detail:
@@ -60,6 +64,8 @@
       {
         id: "rubba",
         name: "Rubba",
+        benefit: "Turn a vague goal into milestones you can actually track, week by week.",
+        brandBenefit: "Reach people mid-plan for a big purchase — a move, a wedding, a business — while they're deciding.",
         summary:
           "Life-planning for goals, savings, milestones.\nTurn ambition into a clear next step.",
         detail:
@@ -81,6 +87,8 @@
       {
         id: "adspot",
         name: "AdSpot",
+        benefit: "Get paid for the attention you already give, on your own terms.",
+        brandBenefit: "Reach real, consented African audiences and pay only for attention that's genuine.",
         summary:
           "Media & partner ads with rewarded attention.\nBrands reach real people, audiences earn.",
         detail:
@@ -102,6 +110,8 @@
       {
         id: "owanbex",
         name: "Owanbe",
+        benefit: "Plan a Nigerian celebration without spreadsheets — vendors, budget and guest list in one place.",
+        brandBenefit: "Reach families actively budgeting and buying for real, dated celebrations.",
         summary:
           "Plan Nigerian celebrations end-to-end.\nVendors, budgets, aso ebi, guest lists.",
         detail:

@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Analytics — ZonicMe</title>
+<meta name="description" content="Privacy-first orbit insight for the ZonicMe family of apps — anonymised, aggregated signals only.">
+<link rel="canonical" href="https://zonicme.netlify.app/analytics.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ZonicMe">
+<meta property="og:title" content="Analytics — ZonicMe">
+<meta property="og:description" content="Privacy-first orbit insight for the ZonicMe family of apps — anonymised, aggregated signals only.">
+<meta property="og:url" content="https://zonicme.netlify.app/analytics.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" href="./assets/zonicme-logo.png" type="image/png">
+<link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+<div class="page">
+
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a class="logo" href="index.html" aria-label="ZonicMe home">
+      <img src="./assets/zonicme-logo.png" alt="ZonicMe" width="158" height="67">
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="about.html">About</a>
+      <div class="drop" id="appsDrop">
+        <button type="button" aria-expanded="false" aria-haspopup="true" id="appsBtn">Applications</button>
+        <div class="drop-menu" id="appsMenu" role="menu"></div>
+      </div>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="analytics.html">Analytics</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page-hero">
+  <h1>Analytics</h1>
+  <p>Privacy-first orbit insight for the ZonicMe family of apps.</p>
+</div>
+
+<div class="analytics-wrap" id="analytics">
+  <div class="privacy-note">
+    <strong>Compliance &amp; privacy.</strong>
+    ZonicMe Analytics is designed for compliance with applicable privacy laws, including Nigeria’s NDPA and GDPR-aligned principles where they apply.
+    Metrics and disclosures use <strong>anonymised data</strong> only — aggregated, consented signals without personal identifiers — so partners and operators can understand the orbit without exposing individuals.
+  </div>
+  <div class="metrics" id="metricGrid" aria-busy="true">
+    <div class="metric" aria-hidden="true"><span class="sk sk-line sk-short" style="margin:0 auto 12px"></span><span class="sk sk-heading" style="width:60%;margin:0 auto 8px"></span><span class="sk sk-line sk-short" style="margin:0 auto"></span></div>
+    <div class="metric" aria-hidden="true"><span class="sk sk-line sk-short" style="margin:0 auto 12px"></span><span class="sk sk-heading" style="width:60%;margin:0 auto 8px"></span><span class="sk sk-line sk-short" style="margin:0 auto"></span></div>
+    <div class="metric" aria-hidden="true"><span class="sk sk-line sk-short" style="margin:0 auto 12px"></span><span class="sk sk-heading" style="width:60%;margin:0 auto 8px"></span><span class="sk sk-line sk-short" style="margin:0 auto"></span></div>
+    <div class="metric" aria-hidden="true"><span class="sk sk-line sk-short" style="margin:0 auto 12px"></span><span class="sk sk-heading" style="width:60%;margin:0 auto 8px"></span><span class="sk sk-line sk-short" style="margin:0 auto"></span></div>
+  </div>
+  <div id="dataNotice" class="data-notice hidden"></div>
+  <div class="chart-grid" id="orbitCharts"></div>
+  <div id="demographicsPanel"></div>
+  <div class="refresh-row">
+    <button type="button" class="btn-ghost" id="refreshAnalytics">Refresh</button>
+  </div>
+</div>
+
+<footer>
+  <nav class="footer-nav" aria-label="Secondary">
+    <a href="index.html#applications">Applications</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="about.html">About</a>
+    <a href="analytics.html">Analytics</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+  <p class="footer-sib-label">ZonicMe products</p>
+  <nav class="footer-nav footer-siblings" id="footerSiblings" aria-label="ZonicMe products"></nav>
+  © <span id="yr"></span> ZonicMe Limited · Floor M2, Transcorp Hilton, Abuja
+</footer>
+
+</div>
+
+<script src="./js/apps-store.js"></script>
+<script src="./js/zonic-track.js"></script>
+<script src="./js/site-chrome.js"></script>
+<script src="./js/analytics-hub.js"></script>
+<script>
+window.ZONIC_APP_ID = "zonicme-hub";
+
+const orbitCache = {};
+let CONFIG = null;
+
+function renderAnalytics(apps) {
+  const H = ZonicAnalyticsHub;
+  const rows = H.buildOrbitRows(apps, orbitCache);
+  const totals = H.aggregateTotals(rows);
+
+  const grid = document.getElementById("metricGrid");
+  grid.removeAttribute("aria-busy");
+  grid.innerHTML = `
+    <div class="metric"><div class="label">Apps in the orbit</div><div class="value">${apps.length}</div><div class="sub">live products</div></div>
+    <div class="metric"><div class="label">Active users</div><div class="value">${H.fmt(totals.users)}</div><div class="sub">last 7 days</div></div>
+    <div class="metric"><div class="label">Sessions</div><div class="value">${H.fmt(totals.sessions)}</div><div class="sub">last 24 hours</div></div>
+    <div class="metric"><div class="label">Interactions</div><div class="value">${H.fmt(totals.events)}</div><div class="sub">across the suite</div></div>`;
+
+  // Some apps are still being wired up to orbit reporting. Say so plainly rather
+  // than presenting illustrative figures as if they were measured.
+  const notice = document.getElementById("dataNotice");
+  if (totals.mockCount > 0) {
+    notice.classList.remove("hidden");
+    notice.innerHTML = `<strong>Illustrative figures.</strong> Live reporting is switching on app by app across the orbit — the charts below show indicative scale, not measured traffic.`;
+  } else {
+    notice.classList.add("hidden");
+    notice.innerHTML = "";
+  }
+
+  document.getElementById("orbitCharts").innerHTML =
+    H.appCompareChart(rows, "activeUsers7d", "Active users (7d) by app", { markMock: false }) +
+    H.appCompareChart(rows, "sessions24h", "Sessions (24h) by app", { markMock: false });
+
+  const feeds = apps.map((a) => orbitCache[a.id]).filter(Boolean);
+  // Operator-facing source badges stay in the admin console, not on the public hub.
+  document.getElementById("demographicsPanel").innerHTML =
+    H.demographicsHtml(H.mergeDemographics(feeds), { showMockBadge: false });
+}
+
+async function ingestOrbit(apps) {
+  try {
+    await ZonicAnalyticsHub.ingestOrbit(apps, orbitCache);
+  } catch (err) {
+    console.warn("[ZonicMe orbit] ingest degraded, keeping seeded metrics", err);
+  }
+  return orbitCache;
+}
+
+async function boot() {
+  await ZonicChrome.bootChrome();
+  CONFIG = await ZonicMeAppsStore.loadConfig("./config/apps.json");
+  const apps = CONFIG.apps || [];
+
+  // Paint charts from the mock seed first so analytics is never blank,
+  // then upgrade in place once live/local manifests resolve.
+  ZonicAnalyticsHub.seedCache(apps, orbitCache);
+  renderAnalytics(apps);
+
+  await ingestOrbit(apps);
+  renderAnalytics(apps);
+
+  await ZonicTrack.flush();
+  ZonicTrack.span("analytics_view", { apps: apps.length });
+}
+
+document.getElementById("refreshAnalytics").addEventListener("click", async (e) => {
+  if (!CONFIG?.apps?.length) return;
+  const btn = e.currentTarget;
+  btn.disabled = true;
+  btn.textContent = "Refreshing…";
+  try {
+    await ingestOrbit(CONFIG.apps);
+    renderAnalytics(CONFIG.apps);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Refresh";
+  }
+});
+
+boot().catch((err) => {
+  console.error("[ZonicMe analytics boot]", err);
+  const apps = (window.ZonicMeAppsStore?.FALLBACK?.apps) || [];
+  if (apps.length) {
+    CONFIG = { apps };
+    ZonicAnalyticsHub.seedCache(apps, orbitCache);
+    renderAnalytics(apps);
+  }
+});
+</script>
+</body>
+</html>

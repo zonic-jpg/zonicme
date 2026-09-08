@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>About Us — ZonicMe</title>
+<meta name="description" content="ZonicMe is the parent group behind a family of Nigerian and pan-African consumer apps across fashion, art, media and everyday planning.">
+<link rel="canonical" href="https://zonicme.netlify.app/about.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ZonicMe">
+<meta property="og:title" content="About Us — ZonicMe">
+<meta property="og:description" content="ZonicMe is the parent group behind a family of Nigerian and pan-African consumer apps across fashion, art, media and everyday planning.">
+<meta property="og:url" content="https://zonicme.netlify.app/about.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" href="./assets/zonicme-logo.png" type="image/png">
+<link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+<div class="page">
+
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a class="logo" href="index.html" aria-label="ZonicMe home">
+      <img src="./assets/zonicme-logo.png" alt="ZonicMe" width="158" height="67">
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="about.html">About</a>
+      <div class="drop" id="appsDrop">
+        <button type="button" aria-expanded="false" aria-haspopup="true" id="appsBtn">Applications</button>
+        <div class="drop-menu" id="appsMenu" role="menu"></div>
+      </div>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="analytics.html">Analytics</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page-hero">
+  <h1>About Us</h1>
+  <p>One parent group, five apps, a single mission across Africa and the diaspora.</p>
+</div>
+
+<section class="section" id="about">
+  <div class="divider"></div>
+  <div class="about-grid">
+    <div>
+      <p>ZonicMe is the parent group behind a family of Nigerian and pan-African consumer apps. We build products across fashion, art, media and everyday planning — each solving a real need for the continent and its diaspora.</p>
+      <p>Our mission is to empower Africans through the creative economy: creators earn, audiences discover, and brands connect with real communities across the orbit.</p>
+    </div>
+    <aside class="about-panel" id="reveal">
+      <h3>What the orbit reveals</h3>
+      <p class="reveal-lead">One family of apps — clear value for people who use them, and clear opportunity for brands who meet them there.</p>
+      <div class="reveal-cols">
+        <div class="reveal-col">
+          <h4>For users</h4>
+          <ul>
+            <li>Discover African fashion, art, media and celebrations in one trusted orbit</li>
+            <li>Tools for style, planning and events that fit everyday life across Africa and the diaspora</li>
+            <li>Earn rewarded attention on AdSpot while keeping control of what you engage with</li>
+            <li>Move between apps without losing the ZonicMe parent you already trust</li>
+          </ul>
+        </div>
+        <div class="reveal-col">
+          <h4>For brands</h4>
+          <ul>
+            <li>Reach consented audiences inside fashion, art, media and celebration contexts</li>
+            <li>Partner across the orbit instead of rebuilding presence app by app</li>
+            <li>Use privacy-first, anonymised orbit signals to understand demand — not personal dossiers</li>
+            <li>Activate campaigns, sponsorships and marketplace presence where culture already lives</li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<footer>
+  <nav class="footer-nav" aria-label="Secondary">
+    <a href="index.html#applications">Applications</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="about.html">About</a>
+    <a href="analytics.html">Analytics</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+  <p class="footer-sib-label">ZonicMe products</p>
+  <nav class="footer-nav footer-siblings" id="footerSiblings" aria-label="ZonicMe products"></nav>
+  © <span id="yr"></span> ZonicMe Limited · Floor M2, Transcorp Hilton, Abuja
+</footer>
+
+</div>
+
+<script src="./js/apps-store.js"></script>
+<script src="./js/zonic-track.js"></script>
+<script src="./js/site-chrome.js"></script>
+<script>
+window.ZONIC_APP_ID = "zonicme-hub";
+ZonicChrome.bootChrome().then(() => ZonicTrack.flush()).then(() => ZonicTrack.span("about_view"));
+</script>
+</body>
+</html>
