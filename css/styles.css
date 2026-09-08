@@ -29,21 +29,27 @@ button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
 .hidden{display:none !important}
 .page > *{position:relative;z-index:1}
 
-/* —— Header (always solid — the hero is a light section now, not a photo backdrop) —— */
+/* —— Header: two stacked bars — logo alone on white, nav on black underneath —— */
 .site-header{
   position:fixed;top:0;left:0;right:0;z-index:100;
-  background:rgba(15,20,18,.97);box-shadow:0 2px 16px rgba(0,0,0,.1);
+  box-shadow:0 2px 16px rgba(0,0,0,.1);
 }
-.header-inner{
-  max-width:1180px;margin:0 auto;padding:14px 24px;
-  display:flex;align-items:center;justify-content:space-between;gap:20px;
+.header-top{
+  background:#fff;padding:14px 24px;
+  display:flex;align-items:center;justify-content:center;
 }
 .logo{
   display:inline-flex;align-items:center;gap:0;flex-shrink:0;
   line-height:0;
 }
 .logo img{height:36px;width:auto;display:block}
-.nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.header-nav{
+  background:rgba(15,20,18,.97);padding:8px 24px;
+}
+.nav{
+  max-width:1180px;margin:0 auto;
+  display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;
+}
 .nav > a,.nav > .drop > button{
   font-family:var(--display);font-size:12px;font-weight:600;letter-spacing:.08em;
   text-transform:uppercase;color:rgba(255,255,255,.88);padding:10px 12px;
@@ -72,7 +78,7 @@ button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
 .hero{
   position:relative;overflow:hidden;
   background:#fbf7f1;
-  padding:132px 24px 64px;
+  padding:176px 24px 64px;
 }
 .hero-inner{
   max-width:1180px;margin:0 auto;position:relative;z-index:1;
@@ -320,7 +326,7 @@ button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
 
 /* —— Sub-page intro banner (About / Roadmap / Analytics / Contact) —— */
 .page-hero{
-  background:#fbf7f1;padding:128px 24px 48px;text-align:center;
+  background:#fbf7f1;padding:172px 24px 48px;text-align:center;
 }
 .page-hero h1{
   font-family:var(--display);font-weight:800;font-size:clamp(1.7rem,3.2vw,2.3rem);
@@ -491,14 +497,15 @@ footer a:hover{color:var(--teal-bright)}
 }
 @media(max-width:560px){
   .metrics{grid-template-columns:1fr}
-  /* Keep the header on one line on phones — a wrapped nav pushes into the hero. */
-  .header-inner{padding:12px 16px;gap:10px}
-  .logo img{height:30px}
+  /* Keep the nav on one line on phones — a wrapped nav pushes into the hero. */
+  .header-top{padding:10px 16px}
+  .logo img{height:28px}
+  .header-nav{padding:6px 16px}
   .nav{flex-wrap:nowrap;gap:2px}
   .nav > a,.nav > .drop > button{padding:6px 6px;font-size:10px;letter-spacing:.05em}
   .nav > a[href="roadmap.html"]{display:none} /* still reachable from the footer */
   .drop-menu{left:auto;right:0}
-  .hero{padding:96px 18px 40px}
+  .hero{padding:132px 18px 40px}
   .hero-inner{grid-template-columns:1fr;gap:28px}
   .hero-copy{max-width:none}
   .hero-photo{aspect-ratio:1224/662;order:-1}
@@ -506,5 +513,5 @@ footer a:hover{color:var(--teal-bright)}
   .benefit-strip{grid-template-columns:1fr;padding-bottom:40px}
   .deck-card{grid-template-columns:76px minmax(0,1fr);min-height:80px}
   .roadmap-grid{grid-template-columns:1fr}
-  .page-hero{padding:96px 18px 36px}
+  .page-hero{padding:128px 18px 36px}
 }
