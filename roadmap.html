@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Roadmap — ZonicMe</title>
+<meta name="description" content="Five products in build for 2027 across the ZonicMe orbit, each aimed at a gap people keep running into.">
+<link rel="canonical" href="https://zonicme.netlify.app/roadmap.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ZonicMe">
+<meta property="og:title" content="Roadmap — ZonicMe">
+<meta property="og:description" content="Five products in build for 2027 across the ZonicMe orbit, each aimed at a gap people keep running into.">
+<meta property="og:url" content="https://zonicme.netlify.app/roadmap.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" href="./assets/zonicme-logo.png" type="image/png">
+<link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+<div class="page">
+
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a class="logo" href="index.html" aria-label="ZonicMe home">
+      <img src="./assets/zonicme-logo.png" alt="ZonicMe" width="158" height="67">
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="about.html">About</a>
+      <div class="drop" id="appsDrop">
+        <button type="button" aria-expanded="false" aria-haspopup="true" id="appsBtn">Applications</button>
+        <div class="drop-menu" id="appsMenu" role="menu"></div>
+      </div>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="analytics.html">Analytics</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page-hero">
+  <h1>Next in the orbit</h1>
+  <p>Five products in build for 2027, each aimed at a gap people keep running into.</p>
+</div>
+
+<section class="section">
+  <div class="divider"></div>
+  <div class="roadmap-grid">
+    <article class="roadmap-card">
+      <span class="roadmap-tag">2027</span>
+      <h3>Confirmahead</h3>
+      <p>Booking clarity and appointment verification, so you know an appointment is real and confirmed before you travel for it.</p>
+    </article>
+    <article class="roadmap-card">
+      <span class="roadmap-tag">2027</span>
+      <h3>CAC Verify</h3>
+      <p>Company registration status monitoring — check that a business is properly registered, and get told when its status changes.</p>
+    </article>
+    <article class="roadmap-card">
+      <span class="roadmap-tag">2027</span>
+      <h3>Notify Me</h3>
+      <p>Bank login alerts that tell you the moment someone signs in to your account, so nothing happens without you knowing.</p>
+    </article>
+    <article class="roadmap-card">
+      <span class="roadmap-tag">2027</span>
+      <h3>InfluencerMatch</h3>
+      <p>Brand and influencer matching with a risk rating, so partnerships start with an honest read on both sides.</p>
+    </article>
+    <article class="roadmap-card">
+      <span class="roadmap-tag">2027</span>
+      <h3>EduChatrooms</h3>
+      <p>Tiered subject rooms that connect learners across borders, grouped by level so conversations stay useful.</p>
+    </article>
+  </div>
+</section>
+
+<footer>
+  <nav class="footer-nav" aria-label="Secondary">
+    <a href="index.html#applications">Applications</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="about.html">About</a>
+    <a href="analytics.html">Analytics</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+  <p class="footer-sib-label">ZonicMe products</p>
+  <nav class="footer-nav footer-siblings" id="footerSiblings" aria-label="ZonicMe products"></nav>
+  © <span id="yr"></span> ZonicMe Limited · Floor M2, Transcorp Hilton, Abuja
+</footer>
+
+</div>
+
+<script src="./js/apps-store.js"></script>
+<script src="./js/zonic-track.js"></script>
+<script src="./js/site-chrome.js"></script>
+<script>
+window.ZONIC_APP_ID = "zonicme-hub";
+ZonicChrome.bootChrome().then(() => ZonicTrack.flush()).then(() => ZonicTrack.span("roadmap_view"));
+</script>
+</body>
+</html>

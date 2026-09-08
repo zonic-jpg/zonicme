@@ -9,6 +9,8 @@
     {
       "id": "myyanga",
       "name": "MyYangaX",
+      "benefit": "Try a look before you buy it, and order straight from the creator who styled it.",
+      "brandBenefit": "Put your designs in front of fashion-forward shoppers who are ready to discover and buy.",
       "summary": "African fashion discovery, styling and Runway.\nCreators and shoppers meet in one place.",
       "detail": "MyYangaX is ZonicMe’s fashion platform — browse looks, style them your way, and follow Runway drops from African designers and the diaspora. Discovery meets commerce so creators earn and audiences find style that feels like home.",
       "features": [
@@ -28,6 +30,8 @@
     {
       "id": "myafriart",
       "name": "MyAfriArt",
+      "benefit": "Preview a piece on your own wall before you commit, and buy with real provenance.",
+      "brandBenefit": "Get your gallery and artists in front of collectors actively looking to buy African art.",
       "summary": "African art marketplace — discover, stage, collect.\nGalleries and collectors in one place.",
       "detail": "MyAfriArt connects artists, galleries, and collectors across Africa and the diaspora. Discover original work, stage digital exhibitions, and collect with confidence — a marketplace built for the continent’s creative voice.",
       "features": [
@@ -47,6 +51,8 @@
     {
       "id": "rubba",
       "name": "Rubba",
+      "benefit": "Turn a vague goal into milestones you can actually track, week by week.",
+      "brandBenefit": "Reach people mid-plan for a big purchase — a move, a wedding, a business — while they're deciding.",
       "summary": "Life-planning for goals, savings, milestones.\nTurn ambition into a clear next step.",
       "detail": "Rubba helps people plan life with clarity — goals, savings targets, and milestones in one calm workspace. Built for everyday Africans who want structure without complexity, and progress they can see.",
       "features": [
@@ -66,6 +72,8 @@
     {
       "id": "adspot",
       "name": "AdSpot",
+      "benefit": "Get paid for the attention you already give, on your own terms.",
+      "brandBenefit": "Reach real, consented African audiences and pay only for attention that's genuine.",
       "summary": "Media & partner ads with rewarded attention.\nBrands reach real people, audiences earn.",
       "detail": "AdSpot is the orbit’s media and partner network. Rewarded attention means brands reach consented audiences while users earn value — transparent, fair, and tuned for African markets and diaspora reach.",
       "features": [
@@ -85,6 +93,8 @@
     {
       "id": "owanbex",
       "name": "Owanbe",
+      "benefit": "Plan a Nigerian celebration without spreadsheets — vendors, budget and guest list in one place.",
+      "brandBenefit": "Reach families actively budgeting and buying for real, dated celebrations.",
       "summary": "Plan Nigerian celebrations end-to-end.\nVendors, budgets, aso ebi, guest lists.",
       "detail": "Owanbe helps families and brands plan weddings, birthdays, and milestone events across Nigeria — vetted vendors, live Naira budgets, aso ebi coordination, and brand analytics in one planner.",
       "features": [

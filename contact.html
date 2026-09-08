@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contact Us — ZonicMe</title>
+<meta name="description" content="Reach ZonicMe Limited — general enquiries and brand partnerships across the orbit of apps.">
+<link rel="canonical" href="https://zonicme.netlify.app/contact.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ZonicMe">
+<meta property="og:title" content="Contact Us — ZonicMe">
+<meta property="og:description" content="Reach ZonicMe Limited — general enquiries and brand partnerships across the orbit of apps.">
+<meta property="og:url" content="https://zonicme.netlify.app/contact.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" href="./assets/zonicme-logo.png" type="image/png">
+<link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+<div class="page">
+
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a class="logo" href="index.html" aria-label="ZonicMe home">
+      <img src="./assets/zonicme-logo.png" alt="ZonicMe" width="158" height="67">
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="about.html">About</a>
+      <div class="drop" id="appsDrop">
+        <button type="button" aria-expanded="false" aria-haspopup="true" id="appsBtn">Applications</button>
+        <div class="drop-menu" id="appsMenu" role="menu"></div>
+      </div>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="analytics.html">Analytics</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page-hero">
+  <h1>Contact Us</h1>
+  <p>General enquiries, partnerships and brand questions — we read every message.</p>
+</div>
+
+<section class="section contact">
+  <div class="divider"></div>
+  <div class="contact-grid">
+    <div class="contact-card">
+      <h3>General enquiries</h3>
+      <p>ZonicMe Limited</p>
+      <p>Floor M2, Transcorp Hilton, Abuja, Nigeria</p>
+      <p><a href="mailto:hello@zonicme.com.ng">hello@zonicme.com.ng</a></p>
+    </div>
+    <div class="contact-card">
+      <h3>Brand &amp; partnerships</h3>
+      <p>Sponsorships, campaigns and orbit-wide analytics requests.</p>
+      <p><a href="mailto:partners@zonicme.com.ng">partners@zonicme.com.ng</a></p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <nav class="footer-nav" aria-label="Secondary">
+    <a href="index.html#applications">Applications</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="about.html">About</a>
+    <a href="analytics.html">Analytics</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+  <p class="footer-sib-label">ZonicMe products</p>
+  <nav class="footer-nav footer-siblings" id="footerSiblings" aria-label="ZonicMe products"></nav>
+  © <span id="yr"></span> ZonicMe Limited · Floor M2, Transcorp Hilton, Abuja
+</footer>
+
+</div>
+
+<script src="./js/apps-store.js"></script>
+<script src="./js/zonic-track.js"></script>
+<script src="./js/site-chrome.js"></script>
+<script>
+window.ZONIC_APP_ID = "zonicme-hub";
+ZonicChrome.bootChrome().then(() => ZonicTrack.flush()).then(() => ZonicTrack.span("contact_view"));
+</script>
+</body>
+</html>
