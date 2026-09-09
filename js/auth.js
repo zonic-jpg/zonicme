@@ -5,7 +5,17 @@
  * to your Google OAuth Web client ID. Soft-fails on invalid_origin like AdSpot.
  *
  * Owner signs in with their own account (roles come from the server).
- * SECURITY (audit): the former shared-password admin gate has been removed.
+ * SECURITY (audit, 2026-09): the shared-password admin gate below is NOT
+ * removed — it is still live, on purpose, as a bootstrap path for the owner
+ * and approved testers. It is safe only because it is wired exclusively into
+ * admin.html's own login form (the sole caller of loginEmailPassword() in
+ * this repo — see admin.html). It must never be exposed to any public page,
+ * component, or the site's regular nav/header. If you are reading this
+ * because you're adding a public-facing login/signup form anywhere else in
+ * the ZonicMe portfolio, do NOT wire isSharedAdminPassword()/this file into
+ * it — that is exactly the mistake found (and fixed) across AdSpotX,
+ * MyYangaX, MyAfriArt, Rubba, and Owanbe in the 2026-09 admin-visibility
+ * audit.
  */
 (function (global) {
   const SESSION_KEY = "zonicme_admin_session_v1";
