@@ -180,6 +180,7 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
       <button type="button" class="secondary" id="exportBtn">Download JSON</button>
       <button type="button" class="secondary" id="reloadBtn">Reload seed JSON</button>
       <button type="button" class="danger" id="resetBtn">Clear local overrides</button>
+      <span id="autosaveNote" class="hint" hidden></span>
     </div>
   </div>
 
@@ -394,6 +395,7 @@ function renderApps() {
       const i = +el.dataset.i;
       const field = el.dataset.field;
       state.apps[i][field] = el.value;
+      scheduleAutosave();
     });
   });
 }
@@ -478,6 +480,27 @@ function normalize(e) { return String(e || "").trim().toLowerCase(); }
 function displayIngestUrl(config) {
   const url = ZonicMeAppsStore.getIngestUrl(config) || "";
   return url.includes("YOUR-SUPABASE") ? "" : url;
+}
+
+// Editing a field only updated in-memory `state` — nothing was persisted
+// until the admin explicitly clicked "Save to browser", so a refresh (or
+// an accidental navigation) mid-edit silently discarded everything typed.
+// This debounces a real save into the same localStorage-backed layer the
+// button already writes to, so the work survives even if Save is never
+// clicked; the button remains for an explicit, confirmed save.
+let autosaveTimer = null;
+function scheduleAutosave() {
+  if (!ZonicMeAuth.hasMinRole(ZonicMeAuth.getSession(), "admin")) return;
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(() => {
+    collectMission();
+    ZonicMeAppsStore.saveLocal(state);
+    const el = document.getElementById("autosaveNote");
+    if (el) {
+      el.textContent = `Autosaved to this browser at ${new Date().toLocaleTimeString()}`;
+      el.hidden = false;
+    }
+  }, 1200);
 }
 
 function collectMission() {
@@ -623,6 +646,9 @@ document.getElementById("grantBtn").addEventListener("click", () => {
     renderUsers();
   }
 });
+
+document.getElementById("mission").addEventListener("input", scheduleAutosave);
+document.getElementById("ingestUrl").addEventListener("input", scheduleAutosave);
 
 document.getElementById("saveBtn").addEventListener("click", () => {
   if (!ZonicMeAuth.hasMinRole(ZonicMeAuth.getSession(), "admin")) {

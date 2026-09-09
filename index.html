@@ -152,6 +152,16 @@ function thumbSrc(app) {
   return app.thumbnail || PLACEHOLDER(app.name, app.color || "#c45c26");
 }
 
+// Falls back to the same generated placeholder used for a missing thumbnail
+// when a *set* thumbnail URL 404s or otherwise fails to load, instead of
+// showing a broken-image icon. Exposed on window so the inline onerror=
+// attribute below (deck cards are built via innerHTML, not React/JSX) can
+// reach it.
+window.__zonicThumbFallback = function (img) {
+  img.onerror = null; // avoid a loop if the placeholder itself somehow fails
+  img.src = PLACEHOLDER(img.dataset.appName || "", img.dataset.appColor || "#c45c26");
+};
+
 const COUNT_WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
 
 function renderAppsLead(apps) {
@@ -176,7 +186,9 @@ function renderDeck(apps) {
     return `
     <button type="button" class="deck-card${isActive ? " is-active" : ""}" role="option"
       aria-selected="${isActive ? "true" : "false"}" data-app-id="${esc(a.id)}" id="deck-${esc(a.id)}">
-      <div class="deck-thumb"><img src="${esc(thumbSrc(a))}" alt="" loading="lazy"></div>
+      <div class="deck-thumb"><img src="${esc(thumbSrc(a))}" alt="" loading="lazy"
+        data-app-name="${esc(a.name)}" data-app-color="${esc(a.color || "#c45c26")}"
+        onerror="window.__zonicThumbFallback(this)"></div>
       <div class="deck-body">
         <h3>${esc(a.name)}</h3>
         <div class="deck-summary">${esc(summaryLines(a))}</div>
