@@ -2,5 +2,5 @@
 # so nobody edits this copy and expects it to take effect.
 /admin             /admin.html   200
 /config            /admin.html   302
-/hub               /             301
-/zonicme-hub.html  /             301
+/hub               /             301!
+/zonicme-hub.html  /             301!
