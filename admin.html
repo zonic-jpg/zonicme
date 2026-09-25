@@ -123,21 +123,26 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
   </div>
   <button type="button" id="loginBtn" style="width:100%;margin-top:4px">Sign in</button>
   <p style="margin-top:10px;text-align:center"><a href="#forgot" id="forgotLink" style="font-size:13px">Forgot password?</a></p>
-  <p class="hint" style="margin-top:14px">New team members need the owner to approve them on first sign-in. Sign-in details are kept in this browser only — they do not follow you to another computer.</p>
+  <p class="hint" style="margin-top:14px">New team members need the owner to approve them on first sign-in. Sign-in now works from any device or browser.</p>
   <p class="err" id="loginErr"></p>
   <p style="margin-top:18px;font-size:13px"><a class="back" href="./index.html">← Back to hub</a></p>
 </div>
 
 <div id="forgotPanel" class="gate hidden">
   <h2 style="margin-top:0;font-size:1.25rem">Reset your password</h2>
-  <p class="hint">No reset email is sent. ZonicMe admin accounts are stored in this browser, so the new password below applies on this device only — you will need to reset again on another computer.</p>
-  <label for="forgotEmail">Email</label>
-  <input id="forgotEmail" type="email" autocomplete="email" placeholder="you@example.com" />
-  <label for="forgotPass">New password</label>
-  <input id="forgotPass" type="password" autocomplete="new-password" placeholder="Min 8 characters" />
-  <label for="forgotPass2">Confirm</label>
-  <input id="forgotPass2" type="password" autocomplete="new-password" />
-  <button type="button" id="forgotBtn" style="width:100%;margin-top:12px">Update password</button>
+  <div id="forgotRequestFields">
+    <p class="hint">We'll email a reset link to this address.</p>
+    <label for="forgotEmail">Email</label>
+    <input id="forgotEmail" type="email" autocomplete="email" placeholder="you@example.com" />
+  </div>
+  <div id="forgotNewPasswordFields" class="hidden">
+    <p class="hint">Choose a new password for your account.</p>
+    <label for="forgotPass">New password</label>
+    <input id="forgotPass" type="password" autocomplete="new-password" placeholder="Min 8 characters" />
+    <label for="forgotPass2">Confirm</label>
+    <input id="forgotPass2" type="password" autocomplete="new-password" />
+  </div>
+  <button type="button" id="forgotBtn" style="width:100%;margin-top:12px">Send reset link</button>
   <button type="button" id="forgotCancel" class="secondary" style="width:100%;margin-top:8px">Back to sign in</button>
   <p class="err" id="forgotErr"></p>
   <p class="hint" id="forgotOk" style="color:#166534"></p>
@@ -239,6 +244,8 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
   <p class="toast" id="toast"></p>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="./js/supabase-client.js"></script>
 <script src="./js/publicMessage.js"></script>
 <script src="./js/adminTesterApproval.js"></script>
 <script src="./js/apps-store.js"></script>
@@ -400,7 +407,7 @@ function renderApps() {
   });
 }
 
-function renderApprovals() {
+async function renderApprovals() {
   const A = window.ZonicAdminApproval;
   const session = ZonicMeAuth.getSession();
   const panel = document.getElementById("admintester-queue");
@@ -410,8 +417,7 @@ function renderApprovals() {
     return;
   }
   panel.classList.remove("hidden");
-  const pending = A.listPendingQueue("zonicme");
-  const approved = A.listApprovedAdmins();
+  const [pending, approved] = await Promise.all([A.listPendingQueue("zonicme"), A.listApprovedAdmins()]);
   document.getElementById("approvalPending").innerHTML = pending.length
     ? pending.map((p) => `
       <div class="user-row">
@@ -429,27 +435,31 @@ function renderApprovals() {
       </div>`).join("")
     : "";
   panel.querySelectorAll("[data-approve]").forEach((btn) => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
       const email = btn.getAttribute("data-approve");
-      const res = A.approveAdmin(session.email, email);
+      btn.disabled = true;
+      const res = await A.approveAdmin(session, email);
       if (res.ok) toast(`Approved ${email}`);
+      else toast(res.error || "Approve failed");
       renderApprovals();
     });
   });
   panel.querySelectorAll("[data-revoke]").forEach((btn) => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
       const email = btn.getAttribute("data-revoke");
-      const res = A.revokeAdmin(session.email, email);
+      btn.disabled = true;
+      const res = await A.revokeAdmin(session, email);
       if (res.ok) toast(`Revoked ${email}`);
+      else toast(res.error || "Revoke failed");
       renderApprovals();
     });
   });
 }
 
-function renderUsers() {
+async function renderUsers() {
   const session = ZonicMeAuth.getSession();
   if (!ZonicMeAuth.canManageRoles(session)) return;
-  const users = ZonicMeAuth.loadUsers();
+  const users = await ZonicMeAuth.loadUsers();
   document.getElementById("usersList").innerHTML = users.map((u) => `
     <div class="user-row">
       <div>
@@ -466,8 +476,9 @@ function renderUsers() {
   `).join("") || `<p class="hint">No users yet.</p>`;
 
   document.querySelectorAll("[data-remove]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const res = ZonicMeAuth.removeUser(session, btn.getAttribute("data-remove"));
+    btn.addEventListener("click", async () => {
+      btn.disabled = true;
+      const res = await ZonicMeAuth.removeUser(session, btn.getAttribute("data-remove"));
       document.getElementById("usersErr").textContent = res.ok ? "" : (res.error || "");
       if (res.ok) { toast("User removed"); renderUsers(); }
     });
@@ -515,10 +526,10 @@ function collectMission() {
 async function enterAdmin() {
   const session = ZonicMeAuth.getSession();
   if (!session || !ZonicMeAuth.canAccessAdmin(session)) {
-    ZonicMeAuth.clearSession();
     showGate();
-    document.getElementById("loginErr").textContent =
-      "This account needs admin (or higher). Ask the owner to grant a role.";
+    document.getElementById("loginErr").textContent = session
+      ? "This account needs admin (or higher). Ask the owner to grant a role."
+      : "";
     return;
   }
   showAdmin(session);
@@ -538,13 +549,18 @@ async function enterAdmin() {
   }
 }
 
-document.getElementById("loginBtn").addEventListener("click", () => {
+document.getElementById("loginBtn").addEventListener("click", async () => {
   const btn = document.getElementById("loginBtn");
   const email = document.getElementById("loginEmail").value;
   const pass = document.getElementById("loginPass").value;
   btn.disabled = true;
   btn.textContent = "Signing in…";
-  const res = ZonicMeAuth.loginEmailPassword(email, pass);
+  let res;
+  try {
+    res = await ZonicMeAuth.loginEmailPassword(email, pass);
+  } catch (err) {
+    res = { ok: false, error: err instanceof Error ? err.message : "Sign-in failed" };
+  }
   btn.disabled = false;
   btn.textContent = "Sign in";
   if (!res.ok) {
@@ -553,9 +569,8 @@ document.getElementById("loginBtn").addEventListener("click", () => {
     return;
   }
   if (!ZonicMeAuth.canAccessAdmin(res.session)) {
-    ZonicMeAuth.clearSession();
     document.getElementById("loginErr").textContent =
-      "Signed in, but this account needs admin access.";
+      "Signed in, but this account needs admin (or higher). Ask the owner to grant a role.";
     return;
   }
   document.getElementById("loginErr").textContent = "";
@@ -576,12 +591,15 @@ document.getElementById("loginPass").addEventListener("keydown", (e) => {
   if (e.key === "Enter") document.getElementById("loginBtn").click();
 });
 
-function showForgot(on) {
+function showForgot(on, recoveryMode) {
   document.getElementById("gate").classList.toggle("hidden", !!on);
   document.getElementById("forgotPanel").classList.toggle("hidden", !on);
   document.getElementById("forgotErr").textContent = "";
   document.getElementById("forgotOk").textContent = "";
-  if (on) {
+  document.getElementById("forgotRequestFields").classList.toggle("hidden", !!recoveryMode);
+  document.getElementById("forgotNewPasswordFields").classList.toggle("hidden", !recoveryMode);
+  document.getElementById("forgotBtn").textContent = recoveryMode ? "Update password" : "Send reset link";
+  if (on && !recoveryMode) {
     document.getElementById("forgotEmail").value = document.getElementById("loginEmail").value || "";
   }
 }
@@ -594,12 +612,28 @@ document.getElementById("forgotCancel").addEventListener("click", () => {
   location.hash = "";
   showForgot(false);
 });
-document.getElementById("forgotBtn").addEventListener("click", () => {
-  const res = ZonicMeAuth.resetLocalPassword(
-    document.getElementById("forgotEmail").value,
-    document.getElementById("forgotPass").value,
-    document.getElementById("forgotPass2").value,
-  );
+document.getElementById("forgotBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("forgotBtn");
+  const inRecovery = !document.getElementById("forgotNewPasswordFields").classList.contains("hidden");
+  btn.disabled = true;
+  let res;
+  try {
+    if (inRecovery) {
+      const pass = document.getElementById("forgotPass").value;
+      const pass2 = document.getElementById("forgotPass2").value;
+      if (pass.length < 8) res = { ok: false, error: "Password must be at least 8 characters" };
+      else if (pass !== pass2) res = { ok: false, error: "Passwords don't match" };
+      else {
+        const { error } = await window.ZonicSupabase.auth.updateUser({ password: pass });
+        res = error ? { ok: false, error: error.message } : { ok: true, message: "Password updated — you're signed in." };
+      }
+    } else {
+      res = await ZonicMeAuth.resetLocalPassword(document.getElementById("forgotEmail").value);
+    }
+  } catch (err) {
+    res = { ok: false, error: err instanceof Error ? err.message : "Reset failed" };
+  }
+  btn.disabled = false;
   if (!res.ok) {
     document.getElementById("forgotErr").textContent = res.error || "Reset failed";
     document.getElementById("forgotOk").textContent = "";
@@ -607,12 +641,22 @@ document.getElementById("forgotBtn").addEventListener("click", () => {
   }
   document.getElementById("forgotErr").textContent = "";
   document.getElementById("forgotOk").textContent = res.message || "Updated";
-  setTimeout(() => {
-    showForgot(false);
-    document.getElementById("loginErr").textContent = "";
-  }, 1200);
+  if (inRecovery) {
+    history.replaceState(null, "", location.pathname + location.search);
+    setTimeout(async () => {
+      showForgot(false);
+      document.getElementById("loginErr").textContent = "";
+      await ZonicMeAuth.init();
+      const session = ZonicMeAuth.getSession();
+      if (session && ZonicMeAuth.canAccessAdmin(session)) enterAdmin();
+    }, 1200);
+  } else {
+    setTimeout(() => {
+      showForgot(false);
+      document.getElementById("loginErr").textContent = "";
+    }, 2500);
+  }
 });
-if (location.hash.replace(/^#/, "") === "forgot") showForgot(true);
 
 document.getElementById("logoutBtn").addEventListener("click", () => {
   ZonicMeAuth.clearSession();
@@ -634,11 +678,14 @@ document.getElementById("tabs").addEventListener("click", (e) => {
   if (id === "pricing") window.__renderServicePricing?.();
 });
 
-document.getElementById("grantBtn").addEventListener("click", () => {
+document.getElementById("grantBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("grantBtn");
   const session = ZonicMeAuth.getSession();
   const email = document.getElementById("newEmail").value;
   const role = document.getElementById("newRole").value;
-  const res = ZonicMeAuth.upsertUserRole(session, email, [role]);
+  btn.disabled = true;
+  const res = await ZonicMeAuth.upsertUserRole(session, email, [role]);
+  btn.disabled = false;
   document.getElementById("usersErr").textContent = res.ok ? "" : (res.error || "");
   if (res.ok) {
     toast(`Updated ${email}`);
@@ -712,10 +759,20 @@ document.getElementById("flushSpansBtn").addEventListener("click", async () => {
     : `Held on this device (${res.buffered || 0} records) — no analytics endpoint set`);
 });
 
-(function boot() {
+(async function boot() {
   // Every panel starts hidden, so an exception here would leave a blank page.
   // Fail visibly instead: always end up on either the console or the sign-in gate.
   try {
+    const isRecoveryLink = /type=recovery/.test(location.hash);
+    await ZonicMeAuth.init();
+    if (isRecoveryLink) {
+      showForgot(true, true);
+      return;
+    }
+    if (location.hash.replace(/^#/, "") === "forgot") {
+      showForgot(true);
+      return;
+    }
     const session = ZonicMeAuth.getSession();
     if (session && ZonicMeAuth.canAccessAdmin(session)) enterAdmin();
     else showGate();

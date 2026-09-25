@@ -1,161 +1,160 @@
 /**
- * Zonic ADMINTESTER approval — ZonicMe (browser).
+ * Zonic ADMINTESTER approval — ZonicMe.
  * Orbit standard: ~/Downloads/MyYangaX-COMPLETE/AUTH.md
+ *
+ * 2026-09-25 (login-instability fix): the approval queue now lives in the
+ * `admin_approval_queue` Supabase table instead of localStorage, so a
+ * request raised on one device is visible to the owner from any device —
+ * that was the actual bug behind "the queue only shows requests made on
+ * this browser."
  */
 (function (global) {
   const OWNER_EMAIL = "oadeagbo@gmail.com";
-  const APPROVAL_STORE_KEY = "zonic_admintester_approval_v1";
-  /**
-   * The approval store is localStorage, so a request only exists in the browser it
-   * was made from and nothing is emailed. Say exactly that — do not promise a
-   * notification or a central queue this implementation cannot deliver.
-   */
   const AWAITING_MSG =
-    "Access request recorded on this device. Approvals are stored per browser and nothing is sent automatically, so ask the ZonicMe owner to approve you on this computer.";
+    "Access request recorded. The ZonicMe owner can approve it from any device — check back after they do.";
 
-  /** Orbit admin password (2026) — case-insensitive; never show in UI. */
-  const ORBIT_ADMIN_PASSWORDS = ["zonicGate2026"];
-  function isSharedAdminPassword(password) {
-    const candidate = String(password ?? "").trim().toLowerCase();
-    return ORBIT_ADMIN_PASSWORDS.some((p) => p.toLowerCase() === candidate);
+  function sb() {
+    if (!global.ZonicSupabase) throw new Error("Supabase client not ready");
+    return global.ZonicSupabase;
   }
 
   function isOwnerEmail(email) {
     return String(email ?? "").trim().toLowerCase() === OWNER_EMAIL;
   }
 
-  function identityToEmail(identity) {
-    const raw = String(identity || "").trim();
-    if (!raw) return "";
-    if (raw.includes("@")) return raw.toLowerCase();
-    const safe = raw.replace(/[^a-zA-Z0-9._+-]/g, "").toLowerCase() || "user";
-    return `${safe}@admin.local`;
-  }
-
-  function loadStore() {
-    try {
-      const raw = localStorage.getItem(APPROVAL_STORE_KEY);
-      if (raw) return JSON.parse(raw);
-    } catch (_) {}
-    return { pending: [], approved: [], revoked: [] };
-  }
-
-  function saveStore(store) {
-    try {
-      localStorage.setItem(APPROVAL_STORE_KEY, JSON.stringify(store));
-    } catch (_) {}
-  }
-
   function norm(email) {
-    return identityToEmail(email);
+    return String(email ?? "").trim().toLowerCase();
   }
 
-  function isRevoked(email) {
-    return loadStore().revoked.some((r) => norm(r.email) === norm(email));
-  }
-
-  function isApproved(email) {
-    const e = norm(email);
-    if (isOwnerEmail(e)) return true;
-    if (isRevoked(e)) return false;
-    return loadStore().approved.some((a) => norm(a.email) === e);
-  }
-
-  function listPendingQueue(appFilter) {
-    const pending = loadStore().pending.filter((p) => !isApproved(p.email));
-    if (!appFilter) return pending;
-    return pending.filter((p) => !p.app || p.app === appFilter);
-  }
-
-  function listApprovedAdmins() {
-    return loadStore().approved.filter((a) => !isRevoked(a.email));
-  }
-
-  async function notifyOwnerPending(requesterEmail, appId) {
-    try {
-      const url = global.ZONIC_NOTIFY_URL || global.VITE_ZONIC_NOTIFY_URL;
-      if (url) {
-        await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ to: OWNER_EMAIL, requester: requesterEmail, app: appId }),
-        });
-      }
-    } catch (_) {
-      /* fail-open */
+  /** Called after a real Supabase sign-in already happened; `session` is the
+   *  ZonicMeAuth session object (has userId, email, roles). */
+  async function resolveAdminGateLogin(identity, session) {
+    if (!session) return { ok: false, status: "invalid", message: "Sign-in failed" };
+    if (isOwnerEmail(session.email)) return { ok: true, status: "owner" };
+    if ((session.roles || []).some((r) => r === "owner" || r === "super_admin" || r === "admin")) {
+      return { ok: true, status: "approved" };
     }
-  }
 
-  function queuePendingApproval(identity, appId) {
-    appId = appId || "zonicme";
-    const email = norm(identity);
-    if (!email || isOwnerEmail(email)) return { ok: true, status: "owner" };
-    if (isApproved(email)) return { ok: true, status: "approved" };
-    const store = loadStore();
-    if (!store.pending.some((p) => norm(p.email) === email)) {
-      store.pending.unshift({
-        email,
-        identity: String(identity || "").trim(),
-        app: appId,
-        requestedAt: new Date().toISOString(),
-      });
-      saveStore(store);
-      void notifyOwnerPending(email, appId);
+    const { data: existing, error } = await sb()
+      .from("admin_approval_queue")
+      .select("id,status")
+      .eq("user_id", session.userId)
+      .eq("app", "zonicme")
+      .order("requested_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) {
+      console.error("[ZonicMe approval] queue lookup failed", error);
+      return { ok: false, status: "error", message: "Could not check approval status — try again." };
     }
-    return { ok: false, status: "pending", email, message: AWAITING_MSG };
-  }
-
-  function resolveAdminGateLogin(identity, password, appId) {
-    if (!isSharedAdminPassword(password)) return { ok: false, status: "not_admin_password" };
-    const email = norm(identity);
-    if (!email) return { ok: false, status: "invalid", message: "Enter any username with admin password." };
-    if (isOwnerEmail(email)) return { ok: true, status: "owner", email };
-    if (isRevoked(email)) {
+    if (existing && existing.status === "denied") {
       return {
         ok: false,
         status: "revoked",
-        email,
         message: "Admin access was revoked. Contact the owner to request access again.",
       };
     }
-    if (isApproved(email)) return { ok: true, status: "approved", email };
-    return queuePendingApproval(identity, appId || "zonicme");
+    if (!existing || existing.status !== "pending") {
+      const { error: insertErr } = await sb().from("admin_approval_queue").insert({
+        user_id: session.userId,
+        identity: String(identity || "").trim(),
+        email: session.email,
+        app: "zonicme",
+        status: "pending",
+      });
+      if (insertErr) console.error("[ZonicMe approval] queue insert failed", insertErr);
+    }
+    return { ok: false, status: "pending", message: AWAITING_MSG };
   }
 
-  function approveAdmin(actorEmail, targetEmail) {
-    if (!isOwnerEmail(actorEmail)) return { ok: false, error: "Only the owner can approve." };
+  async function listPendingQueue(appFilter) {
+    try {
+      let query = sb().from("admin_approval_queue").select("*").eq("status", "pending").order("requested_at", { ascending: false });
+      if (appFilter) query = query.eq("app", appFilter);
+      const { data, error } = await query;
+      if (error) {
+        console.error("[ZonicMe approval] listPendingQueue failed", error);
+        return [];
+      }
+      return (data || []).map((row) => ({
+        email: row.email,
+        identity: row.identity,
+        app: row.app,
+        requestedAt: row.requested_at,
+      }));
+    } catch (err) {
+      console.error("[ZonicMe approval] listPendingQueue threw", err);
+      return [];
+    }
+  }
+
+  async function listApprovedAdmins() {
+    try {
+      const { data, error } = await sb()
+        .from("profiles")
+        .select("email,roles")
+        .order("email", { ascending: true });
+      if (error) {
+        console.error("[ZonicMe approval] listApprovedAdmins failed", error);
+        return [];
+      }
+      return (data || [])
+        .filter((p) => !isOwnerEmail(p.email) && (p.roles || []).some((r) => r === "super_admin" || r === "admin"))
+        .map((p) => ({ email: p.email }));
+    } catch (err) {
+      console.error("[ZonicMe approval] listApprovedAdmins threw", err);
+      return [];
+    }
+  }
+
+  /** actorSession is the owner's ZonicMeAuth session. */
+  async function approveAdmin(actorSession, targetEmail) {
+    if (!actorSession || !isOwnerEmail(actorSession.email)) {
+      return { ok: false, error: "Only the owner can approve." };
+    }
     const email = norm(targetEmail);
-    const store = loadStore();
-    store.pending = store.pending.filter((p) => norm(p.email) !== email);
-    store.revoked = store.revoked.filter((r) => norm(r.email) !== email);
-    store.approved.unshift({ email, approvedAt: new Date().toISOString(), approvedBy: OWNER_EMAIL });
-    saveStore(store);
+    const { data: profile, error: findErr } = await sb().from("profiles").select("id,roles").eq("email", email).maybeSingle();
+    if (findErr) return { ok: false, error: findErr.message };
+    if (!profile) return { ok: false, error: "No account found for that email yet." };
+    const roles = Array.from(new Set([...(profile.roles || []), "super_admin"]));
+    const { error: updateErr } = await sb().from("profiles").update({ roles }).eq("id", profile.id);
+    if (updateErr) return { ok: false, error: updateErr.message };
+    await sb()
+      .from("admin_approval_queue")
+      .update({ status: "approved", decided_at: new Date().toISOString(), decided_by: actorSession.userId })
+      .eq("email", email)
+      .eq("app", "zonicme");
     return { ok: true, email };
   }
 
-  function revokeAdmin(actorEmail, targetEmail) {
-    if (!isOwnerEmail(actorEmail)) return { ok: false, error: "Only the owner can revoke." };
+  async function revokeAdmin(actorSession, targetEmail) {
+    if (!actorSession || !isOwnerEmail(actorSession.email)) {
+      return { ok: false, error: "Only the owner can revoke." };
+    }
     const email = norm(targetEmail);
     if (isOwnerEmail(email)) return { ok: false, error: "Cannot revoke owner." };
-    const store = loadStore();
-    store.approved = store.approved.filter((a) => norm(a.email) !== email);
-    store.pending = store.pending.filter((p) => norm(p.email) !== email);
-    store.revoked.unshift({ email, revokedAt: new Date().toISOString(), revokedBy: OWNER_EMAIL });
-    saveStore(store);
+    const { data: profile, error: findErr } = await sb().from("profiles").select("id").eq("email", email).maybeSingle();
+    if (findErr) return { ok: false, error: findErr.message };
+    if (profile) {
+      const { error: updateErr } = await sb().from("profiles").update({ roles: [] }).eq("id", profile.id);
+      if (updateErr) return { ok: false, error: updateErr.message };
+    }
+    await sb()
+      .from("admin_approval_queue")
+      .update({ status: "denied", decided_at: new Date().toISOString(), decided_by: actorSession.userId })
+      .eq("email", email)
+      .eq("app", "zonicme");
     return { ok: true, email };
   }
 
   global.ZonicAdminApproval = {
     OWNER_EMAIL,
     AWAITING_MSG,
-    isSharedAdminPassword,
     isOwnerEmail,
-    isApproved,
+    resolveAdminGateLogin,
     listPendingQueue,
     listApprovedAdmins,
-    resolveAdminGateLogin,
     approveAdmin,
     revokeAdmin,
-    notifyOwnerPending,
   };
 })(typeof window !== "undefined" ? window : globalThis);

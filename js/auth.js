@@ -1,8 +1,6 @@
 /**
- * ZonicMe admin auth — local demo + optional Google OAuth.
- *
- * Production: set window.ZONICME_GOOGLE_CLIENT_ID (or localStorage zonicme_google_client_id)
- * to your Google OAuth Web client ID. Soft-fails on invalid_origin like AdSpot.
+ * ZonicMe admin auth — real backend (Supabase Auth + `profiles` table),
+ * replacing the old client-only localStorage implementation.
  *
  * Owner signs in with their own account (roles come from the server).
  * SECURITY (audit, 2026-09): the shared-password admin gate below is NOT
@@ -16,18 +14,22 @@
  * it — that is exactly the mistake found (and fixed) across AdSpotX,
  * MyYangaX, MyAfriArt, Rubba, and Owanbe in the 2026-09 admin-visibility
  * audit.
+ *
+ * 2026-09-25 (login-instability fix): sessions, the user list, and the
+ * ADMINTESTER approval queue now live in the `zonicme` Supabase project
+ * (profiles + admin_approval_queue tables, RLS-protected) instead of
+ * localStorage, so they're consistent across every browser and device.
+ * getSession()/isOwner()/canAccessAdmin() etc. stay synchronous (admin.html
+ * reads them in render loops); they read an in-memory cache that init()
+ * populates at boot and every login/logout keeps fresh. Anything that talks
+ * to Supabase directly (login, role changes) is necessarily async now —
+ * admin.html awaits those specific call sites.
  */
 (function (global) {
-  const SESSION_KEY = "zonicme_admin_session_v1";
-  const USERS_KEY = "zonicme_admin_users_v1";
-  const GOOGLE_ID_KEY = "zonicme_google_client_id";
-  const CLIENT_SECRET = "zonicme-hub-local-sign-v1"; // demo signing only — replace server-side in prod
-
   const ROLES = ["owner", "super_admin", "admin", "viewer"];
   const ROLE_RANK = { viewer: 1, admin: 2, super_admin: 3, owner: 4 };
 
   const OWNER_EMAIL = "oadeagbo@gmail.com";
-  const DEMO_PASSWORD = "password123";
   /** Orbit admin password (2026) — case-insensitive; never show in UI. */
   const ORBIT_ADMIN_PASSWORDS = ["zonicGate2026"];
   function isSharedAdminPassword(password) {
@@ -35,144 +37,80 @@
     return ORBIT_ADMIN_PASSWORDS.some((p) => p.toLowerCase() === candidate);
   }
 
-  const SEED_USERS = [
-    {
-      email: OWNER_EMAIL,
-      name: "Olu Adeagbo",
-      roles: ["owner", "super_admin"],
-      password: DEMO_PASSWORD,
-    },
-  ];
-
-  function b64url(str) {
-    return btoa(unescape(encodeURIComponent(str)))
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_")
-      .replace(/=+$/, "");
-  }
-
-  function b64urlDecode(str) {
-    const pad = str.length % 4 === 0 ? "" : "=".repeat(4 - (str.length % 4));
-    const s = (str + pad).replace(/-/g, "+").replace(/_/g, "/");
-    return decodeURIComponent(escape(atob(s)));
-  }
-
-  function simpleSign(payloadB64) {
-    let h = 0;
-    const raw = CLIENT_SECRET + "." + payloadB64;
-    for (let i = 0; i < raw.length; i++) h = (Math.imul(31, h) + raw.charCodeAt(i)) | 0;
-    return b64url(String(h));
-  }
-
-  function mintToken(user) {
-    const payload = {
-      sub: user.email.toLowerCase(),
-      name: user.name || user.email,
-      roles: user.roles || ["viewer"],
-      iat: Date.now(),
-      exp: Date.now() + 7 * 24 * 60 * 60 * 1000,
-    };
-    const body = b64url(JSON.stringify(payload));
-    return `zm1.${body}.${simpleSign(body)}`;
-  }
-
-  function parseToken(token) {
-    if (!token || typeof token !== "string") return null;
-    const parts = token.split(".");
-    if (parts.length !== 3 || parts[0] !== "zm1") return null;
-    const [, body, sig] = parts;
-    if (simpleSign(body) !== sig) return null;
-    try {
-      const payload = JSON.parse(b64urlDecode(body));
-      if (!payload.exp || payload.exp < Date.now()) return null;
-      return payload;
-    } catch (_) {
-      return null;
-    }
-  }
-
   function normalizeEmail(email) {
     return String(email || "").trim().toLowerCase();
   }
 
-  function loadUsers() {
+  function identityToEmail(identity) {
+    const raw = String(identity || "").trim();
+    if (!raw) return "";
+    if (raw.includes("@")) return normalizeEmail(raw);
+    // Allow bare usernames with the shared admin password
+    const safe = raw.replace(/[^a-zA-Z0-9._+-]/g, "").toLowerCase() || "user";
+    return `${safe}@admin.local`;
+  }
+
+  function sb() {
+    if (!global.ZonicSupabase) throw new Error("Supabase client not ready");
+    return global.ZonicSupabase;
+  }
+
+  // ---- in-memory cache: keeps the existing synchronous call sites working ----
+  let cachedSession = null;
+
+  function toSession(authUser, profile) {
+    if (!authUser) return null;
+    return {
+      email: normalizeEmail(authUser.email),
+      userId: authUser.id,
+      name: (profile && profile.name) || authUser.email,
+      roles: (profile && profile.roles) || [],
+    };
+  }
+
+  async function fetchProfile(userId) {
     try {
-      const raw = localStorage.getItem(USERS_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length) return parsed;
-      }
-    } catch (_) {}
-    const seed = structuredClone(SEED_USERS);
-    saveUsers(seed);
-    return seed;
-  }
-
-  function saveUsers(users) {
-    localStorage.setItem(USERS_KEY, JSON.stringify(users));
-    return users;
-  }
-
-  function findUser(email) {
-    const e = normalizeEmail(email);
-    return loadUsers().find((u) => normalizeEmail(u.email) === e) || null;
-  }
-
-  function ensureOwnerBootstrap(users) {
-    const owner = users.find((u) => normalizeEmail(u.email) === OWNER_EMAIL);
-    if (!owner) {
-      users.push({
-        email: OWNER_EMAIL,
-        name: "Olu Adeagbo",
-        roles: ["owner", "super_admin"],
-        password: DEMO_PASSWORD,
-      });
-    } else {
-      const roles = new Set(owner.roles || []);
-      roles.add("owner");
-      roles.add("super_admin");
-      owner.roles = [...roles];
-      if (!owner.password) owner.password = DEMO_PASSWORD;
-    }
-    return users;
-  }
-
-  function getSession() {
-    try {
-      const raw = localStorage.getItem(SESSION_KEY);
-      if (!raw) return null;
-      const session = JSON.parse(raw);
-      const payload = parseToken(session.token);
-      if (!payload) {
-        clearSession();
+      const { data, error } = await sb().from("profiles").select("*").eq("id", userId).maybeSingle();
+      if (error) {
+        console.error("[ZonicMe auth] profile fetch failed", error);
         return null;
       }
-      return {
-        token: session.token,
-        email: payload.sub,
-        name: payload.name,
-        roles: payload.roles || [],
-        exp: payload.exp,
-      };
-    } catch (_) {
+      return data;
+    } catch (err) {
+      console.error("[ZonicMe auth] profile fetch threw", err);
       return null;
     }
   }
 
-  function setSession(user) {
-    const token = mintToken(user);
-    const session = {
-      token,
-      email: normalizeEmail(user.email),
-      name: user.name || user.email,
-      roles: user.roles || ["viewer"],
-    };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-    return getSession();
+  async function refreshCachedSession() {
+    const { data } = await sb().auth.getSession();
+    const authUser = data && data.session ? data.session.user : null;
+    if (!authUser) {
+      cachedSession = null;
+      return null;
+    }
+    const profile = await fetchProfile(authUser.id);
+    cachedSession = toSession(authUser, profile);
+    return cachedSession;
+  }
+
+  /** Call once at page boot, before reading getSession(). Resolves once the
+   *  cache reflects whatever session Supabase already has persisted. */
+  async function init() {
+    await refreshCachedSession();
+    sb().auth.onAuthStateChange((_event, _session) => {
+      refreshCachedSession().catch((err) => console.error("[ZonicMe auth] session refresh failed", err));
+    });
+    return cachedSession;
+  }
+
+  function getSession() {
+    return cachedSession;
   }
 
   function clearSession() {
-    localStorage.removeItem(SESSION_KEY);
+    cachedSession = null;
+    sb().auth.signOut().catch((err) => console.error("[ZonicMe auth] sign-out failed", err));
   }
 
   function hasMinRole(session, minRole) {
@@ -193,124 +131,84 @@
     return hasMinRole(session, "admin");
   }
 
-  function identityToEmail(identity) {
-    const raw = String(identity || "").trim();
-    if (!raw) return "";
-    if (raw.includes("@")) return normalizeEmail(raw);
-    // Allow bare usernames with the shared admin password
-    const safe = raw.replace(/[^a-zA-Z0-9._+-]/g, "").toLowerCase() || "user";
-    return `${safe}@admin.local`;
+  /** Sign in, creating the account on first use. Only reached via the shared
+   *  admin-gate password, so every caller uses the SAME password for a given
+   *  identity — there's no ambiguity between "wrong password" and "no
+   *  account yet" the way there would be for a personal password. */
+  async function ensureGateAccount(email, password, name) {
+    const signIn = await sb().auth.signInWithPassword({ email, password });
+    if (!signIn.error) return { ok: true };
+    const msg = String(signIn.error.message || "");
+    if (/invalid login credentials/i.test(msg)) {
+      const signUp = await sb().auth.signUp({ email, password, options: { data: { name } } });
+      if (signUp.error) return { ok: false, error: signUp.error.message };
+      if (!signUp.data.session) {
+        // Project has email confirmation on — sign-up succeeded but needs a click.
+        return { ok: false, error: "Check your email to confirm the new account, then sign in again." };
+      }
+      return { ok: true };
+    }
+    return { ok: false, error: msg };
   }
 
-  function loginEmailPassword(email, password) {
+  async function loginEmailPassword(email, password) {
     const pass = String(password ?? "");
     const identity = String(email || "").trim();
+    if (!identity) return { ok: false, error: "Username or email required" };
 
-    // Shared gate: any username + shared admin password → pending until owner approves
     if (isSharedAdminPassword(pass)) {
-      const gate =
-        global.ZonicAdminApproval?.resolveAdminGateLogin?.(identity, pass, "zonicme") ||
-        { ok: true, status: "approved" };
-      if (!gate.ok) {
-        return { ok: false, error: gate.message || "Awaiting approval" };
-      }
-      const grantRole = "super_admin";
-      if (!identity) return { ok: false, error: "Username required" };
       const e = identityToEmail(identity);
-      let users = ensureOwnerBootstrap(loadUsers());
-      if (e === OWNER_EMAIL) {
-        saveUsers(users);
-        const owner = findUser(OWNER_EMAIL);
-        return { ok: true, session: setSession(owner) };
-      }
-      let user = users.find((u) => normalizeEmail(u.email) === e);
-      if (!user) {
-        user = {
-          email: e,
-          name: identity,
-          roles: [grantRole],
-          password: pass,
-        };
-        users.push(user);
-      } else {
-        const roles = new Set(user.roles || []);
-        roles.add(grantRole);
-        user.roles = [...roles];
-        user.password = pass;
-        if (!user.name) user.name = identity;
-      }
-      saveUsers(users);
-      return { ok: true, session: setSession(user) };
+      const acct = await ensureGateAccount(e, pass, identity);
+      if (!acct.ok) return { ok: false, error: acct.error };
+      const session = await refreshCachedSession();
+      if (!session) return { ok: false, error: "Sign-in failed" };
+      if (session.email === OWNER_EMAIL) return { ok: true, session };
+      const gate = await global.ZonicAdminApproval.resolveAdminGateLogin(identity, session);
+      if (!gate.ok) return { ok: false, error: gate.message || "Awaiting approval" };
+      return { ok: true, session: getSession() };
     }
 
-    let users = ensureOwnerBootstrap(loadUsers());
-    saveUsers(users);
-    const user = findUser(email);
-    if (!user) return { ok: false, error: "Unknown account" };
-    if (pass !== String(user.password || "")) {
-      return { ok: false, error: "Invalid password" };
+    const { error } = await sb().auth.signInWithPassword({ email: normalizeEmail(identity), password: pass });
+    if (error) {
+      const friendly = /invalid login credentials/i.test(error.message || "")
+        ? "Invalid email or password"
+        : error.message;
+      return { ok: false, error: friendly };
     }
-    const session = setSession(user);
+    const session = await refreshCachedSession();
+    if (!session) return { ok: false, error: "Sign-in failed" };
     return { ok: true, session };
   }
 
-  /**
-   * Password reset for the hub's on-device accounts. There is no mail provider,
-   * so nothing is sent anywhere — the new password is written to this browser only.
-   * Refuses unknown emails so the confirmation message is never a lie.
-   */
-  function resetLocalPassword(email, newPassword, confirmPassword) {
+  /** Real email-based reset via Supabase Auth — the old localStorage version
+   *  could only rewrite a password on the same device/browser and could
+   *  never actually email anyone; this sends a real reset link. */
+  async function resetLocalPassword(email) {
     const e = normalizeEmail(email);
     if (!e || !e.includes("@")) return { ok: false, error: "Enter the account email" };
-    const pass = String(newPassword || "");
-    const confirm = String(confirmPassword || "");
-    if (pass.length < 8) return { ok: false, error: "Password must be at least 8 characters" };
-    if (pass !== confirm) return { ok: false, error: "Passwords don't match" };
-    if (isSharedAdminPassword(pass)) {
-      return { ok: false, error: "Choose a personal password — not a shared team password" };
-    }
-    const users = ensureOwnerBootstrap(loadUsers());
-    const user = users.find((u) => normalizeEmail(u.email) === e);
-    if (!user) {
-      return {
-        ok: false,
-        error: "No account for that email in this browser. Sign in once on this device first.",
-      };
-    }
-    user.password = pass;
-    saveUsers(users);
+    const { error } = await sb().auth.resetPasswordForEmail(e, {
+      redirectTo: global.location ? `${global.location.origin}/admin.html#reset` : undefined,
+    });
+    if (error) return { ok: false, error: error.message };
     return {
       ok: true,
-      message: "Password updated in this browser. Sign in with the new password.",
+      message: "If that email has an account, a reset link was just sent to it.",
     };
   }
 
-  function loginGoogleProfile(profile) {
+  async function loginGoogleProfile(profile) {
+    // Google sign-in still identifies the person; role checks now come from
+    // the same `profiles` table as the password path.
     const email = normalizeEmail(profile.email);
     if (!email) return { ok: false, error: "Google did not return an email" };
-    let users = ensureOwnerBootstrap(loadUsers());
-    let user = users.find((u) => normalizeEmail(u.email) === email);
-    if (!user) {
-      user = {
-        email,
-        name: profile.name || email,
-        roles: email === OWNER_EMAIL ? ["owner", "super_admin"] : ["viewer"],
-        password: null,
-        google: true,
+    const session = await refreshCachedSession();
+    if (!session || session.email !== email) {
+      return {
+        ok: false,
+        error: "Signed in with Google, but no matching admin session — sign in with email/password first.",
       };
-      users.push(user);
-      saveUsers(users);
-    } else {
-      if (profile.name) user.name = profile.name;
-      if (email === OWNER_EMAIL) {
-        const roles = new Set(user.roles || []);
-        roles.add("owner");
-        roles.add("super_admin");
-        user.roles = [...roles];
-      }
-      saveUsers(users);
     }
-    if (!canAccessAdmin({ roles: user.roles })) {
+    if (!canAccessAdmin(session)) {
       return {
         ok: false,
         error: "Signed in, but this account needs admin access. Ask the owner to grant a role.",
@@ -318,48 +216,75 @@
         needsRole: true,
       };
     }
-    return { ok: true, session: setSession(user) };
+    return { ok: true, session };
   }
 
-  function upsertUserRole(actorSession, email, roles, name) {
+  async function loadUsers() {
+    try {
+      const { data, error } = await sb().from("profiles").select("*").order("created_at", { ascending: true });
+      if (error) {
+        console.error("[ZonicMe auth] loadUsers failed", error);
+        return [];
+      }
+      return data || [];
+    } catch (err) {
+      console.error("[ZonicMe auth] loadUsers threw", err);
+      return [];
+    }
+  }
+
+  async function upsertUserRole(actorSession, email, roles) {
     if (!canManageRoles(actorSession)) {
       return { ok: false, error: "Only owner / super_admin can assign roles" };
     }
     const e = normalizeEmail(email);
     if (!e || !e.includes("@")) return { ok: false, error: "Valid email required" };
-    let list = roles;
-    if (typeof roles === "string") list = [roles];
-    list = (list || []).filter((r) => ROLES.includes(r));
+    let list = Array.isArray(roles) ? roles : [roles];
+    list = list.filter((r) => ROLES.includes(r));
     if (!list.length) return { ok: false, error: "Pick at least one role" };
-    if (e === OWNER_EMAIL) {
-      list = Array.from(new Set([...list, "owner", "super_admin"]));
-    }
-    let users = ensureOwnerBootstrap(loadUsers());
-    let user = users.find((u) => normalizeEmail(u.email) === e);
-    if (!user) {
-      user = {
-        email: e,
-        name: name || e,
-        roles: list,
-        password: DEMO_PASSWORD,
+    if (e === OWNER_EMAIL) list = Array.from(new Set([...list, "owner", "super_admin"]));
+
+    const { data: existing, error: findErr } = await sb().from("profiles").select("id").eq("email", e).maybeSingle();
+    if (findErr) return { ok: false, error: findErr.message };
+    if (!existing) {
+      return {
+        ok: false,
+        error: "That account doesn't exist yet — they need to sign in (or request access) at least once first.",
       };
-      users.push(user);
-    } else {
-      user.roles = list;
-      if (name) user.name = name;
     }
-    saveUsers(users);
-    return { ok: true, user };
+    const { error } = await sb().from("profiles").update({ roles: list }).eq("id", existing.id);
+    if (error) return { ok: false, error: error.message };
+    // Mirror onto any pending/approved queue row so the approvals panel stays in sync.
+    await sb()
+      .from("admin_approval_queue")
+      .update({ status: "approved", decided_at: new Date().toISOString(), decided_by: actorSession.userId })
+      .eq("email", e)
+      .eq("app", "zonicme")
+      .neq("status", "denied");
+    return { ok: true };
   }
 
-  function removeUser(actorSession, email) {
+  /** "Remove" = revoke admin access. We can't delete the underlying Supabase
+   *  Auth account from client-side code (that needs the service-role key,
+   *  which never belongs in browser JS) — same practical effect for this
+   *  console, since access is gated entirely on `roles`. */
+  async function removeUser(actorSession, email) {
     if (!canManageRoles(actorSession)) {
       return { ok: false, error: "Only owner / super_admin can remove users" };
     }
     const e = normalizeEmail(email);
     if (e === OWNER_EMAIL) return { ok: false, error: "Cannot remove the owner account" };
-    const users = loadUsers().filter((u) => normalizeEmail(u.email) !== e);
-    saveUsers(users);
+    const { data: existing, error: findErr } = await sb().from("profiles").select("id").eq("email", e).maybeSingle();
+    if (findErr) return { ok: false, error: findErr.message };
+    if (existing) {
+      const { error } = await sb().from("profiles").update({ roles: [] }).eq("id", existing.id);
+      if (error) return { ok: false, error: error.message };
+    }
+    await sb()
+      .from("admin_approval_queue")
+      .update({ status: "denied", decided_at: new Date().toISOString(), decided_by: actorSession.userId })
+      .eq("email", e)
+      .eq("app", "zonicme");
     return { ok: true };
   }
 
@@ -368,14 +293,16 @@
       return global.ZONICME_GOOGLE_CLIENT_ID.trim();
     }
     try {
-      const stored = localStorage.getItem(GOOGLE_ID_KEY);
+      const stored = localStorage.getItem("zonicme_google_client_id");
       if (stored && stored.trim()) return stored.trim();
     } catch (_) {}
     return "";
   }
 
   function setGoogleClientId(id) {
-    localStorage.setItem(GOOGLE_ID_KEY, String(id || "").trim());
+    try {
+      localStorage.setItem("zonicme_google_client_id", String(id || "").trim());
+    } catch (_) {}
   }
 
   function isOriginError(message) {
@@ -386,6 +313,12 @@
       m.includes("origin_mismatch") ||
       m.includes("idpiframe_initialization_failed")
     );
+  }
+
+  function b64urlDecode(str) {
+    const pad = str.length % 4 === 0 ? "" : "=".repeat(4 - (str.length % 4));
+    const s = (str + pad).replace(/-/g, "+").replace(/_/g, "/");
+    return decodeURIComponent(escape(atob(s)));
   }
 
   /**
@@ -497,18 +430,11 @@
     };
   }
 
-  // Bootstrap owner on first load
-  try {
-    saveUsers(ensureOwnerBootstrap(loadUsers()));
-  } catch (_) {}
-
   global.ZonicMeAuth = {
-    SESSION_KEY,
-    USERS_KEY,
     ROLES,
     OWNER_EMAIL,
-    DEMO_PASSWORD,
     isSharedAdminPassword,
+    init,
     getSession,
     clearSession,
     loginEmailPassword,
