@@ -109,42 +109,66 @@
 
   /** actorSession is the owner's ZonicMeAuth session. */
   async function approveAdmin(actorSession, targetEmail) {
-    if (!actorSession || !isOwnerEmail(actorSession.email)) {
-      return { ok: false, error: "Only the owner can approve." };
+    try {
+      if (!actorSession || !isOwnerEmail(actorSession.email)) {
+        return { ok: false, error: "Only the owner can approve." };
+      }
+      const email = norm(targetEmail);
+      const { data: profile, error: findErr } = await sb().from("profiles").select("id,roles").eq("email", email).maybeSingle();
+      if (findErr) {
+        console.error("[ZonicMe approval] approveAdmin: profile lookup failed", findErr);
+        return { ok: false, error: `Lookup failed: ${findErr.message}` };
+      }
+      if (!profile) return { ok: false, error: "No account found for that email yet." };
+      const roles = Array.from(new Set([...(profile.roles || []), "super_admin"]));
+      const { error: updateErr } = await sb().from("profiles").update({ roles }).eq("id", profile.id);
+      if (updateErr) {
+        console.error("[ZonicMe approval] approveAdmin: profile update failed", updateErr);
+        return { ok: false, error: `Role update failed: ${updateErr.message}` };
+      }
+      const { error: queueErr } = await sb()
+        .from("admin_approval_queue")
+        .update({ status: "approved", decided_at: new Date().toISOString(), decided_by: actorSession.userId })
+        .eq("email", email)
+        .eq("app", "zonicme");
+      if (queueErr) console.error("[ZonicMe approval] approveAdmin: queue update failed (roles were still granted)", queueErr);
+      return { ok: true, email };
+    } catch (err) {
+      console.error("[ZonicMe approval] approveAdmin threw", err);
+      return { ok: false, error: err instanceof Error ? err.message : "Approve failed" };
     }
-    const email = norm(targetEmail);
-    const { data: profile, error: findErr } = await sb().from("profiles").select("id,roles").eq("email", email).maybeSingle();
-    if (findErr) return { ok: false, error: findErr.message };
-    if (!profile) return { ok: false, error: "No account found for that email yet." };
-    const roles = Array.from(new Set([...(profile.roles || []), "super_admin"]));
-    const { error: updateErr } = await sb().from("profiles").update({ roles }).eq("id", profile.id);
-    if (updateErr) return { ok: false, error: updateErr.message };
-    await sb()
-      .from("admin_approval_queue")
-      .update({ status: "approved", decided_at: new Date().toISOString(), decided_by: actorSession.userId })
-      .eq("email", email)
-      .eq("app", "zonicme");
-    return { ok: true, email };
   }
 
   async function revokeAdmin(actorSession, targetEmail) {
-    if (!actorSession || !isOwnerEmail(actorSession.email)) {
-      return { ok: false, error: "Only the owner can revoke." };
+    try {
+      if (!actorSession || !isOwnerEmail(actorSession.email)) {
+        return { ok: false, error: "Only the owner can revoke." };
+      }
+      const email = norm(targetEmail);
+      if (isOwnerEmail(email)) return { ok: false, error: "Cannot revoke owner." };
+      const { data: profile, error: findErr } = await sb().from("profiles").select("id").eq("email", email).maybeSingle();
+      if (findErr) {
+        console.error("[ZonicMe approval] revokeAdmin: profile lookup failed", findErr);
+        return { ok: false, error: `Lookup failed: ${findErr.message}` };
+      }
+      if (profile) {
+        const { error: updateErr } = await sb().from("profiles").update({ roles: [] }).eq("id", profile.id);
+        if (updateErr) {
+          console.error("[ZonicMe approval] revokeAdmin: profile update failed", updateErr);
+          return { ok: false, error: `Role update failed: ${updateErr.message}` };
+        }
+      }
+      const { error: queueErr } = await sb()
+        .from("admin_approval_queue")
+        .update({ status: "denied", decided_at: new Date().toISOString(), decided_by: actorSession.userId })
+        .eq("email", email)
+        .eq("app", "zonicme");
+      if (queueErr) console.error("[ZonicMe approval] revokeAdmin: queue update failed (roles were still revoked)", queueErr);
+      return { ok: true, email };
+    } catch (err) {
+      console.error("[ZonicMe approval] revokeAdmin threw", err);
+      return { ok: false, error: err instanceof Error ? err.message : "Revoke failed" };
     }
-    const email = norm(targetEmail);
-    if (isOwnerEmail(email)) return { ok: false, error: "Cannot revoke owner." };
-    const { data: profile, error: findErr } = await sb().from("profiles").select("id").eq("email", email).maybeSingle();
-    if (findErr) return { ok: false, error: findErr.message };
-    if (profile) {
-      const { error: updateErr } = await sb().from("profiles").update({ roles: [] }).eq("id", profile.id);
-      if (updateErr) return { ok: false, error: updateErr.message };
-    }
-    await sb()
-      .from("admin_approval_queue")
-      .update({ status: "denied", decided_at: new Date().toISOString(), decided_by: actorSession.userId })
-      .eq("email", email)
-      .eq("app", "zonicme");
-    return { ok: true, email };
   }
 
   global.ZonicAdminApproval = {

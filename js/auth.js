@@ -234,34 +234,46 @@
   }
 
   async function upsertUserRole(actorSession, email, roles) {
-    if (!canManageRoles(actorSession)) {
-      return { ok: false, error: "Only owner / super_admin can assign roles" };
-    }
-    const e = normalizeEmail(email);
-    if (!e || !e.includes("@")) return { ok: false, error: "Valid email required" };
-    let list = Array.isArray(roles) ? roles : [roles];
-    list = list.filter((r) => ROLES.includes(r));
-    if (!list.length) return { ok: false, error: "Pick at least one role" };
-    if (e === OWNER_EMAIL) list = Array.from(new Set([...list, "owner", "super_admin"]));
+    try {
+      if (!canManageRoles(actorSession)) {
+        return { ok: false, error: "Only owner / super_admin can assign roles" };
+      }
+      const e = normalizeEmail(email);
+      if (!e || !e.includes("@")) return { ok: false, error: "Valid email required" };
+      let list = Array.isArray(roles) ? roles : [roles];
+      list = list.filter((r) => ROLES.includes(r));
+      if (!list.length) return { ok: false, error: "Pick at least one role" };
+      if (e === OWNER_EMAIL) list = Array.from(new Set([...list, "owner", "super_admin"]));
 
-    const { data: existing, error: findErr } = await sb().from("profiles").select("id").eq("email", e).maybeSingle();
-    if (findErr) return { ok: false, error: findErr.message };
-    if (!existing) {
-      return {
-        ok: false,
-        error: "That account doesn't exist yet — they need to sign in (or request access) at least once first.",
-      };
+      const { data: existing, error: findErr } = await sb().from("profiles").select("id").eq("email", e).maybeSingle();
+      if (findErr) {
+        console.error("[ZonicMe auth] upsertUserRole: lookup failed", findErr);
+        return { ok: false, error: `Lookup failed: ${findErr.message}` };
+      }
+      if (!existing) {
+        return {
+          ok: false,
+          error: "That account doesn't exist yet — they need to sign in (or request access) at least once first.",
+        };
+      }
+      const { error } = await sb().from("profiles").update({ roles: list }).eq("id", existing.id);
+      if (error) {
+        console.error("[ZonicMe auth] upsertUserRole: update failed", error);
+        return { ok: false, error: `Role update failed: ${error.message}` };
+      }
+      // Mirror onto any pending/approved queue row so the approvals panel stays in sync.
+      const { error: queueErr } = await sb()
+        .from("admin_approval_queue")
+        .update({ status: "approved", decided_at: new Date().toISOString(), decided_by: actorSession.userId })
+        .eq("email", e)
+        .eq("app", "zonicme")
+        .neq("status", "denied");
+      if (queueErr) console.error("[ZonicMe auth] upsertUserRole: queue mirror failed (role was still granted)", queueErr);
+      return { ok: true };
+    } catch (err) {
+      console.error("[ZonicMe auth] upsertUserRole threw", err);
+      return { ok: false, error: err instanceof Error ? err.message : "Update failed" };
     }
-    const { error } = await sb().from("profiles").update({ roles: list }).eq("id", existing.id);
-    if (error) return { ok: false, error: error.message };
-    // Mirror onto any pending/approved queue row so the approvals panel stays in sync.
-    await sb()
-      .from("admin_approval_queue")
-      .update({ status: "approved", decided_at: new Date().toISOString(), decided_by: actorSession.userId })
-      .eq("email", e)
-      .eq("app", "zonicme")
-      .neq("status", "denied");
-    return { ok: true };
   }
 
   /** "Remove" = revoke admin access. We can't delete the underlying Supabase
@@ -269,23 +281,35 @@
    *  which never belongs in browser JS) — same practical effect for this
    *  console, since access is gated entirely on `roles`. */
   async function removeUser(actorSession, email) {
-    if (!canManageRoles(actorSession)) {
-      return { ok: false, error: "Only owner / super_admin can remove users" };
+    try {
+      if (!canManageRoles(actorSession)) {
+        return { ok: false, error: "Only owner / super_admin can remove users" };
+      }
+      const e = normalizeEmail(email);
+      if (e === OWNER_EMAIL) return { ok: false, error: "Cannot remove the owner account" };
+      const { data: existing, error: findErr } = await sb().from("profiles").select("id").eq("email", e).maybeSingle();
+      if (findErr) {
+        console.error("[ZonicMe auth] removeUser: lookup failed", findErr);
+        return { ok: false, error: `Lookup failed: ${findErr.message}` };
+      }
+      if (existing) {
+        const { error } = await sb().from("profiles").update({ roles: [] }).eq("id", existing.id);
+        if (error) {
+          console.error("[ZonicMe auth] removeUser: update failed", error);
+          return { ok: false, error: `Role update failed: ${error.message}` };
+        }
+      }
+      const { error: queueErr } = await sb()
+        .from("admin_approval_queue")
+        .update({ status: "denied", decided_at: new Date().toISOString(), decided_by: actorSession.userId })
+        .eq("email", e)
+        .eq("app", "zonicme");
+      if (queueErr) console.error("[ZonicMe auth] removeUser: queue update failed (roles were still revoked)", queueErr);
+      return { ok: true };
+    } catch (err) {
+      console.error("[ZonicMe auth] removeUser threw", err);
+      return { ok: false, error: err instanceof Error ? err.message : "Remove failed" };
     }
-    const e = normalizeEmail(email);
-    if (e === OWNER_EMAIL) return { ok: false, error: "Cannot remove the owner account" };
-    const { data: existing, error: findErr } = await sb().from("profiles").select("id").eq("email", e).maybeSingle();
-    if (findErr) return { ok: false, error: findErr.message };
-    if (existing) {
-      const { error } = await sb().from("profiles").update({ roles: [] }).eq("id", existing.id);
-      if (error) return { ok: false, error: error.message };
-    }
-    await sb()
-      .from("admin_approval_queue")
-      .update({ status: "denied", decided_at: new Date().toISOString(), decided_by: actorSession.userId })
-      .eq("email", e)
-      .eq("app", "zonicme");
-    return { ok: true };
   }
 
   function getGoogleClientId() {
