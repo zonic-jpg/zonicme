@@ -78,10 +78,10 @@
           "Personal insights dashboard without overwhelming finance jargon",
           "A progress view of plans created, assists used and milestones hit",
         ],
-        url: "https://rubba.netlify.app",
+        url: "https://rubbax.netlify.app",
         thumbnail: "./assets/thumb-rubba.jpg",
         orbit: "./orbit/rubba.json",
-        orbitLive: "https://rubba.netlify.app/orbit-manifest.json",
+        orbitLive: "https://rubbax.netlify.app/orbit-manifest.json",
         color: "#C99A2E",
       },
       {
