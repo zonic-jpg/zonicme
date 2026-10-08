@@ -113,18 +113,27 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
   <div id="googleWrap">
     <div id="googleBtn"></div>
   </div>
-  <div class="divider-or" id="orDivider">or username / password</div>
-  <label for="loginEmail">Email / username</label>
-  <input id="loginEmail" type="text" autocomplete="username" placeholder="you@example.com or your username" />
+  <div class="divider-or" id="orDivider">or email / password</div>
+  <label for="loginEmail">Email</label>
+  <input id="loginEmail" type="email" autocomplete="username" placeholder="you@example.com" />
+  <div id="signupNameWrap" class="hidden">
+    <label for="signupName">Your name</label>
+    <input id="signupName" type="text" autocomplete="name" placeholder="Full name" />
+  </div>
   <label for="loginPass">Password</label>
   <div style="position:relative">
     <input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••" style="padding-right:64px" />
     <button type="button" id="togglePass" class="secondary" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);margin:0;padding:6px 10px;font-size:12px" aria-label="Show password">Show</button>
   </div>
   <button type="button" id="loginBtn" style="width:100%;margin-top:4px">Sign in</button>
-  <p style="margin-top:10px;text-align:center"><a href="#forgot" id="forgotLink" style="font-size:13px">Forgot password?</a></p>
-  <p class="hint" style="margin-top:14px">New team members need the owner to approve them on first sign-in. Sign-in now works from any device or browser.</p>
+  <p style="margin-top:10px;text-align:center"><a href="#forgot" id="forgotLink" style="font-size:13px">Forgot password?</a> · <a href="#signup" id="modeLink" style="font-size:13px">Create an account</a></p>
+  <p class="hint" style="margin-top:14px">Sign in with your own account. Team members: create an account, then request admin access and the owner will approve it.</p>
   <p class="err" id="loginErr"></p>
+  <div id="needAccess" class="hidden" style="margin-top:12px;padding:12px;border:1px solid var(--line,#ddd);border-radius:8px">
+    <p style="margin:0 0 8px;font-size:14px">You're signed in, but this account doesn't have admin access yet.</p>
+    <button type="button" id="requestAccessBtn" style="width:100%">Request admin access</button>
+    <p class="hint" id="requestAccessMsg" style="margin:8px 0 0"></p>
+  </div>
   <p style="margin-top:18px;font-size:13px"><a class="back" href="./index.html">← Back to hub</a></p>
 </div>
 
@@ -213,7 +222,7 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
   <div id="tab-users" class="hidden">
     <div class="panel" id="admintester-queue">
       <h2 style="margin:0 0 8px;font-size:1.1rem">Access requests</h2>
-      <p class="hint">Anyone signing in with a shared team password for the first time lands here until you approve them. Requests are visible from any device you sign in on as owner.</p>
+      <p class="hint">Requests for admin access land here, from any device. You are also emailed a link that opens this page.</p>
       <div id="approvalPending"></div>
       <div id="approvalApproved" style="margin-top:12px"></div>
     </div>
@@ -417,43 +426,47 @@ async function renderApprovals() {
     return;
   }
   panel.classList.remove("hidden");
-  const [pending, approved] = await Promise.all([A.listPendingQueue("zonicme"), A.listApprovedAdmins()]);
-  document.getElementById("approvalPending").innerHTML = pending.length
-    ? pending.map((p) => `
+  const o = await A.loadOverview();
+  const row = (p, buttons) => `
       <div class="user-row">
-        <div><strong>${esc(p.identity || p.email)}</strong><div style="font-size:12px;color:var(--muted)">${esc(p.email)}</div></div>
-        <div style="font-size:12px;color:var(--muted)">Requested ${esc(new Date(p.requestedAt).toLocaleString())}</div>
-        <button type="button" data-approve="${esc(p.email)}">Approve</button>
-      </div>`).join("")
-    : `<p class="hint">No one is waiting for approval right now.</p>`;
-  document.getElementById("approvalApproved").innerHTML = approved.length
-    ? `<h3 style="margin:0 0 4px;font-size:.95rem">Approved admins</h3>` + approved.map((a) => `
-      <div class="user-row">
-        <span>${esc(a.email)}</span>
+        <div><strong>${esc(p.email)}</strong><div style="font-size:12px;color:var(--muted)">${p.requested_at ? "Requested " + esc(new Date(p.requested_at).toLocaleString()) : ""}</div></div>
         <span></span>
-        <button type="button" class="danger" data-revoke="${esc(a.email)}">Revoke</button>
-      </div>`).join("")
+        <span>${buttons}</span>
+      </div>`;
+  const wanting = [...(o.pending || []), ...(o.admin_requests || [])];
+  const members = (o.members || []).filter((m) => m.is_admin && !m.is_owner);
+  document.getElementById("approvalPending").innerHTML = `
+    <label style="display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;cursor:pointer">
+      <input type="checkbox" id="requireApprovalsToggle" ${o.require_approvals ? "checked" : ""} style="margin-top:3px" />
+      <span><strong>Require approval for admin / tester sign-ups</strong>
+        <span class="hint" style="display:block">Off (default): everyone signs in straight away and you grant admin access with one click below. On: people asking for admin access are held until you approve. Ordinary visitors are never held.</span></span>
+    </label>
+    ${o.error ? `<p class="hint">Could not load requests: ${esc(o.error)}</p>` : ""}
+    ${wanting.length
+      ? wanting.map((p) => row(p, `<button type="button" data-grant="${esc(p.user_id)}" data-decision="${p.status === "pending" ? "approve" : "grant"}">${p.status === "pending" ? "Approve" : "Grant admin"}</button> ` + (p.status === "pending" ? `<button type="button" class="danger" data-reject="${esc(p.user_id)}">Reject</button>` : ""))).join("")
+      : `<p class="hint">No one is waiting for approval right now.</p>`}`;
+  document.getElementById("approvalApproved").innerHTML = members.length
+    ? `<h3 style="margin:0 0 4px;font-size:.95rem">Admins you approved</h3>` + members.map((a) => row(a, `<button type="button" class="danger" data-revoke="${esc(a.user_id)}">Revoke</button>`)).join("")
     : "";
-  panel.querySelectorAll("[data-approve]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const email = btn.getAttribute("data-approve");
-      btn.disabled = true;
-      const res = await A.approveAdmin(session, email);
-      if (res.ok) toast(`Approved ${email}`);
-      else toast(res.error || "Approve failed");
-      renderApprovals();
-    });
+  const done = async (label, res) => { toast(res.ok ? label : (res.error || "Failed")); renderApprovals(); };
+  panel.querySelector("#requireApprovalsToggle")?.addEventListener("change", async (e) => {
+    const res = await A.setRequireApprovals(e.target.checked);
+    toast(res.ok ? (e.target.checked ? "Approvals required for admin sign-ups" : "Approvals switched off") : (res.error || "Failed"));
+    renderApprovals();
   });
-  panel.querySelectorAll("[data-revoke]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const email = btn.getAttribute("data-revoke");
-      btn.disabled = true;
-      const res = await A.revokeAdmin(session, email);
-      if (res.ok) toast(`Revoked ${email}`);
-      else toast(res.error || "Revoke failed");
-      renderApprovals();
-    });
-  });
+  panel.querySelectorAll("[data-grant]").forEach((btn) => btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    const id = btn.getAttribute("data-grant");
+    done("Admin access granted", btn.getAttribute("data-decision") === "approve" ? await A.decide(id, "approve", "admin") : await A.setRole(id, "admin"));
+  }));
+  panel.querySelectorAll("[data-reject]").forEach((btn) => btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    done("Rejected", await A.decide(btn.getAttribute("data-reject"), "reject", "member"));
+  }));
+  panel.querySelectorAll("[data-revoke]").forEach((btn) => btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    done("Admin access revoked", await A.setRole(btn.getAttribute("data-revoke"), "member"));
+  }));
 }
 
 async function renderUsers() {
@@ -527,9 +540,8 @@ async function enterAdmin() {
   const session = ZonicMeAuth.getSession();
   if (!session || !ZonicMeAuth.canAccessAdmin(session)) {
     showGate();
-    document.getElementById("loginErr").textContent = session
-      ? "This account needs admin (or higher). Ask the owner to grant a role."
-      : "";
+    document.getElementById("loginErr").textContent = "";
+    if (session) document.getElementById("needAccess").classList.remove("hidden");
     return;
   }
   showAdmin(session);
@@ -549,32 +561,64 @@ async function enterAdmin() {
   }
 }
 
+let signupMode = false;
+function setSignupMode(on) {
+  signupMode = on;
+  document.getElementById("signupNameWrap").classList.toggle("hidden", !on);
+  document.getElementById("loginBtn").textContent = on ? "Create account" : "Sign in";
+  document.getElementById("modeLink").textContent = on ? "Have an account? Sign in" : "Create an account";
+  document.getElementById("loginPass").autocomplete = on ? "new-password" : "current-password";
+  document.getElementById("loginErr").textContent = "";
+}
+document.getElementById("modeLink")?.addEventListener("click", (e) => { e.preventDefault(); setSignupMode(!signupMode); });
+
 document.getElementById("loginBtn").addEventListener("click", async () => {
   const btn = document.getElementById("loginBtn");
   const email = document.getElementById("loginEmail").value;
   const pass = document.getElementById("loginPass").value;
+  const idleLabel = signupMode ? "Create account" : "Sign in";
   btn.disabled = true;
-  btn.textContent = "Signing in…";
+  btn.textContent = signupMode ? "Creating…" : "Signing in…";
   let res;
   try {
-    res = await ZonicMeAuth.loginEmailPassword(email, pass);
+    res = signupMode
+      ? await ZonicMeAuth.signUpEmailPassword(email, pass, document.getElementById("signupName").value)
+      : await ZonicMeAuth.loginEmailPassword(email, pass);
   } catch (err) {
     res = { ok: false, error: err instanceof Error ? err.message : "Sign-in failed" };
   }
   btn.disabled = false;
-  btn.textContent = "Sign in";
+  btn.textContent = idleLabel;
   if (!res.ok) {
     document.getElementById("loginErr").textContent =
       window.ZonicPublicMessage?.publicError(res.error, "Sign-in failed. Please try again.") || "Sign-in failed";
     return;
   }
+  if (res.needsConfirmation) {
+    document.getElementById("loginErr").textContent = res.message;
+    setSignupMode(false);
+    return;
+  }
   if (!ZonicMeAuth.canAccessAdmin(res.session)) {
-    document.getElementById("loginErr").textContent =
-      "Signed in, but this account needs admin (or higher). Ask the owner to grant a role.";
+    document.getElementById("loginErr").textContent = "";
+    document.getElementById("needAccess").classList.remove("hidden");
     return;
   }
   document.getElementById("loginErr").textContent = "";
   enterAdmin();
+});
+
+document.getElementById("requestAccessBtn")?.addEventListener("click", async () => {
+  const btn = document.getElementById("requestAccessBtn");
+  const msg = document.getElementById("requestAccessMsg");
+  btn.disabled = true;
+  try {
+    const r = await window.ZonicAdminApproval.requestAdminAccess();
+    msg.textContent = r && r.status === "already_admin" ? "You already have admin access — sign in again." : "Request sent. The owner has been notified and can approve it from any device.";
+  } catch (err) {
+    btn.disabled = false;
+    msg.textContent = err instanceof Error ? err.message : "Could not send the request";
+  }
 });
 
 document.getElementById("togglePass")?.addEventListener("click", () => {

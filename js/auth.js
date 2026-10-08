@@ -3,17 +3,10 @@
  * replacing the old client-only localStorage implementation.
  *
  * Owner signs in with their own account (roles come from the server).
- * SECURITY (audit, 2026-09): the shared-password admin gate below is NOT
- * removed — it is still live, on purpose, as a bootstrap path for the owner
- * and approved testers. It is safe only because it is wired exclusively into
- * admin.html's own login form (the sole caller of loginEmailPassword() in
- * this repo — see admin.html). It must never be exposed to any public page,
- * component, or the site's regular nav/header. If you are reading this
- * because you're adding a public-facing login/signup form anywhere else in
- * the ZonicMe portfolio, do NOT wire isSharedAdminPassword()/this file into
- * it — that is exactly the mistake found (and fixed) across AdSpotX,
- * MyYangaX, MyAfriArt, Rubba, and Owanbe in the 2026-09 admin-visibility
- * audit.
+ * SECURITY (2026-10): the old shared admin password was REMOVED. It lived in this public file and the
+ * owner account had been created with it. The owner is now recognised on the server by VERIFIED email,
+ * everybody signs in with their own password, and admin access is granted by the owner (see
+ * adminTesterApproval.js). Never reintroduce a shared password or an email/role check in client code.
  *
  * 2026-09-25 (login-instability fix): sessions, the user list, and the
  * ADMINTESTER approval queue now live in the `zonicme` Supabase project
@@ -30,24 +23,8 @@
   const ROLE_RANK = { viewer: 1, admin: 2, super_admin: 3, owner: 4 };
 
   const OWNER_EMAIL = "oadeagbo@gmail.com";
-  /** Orbit admin password (2026) — case-insensitive; never show in UI. */
-  const ORBIT_ADMIN_PASSWORDS = ["zonicGate2026"];
-  function isSharedAdminPassword(password) {
-    const candidate = String(password ?? "").trim().toLowerCase();
-    return ORBIT_ADMIN_PASSWORDS.some((p) => p.toLowerCase() === candidate);
-  }
-
   function normalizeEmail(email) {
     return String(email || "").trim().toLowerCase();
-  }
-
-  function identityToEmail(identity) {
-    const raw = String(identity || "").trim();
-    if (!raw) return "";
-    if (raw.includes("@")) return normalizeEmail(raw);
-    // Allow bare usernames with the shared admin password
-    const safe = raw.replace(/[^a-zA-Z0-9._+-]/g, "").toLowerCase() || "user";
-    return `${safe}@admin.local`;
   }
 
   function sb() {
@@ -131,52 +108,46 @@
     return hasMinRole(session, "admin");
   }
 
-  /** Sign in, creating the account on first use. Only reached via the shared
-   *  admin-gate password, so every caller uses the SAME password for a given
-   *  identity — there's no ambiguity between "wrong password" and "no
-   *  account yet" the way there would be for a personal password. */
-  async function ensureGateAccount(email, password, name) {
-    const signIn = await sb().auth.signInWithPassword({ email, password });
-    if (!signIn.error) return { ok: true };
-    const msg = String(signIn.error.message || "");
-    if (/invalid login credentials/i.test(msg)) {
-      const signUp = await sb().auth.signUp({ email, password, options: { data: { name } } });
-      if (signUp.error) return { ok: false, error: signUp.error.message };
-      if (!signUp.data.session) {
-        // Project has email confirmation on — sign-up succeeded but needs a click.
-        return { ok: false, error: "Check your email to confirm the new account, then sign in again." };
-      }
-      return { ok: true };
-    }
-    return { ok: false, error: msg };
-  }
-
+  /** Personal-password sign-in. The server decides roles; the verified owner email gets owner roles. */
   async function loginEmailPassword(email, password) {
-    const pass = String(password ?? "");
-    const identity = String(email || "").trim();
-    if (!identity) return { ok: false, error: "Username or email required" };
-
-    if (isSharedAdminPassword(pass)) {
-      const e = identityToEmail(identity);
-      const acct = await ensureGateAccount(e, pass, identity);
-      if (!acct.ok) return { ok: false, error: acct.error };
-      const session = await refreshCachedSession();
-      if (!session) return { ok: false, error: "Sign-in failed" };
-      if (session.email === OWNER_EMAIL) return { ok: true, session };
-      const gate = await global.ZonicAdminApproval.resolveAdminGateLogin(identity, session);
-      if (!gate.ok) return { ok: false, error: gate.message || "Awaiting approval" };
-      return { ok: true, session: getSession() };
-    }
-
-    const { error } = await sb().auth.signInWithPassword({ email: normalizeEmail(identity), password: pass });
+    const identity = normalizeEmail(email);
+    if (!identity || !identity.includes("@")) return { ok: false, error: "Enter your email address" };
+    const { error } = await sb().auth.signInWithPassword({ email: identity, password: String(password ?? "") });
     if (error) {
-      const friendly = /invalid login credentials/i.test(error.message || "")
+      const msg = String(error.message || "");
+      const friendly = /invalid login credentials/i.test(msg)
         ? "Invalid email or password"
-        : error.message;
+        : /email not confirmed/i.test(msg)
+          ? "Confirm your email first (check your inbox), then sign in."
+          : msg;
       return { ok: false, error: friendly };
     }
+    // Idempotent: records the account (and grants owner roles to the verified owner email).
+    if (global.ZonicAdminApproval) await global.ZonicAdminApproval.registerSignup("member");
     const session = await refreshCachedSession();
     if (!session) return { ok: false, error: "Sign-in failed" };
+    return { ok: true, session };
+  }
+
+  /** Create an account with a personal password. Confirmation email is sent by Supabase. */
+  async function signUpEmailPassword(email, password, name) {
+    const identity = normalizeEmail(email);
+    if (!identity || !identity.includes("@")) return { ok: false, error: "Enter your email address" };
+    if (String(password || "").length < 8) return { ok: false, error: "Use a password of at least 8 characters" };
+    const { data, error } = await sb().auth.signUp({
+      email: identity,
+      password: String(password),
+      options: {
+        data: { name: String(name || identity) },
+        emailRedirectTo: global.location ? `${global.location.origin}/admin.html` : undefined,
+      },
+    });
+    if (error) return { ok: false, error: error.message };
+    if (!data.session) {
+      return { ok: true, needsConfirmation: true, message: "Check your email and click the confirmation link, then sign in." };
+    }
+    if (global.ZonicAdminApproval) await global.ZonicAdminApproval.registerSignup("member");
+    const session = await refreshCachedSession();
     return { ok: true, session };
   }
 
@@ -243,7 +214,8 @@
       let list = Array.isArray(roles) ? roles : [roles];
       list = list.filter((r) => ROLES.includes(r));
       if (!list.length) return { ok: false, error: "Pick at least one role" };
-      if (e === OWNER_EMAIL) list = Array.from(new Set([...list, "owner", "super_admin"]));
+      list = list.filter((r) => r !== "owner");
+      if (!list.length) return { ok: false, error: "The owner role is reserved for the verified owner account" };
 
       const { data: existing, error: findErr } = await sb().from("profiles").select("id").eq("email", e).maybeSingle();
       if (findErr) {
@@ -457,11 +429,11 @@
   global.ZonicMeAuth = {
     ROLES,
     OWNER_EMAIL,
-    isSharedAdminPassword,
     init,
     getSession,
     clearSession,
     loginEmailPassword,
+    signUpEmailPassword,
     loginGoogleProfile,
     resetLocalPassword,
     canAccessAdmin,

@@ -1,17 +1,17 @@
 /**
- * Zonic ADMINTESTER approval — ZonicMe.
- * Orbit standard: ~/Downloads/MyYangaX-COMPLETE/AUTH.md
+ * ZonicMe sign-up approvals (portfolio rules).
  *
- * 2026-09-25 (login-instability fix): the approval queue now lives in the
- * `admin_approval_queue` Supabase table instead of localStorage, so a
- * request raised on one device is visible to the owner from any device —
- * that was the actual bug behind "the queue only shows requests made on
- * this browser."
+ * - The owner is recognised by VERIFIED email (oadeagbo@gmail.com) on the server. No shared password.
+ * - Default: everyone signs in straight away. The owner can switch "require approval" on; it then holds
+ *   ONLY admin/tester sign-ups (never ordinary visitors).
+ * - People who want admin access sign up / sign in, then press "Request admin access". The owner is emailed a
+ *   link that opens this console on the approvals tab; granting is one click.
+ *
+ * All state lives in Supabase (project zonicme): signup_policy + signup_approvals, changed only through
+ * SECURITY DEFINER functions that check the caller is the verified owner.
  */
 (function (global) {
   const OWNER_EMAIL = "oadeagbo@gmail.com";
-  const AWAITING_MSG =
-    "Access request recorded. The ZonicMe owner can approve it from any device — check back after they do.";
 
   function sb() {
     if (!global.ZonicSupabase) throw new Error("Supabase client not ready");
@@ -22,163 +22,85 @@
     return String(email ?? "").trim().toLowerCase() === OWNER_EMAIL;
   }
 
-  function norm(email) {
-    return String(email ?? "").trim().toLowerCase();
+  async function rpc(fn, args) {
+    const { data, error } = await sb().rpc(fn, args || {});
+    if (error) throw new Error(error.message);
+    return data;
   }
 
-  /** Called after a real Supabase sign-in already happened; `session` is the
-   *  ZonicMeAuth session object (has userId, email, roles). */
-  async function resolveAdminGateLogin(identity, session) {
-    if (!session) return { ok: false, status: "invalid", message: "Sign-in failed" };
-    if (isOwnerEmail(session.email)) return { ok: true, status: "owner" };
-    if ((session.roles || []).some((r) => r === "owner" || r === "super_admin" || r === "admin")) {
-      return { ok: true, status: "approved" };
-    }
-
-    const { data: existing, error } = await sb()
-      .from("admin_approval_queue")
-      .select("id,status")
-      .eq("user_id", session.userId)
-      .eq("app", "zonicme")
-      .order("requested_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (error) {
-      console.error("[ZonicMe approval] queue lookup failed", error);
-      return { ok: false, status: "error", message: "Could not check approval status — try again." };
-    }
-    if (existing && existing.status === "denied") {
-      return {
-        ok: false,
-        status: "revoked",
-        message: "Admin access was revoked. Contact the owner to request access again.",
-      };
-    }
-    if (!existing || existing.status !== "pending") {
-      const { error: insertErr } = await sb().from("admin_approval_queue").insert({
-        user_id: session.userId,
-        identity: String(identity || "").trim(),
-        email: session.email,
-        app: "zonicme",
-        status: "pending",
-      });
-      if (insertErr) console.error("[ZonicMe approval] queue insert failed", insertErr);
-    }
-    return { ok: false, status: "pending", message: AWAITING_MSG };
-  }
-
-  async function listPendingQueue(appFilter) {
+  /** Fire-and-forget email to the owner. The in-app queue works even if this fails. */
+  async function notifyOwner(kind) {
     try {
-      let query = sb().from("admin_approval_queue").select("*").eq("status", "pending").order("requested_at", { ascending: false });
-      if (appFilter) query = query.eq("app", appFilter);
-      const { data, error } = await query;
-      if (error) {
-        console.error("[ZonicMe approval] listPendingQueue failed", error);
-        return [];
-      }
-      return (data || []).map((row) => ({
-        email: row.email,
-        identity: row.identity,
-        app: row.app,
-        requestedAt: row.requested_at,
-      }));
+      await sb().functions.invoke("notify-owner-approval", { body: { kind } });
     } catch (err) {
-      console.error("[ZonicMe approval] listPendingQueue threw", err);
-      return [];
+      console.warn("[ZonicMe approval] owner email not sent", err);
     }
   }
 
-  async function listApprovedAdmins() {
+  /** Records the account; fails open so a missing function never blocks a visitor. */
+  async function registerSignup(requestedRole) {
     try {
-      const { data, error } = await sb()
-        .from("profiles")
-        .select("email,roles")
-        .order("email", { ascending: true });
-      if (error) {
-        console.error("[ZonicMe approval] listApprovedAdmins failed", error);
-        return [];
-      }
-      return (data || [])
-        .filter((p) => !isOwnerEmail(p.email) && (p.roles || []).some((r) => r === "super_admin" || r === "admin"))
-        .map((p) => ({ email: p.email }));
+      const res = await rpc("register_signup", { _requested_role: requestedRole === "admin" ? "admin" : "member" });
+      if (res && res.status === "pending") notifyOwner("signup");
+      return res || { status: "approved" };
     } catch (err) {
-      console.error("[ZonicMe approval] listApprovedAdmins threw", err);
-      return [];
+      console.warn("[ZonicMe approval] register_signup unavailable", err);
+      return { status: "approved" };
     }
   }
 
-  /** actorSession is the owner's ZonicMeAuth session. */
-  async function approveAdmin(actorSession, targetEmail) {
+  async function requestAdminAccess() {
+    const res = await rpc("request_admin_access");
+    if (res && res.status === "requested") notifyOwner("admin_request");
+    return res || { status: "requested" };
+  }
+
+  /** Owner only. Returns { require_approvals, pending, admin_requests, members, rejected }. */
+  async function loadOverview() {
     try {
-      if (!actorSession || !isOwnerEmail(actorSession.email)) {
-        return { ok: false, error: "Only the owner can approve." };
-      }
-      const email = norm(targetEmail);
-      const { data: profile, error: findErr } = await sb().from("profiles").select("id,roles").eq("email", email).maybeSingle();
-      if (findErr) {
-        console.error("[ZonicMe approval] approveAdmin: profile lookup failed", findErr);
-        return { ok: false, error: `Lookup failed: ${findErr.message}` };
-      }
-      if (!profile) return { ok: false, error: "No account found for that email yet." };
-      const roles = Array.from(new Set([...(profile.roles || []), "super_admin"]));
-      const { error: updateErr } = await sb().from("profiles").update({ roles }).eq("id", profile.id);
-      if (updateErr) {
-        console.error("[ZonicMe approval] approveAdmin: profile update failed", updateErr);
-        return { ok: false, error: `Role update failed: ${updateErr.message}` };
-      }
-      const { error: queueErr } = await sb()
-        .from("admin_approval_queue")
-        .update({ status: "approved", decided_at: new Date().toISOString(), decided_by: actorSession.userId })
-        .eq("email", email)
-        .eq("app", "zonicme");
-      if (queueErr) console.error("[ZonicMe approval] approveAdmin: queue update failed (roles were still granted)", queueErr);
-      return { ok: true, email };
+      return await rpc("list_signup_approvals");
     } catch (err) {
-      console.error("[ZonicMe approval] approveAdmin threw", err);
-      return { ok: false, error: err instanceof Error ? err.message : "Approve failed" };
+      console.error("[ZonicMe approval] list failed", err);
+      return { error: err.message, require_approvals: false, pending: [], admin_requests: [], members: [], rejected: [] };
     }
   }
 
-  async function revokeAdmin(actorSession, targetEmail) {
+  async function setRequireApprovals(on) {
     try {
-      if (!actorSession || !isOwnerEmail(actorSession.email)) {
-        return { ok: false, error: "Only the owner can revoke." };
-      }
-      const email = norm(targetEmail);
-      if (isOwnerEmail(email)) return { ok: false, error: "Cannot revoke owner." };
-      const { data: profile, error: findErr } = await sb().from("profiles").select("id").eq("email", email).maybeSingle();
-      if (findErr) {
-        console.error("[ZonicMe approval] revokeAdmin: profile lookup failed", findErr);
-        return { ok: false, error: `Lookup failed: ${findErr.message}` };
-      }
-      if (profile) {
-        const { error: updateErr } = await sb().from("profiles").update({ roles: [] }).eq("id", profile.id);
-        if (updateErr) {
-          console.error("[ZonicMe approval] revokeAdmin: profile update failed", updateErr);
-          return { ok: false, error: `Role update failed: ${updateErr.message}` };
-        }
-      }
-      const { error: queueErr } = await sb()
-        .from("admin_approval_queue")
-        .update({ status: "denied", decided_at: new Date().toISOString(), decided_by: actorSession.userId })
-        .eq("email", email)
-        .eq("app", "zonicme");
-      if (queueErr) console.error("[ZonicMe approval] revokeAdmin: queue update failed (roles were still revoked)", queueErr);
-      return { ok: true, email };
+      await rpc("set_require_approvals", { _on: !!on });
+      return { ok: true };
     } catch (err) {
-      console.error("[ZonicMe approval] revokeAdmin threw", err);
-      return { ok: false, error: err instanceof Error ? err.message : "Revoke failed" };
+      return { ok: false, error: err.message };
+    }
+  }
+
+  async function decide(userId, decision, role) {
+    try {
+      await rpc("decide_signup", { _user_id: userId, _decision: decision, _role: role || "member" });
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, error: err.message };
+    }
+  }
+
+  async function setRole(userId, role) {
+    try {
+      await rpc("set_member_role", { _user_id: userId, _role: role });
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, error: err.message };
     }
   }
 
   global.ZonicAdminApproval = {
     OWNER_EMAIL,
-    AWAITING_MSG,
     isOwnerEmail,
-    resolveAdminGateLogin,
-    listPendingQueue,
-    listApprovedAdmins,
-    approveAdmin,
-    revokeAdmin,
+    notifyOwner,
+    registerSignup,
+    requestAdminAccess,
+    loadOverview,
+    setRequireApprovals,
+    decide,
+    setRole,
   };
 })(typeof window !== "undefined" ? window : globalThis);

@@ -1,42 +1,15 @@
-# ZonicMe auth — Zonic orbit standard (5 rules)
+# ZonicMe auth — portfolio sign-up / login rules
 
-See MyYangaX `AUTH.md` for the full orbit standard.
+Backed by Supabase (project `zonicme`). No shared password exists anywhere (code, config, DB, tests, docs).
 
-## Rule 1 — Owner always in
+1. **Owner** — `oadeagbo@gmail.com` is the owner / super admin, recognised on the server by a **verified** email
+   (trigger `on_auth_user_owner_roles`). The owner signs up once and confirms the email.
+2. **Anyone can sign up** as a visitor or ask for admin / tester access at `admin.html` ("Create an account").
+3. **Testers** — the owner grants admin access with one click on the *Users & roles* tab (Access requests).
+4. **Default is open login.** The owner can switch **Require approval for admin / tester sign-ups** on; it holds
+   only admin/tester sign-ups, never ordinary visitors. Turning it off releases anyone held.
+5. **Owner email** — when someone asks for access, `notify-owner-approval` emails the owner a link to
+   `admin.html#approvals` (sent with Resend when `RESEND_API_KEY` is set, otherwise through the shared relay).
 
-`oadeagbo@gmail.com` → owner + super_admin immediately on `admin.html`.
-
-## Rule 2 — ADMINTESTER queue
-
-Any other username/email + orbit admin password → **PENDING** (awaiting-approval message).
-Passwords are rotated periodically and never appear in UI or docs.
-
-## Rule 3 — Owner queue on login
-
-Owner login → **Users & roles** tab → ADMINTESTER approvals (`#admintester-queue`).
-
-## Rule 4 — Approved = full access
-
-Approved testers get super_admin on admin console (apps, ingest, all panels).
-
-## Rule 5 — Owner allocates rights
-
-Owner grants roles/privileges via Users & roles UI.
-
-## Limits of the localStorage implementation
-
-The hub has no server identity — sessions, users and the approval queue all live in
-`localStorage`. That means:
-
-- Accounts and approvals do **not** sync between devices or browsers.
-- The pending queue is stored in the browser the request was made from, so the owner
-  only sees requests raised on the same machine.
-- Nothing is emailed. "Forgot password" rewrites the stored password on that device
-  only, and refuses an email that has no account in that browser.
-
-User-facing copy must state these limits rather than imply emailed resets, cross-device
-accounts, or approval notifications. Anything stronger needs a real backend first.
-
-## Module
-
-`website/js/adminTesterApproval.js` · `website/js/auth.js`
+Roles can only be changed by the verified owner (`profiles_guard_roles`). Modules: `js/auth.js`,
+`js/adminTesterApproval.js`. Server: `supabase/migrations/20261004120000_signup_approvals.sql`.
