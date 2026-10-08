@@ -1,0 +1,13 @@
+{
+  "name": "zonicme-hub",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "ZonicMe hub — static site plus headless Netlify deploy scripts.",
+  "scripts": {
+    "dev": "python3 -m http.server 8000",
+    "ship": "node scripts/netlify-digest-deploy.mjs",
+    "ship:dry": "DRY_RUN=1 node scripts/netlify-digest-deploy.mjs",
+    "ship:b64": "node scripts/make-b64deploy.mjs"
+  }
+}

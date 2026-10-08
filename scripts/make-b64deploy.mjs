@@ -8,6 +8,8 @@ const ROOT = join(import.meta.dirname, '..');
 const SITE_ID = '3b53561c-3d9b-4184-b525-2ab704ca9eb6';
 
 function token() {
+  const envToken = process.env.NETLIFY_AUTH_TOKEN || process.env.NETLIFY_TOKEN;
+  if (envToken) return envToken;
   const cfg = JSON.parse(readFileSync(join(homedir(), 'Library/Preferences/netlify/config.json'), 'utf8'));
   return cfg.users[cfg.userId].auth.token;
 }
