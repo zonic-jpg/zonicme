@@ -110,6 +110,38 @@
       "orbit": "./orbit/owanbex.json",
       "orbitLive": "https://owanbex.netlify.app/orbit-manifest.json",
       "color": "#9B2335"
+    },
+    {
+      "id": "confirmahead",
+      "name": "ConfirmAhead",
+      "benefit": "Fewer no-shows: customers get a WhatsApp confirmation and reminder for every booking.",
+      "brandBenefit": "Service businesses fill their diary and cut empty slots with automatic reminders and deposits.",
+      "summary": "WhatsApp booking confirmations and reminders.\nBuilt for service businesses.",
+      "detail": "ConfirmAhead helps salons, clinics, studios and other service businesses take bookings, confirm them on WhatsApp and remind customers before the appointment, so fewer slots go empty.",
+      "features": [
+        "Online booking page for services and staff",
+        "Automatic WhatsApp confirmation and reminder messages",
+        "Staff availability, time off and service lists",
+        "Business dashboard with bookings and messages",
+        "Plans for small and growing businesses"
+      ],
+      "url": "https://confirmahead.netlify.app",
+      "color": "#2563EB"
+    },
+    {
+      "id": "sydef",
+      "name": "Sydef",
+      "benefit": "Book self-defence classes near you and learn practical safety skills.",
+      "brandBenefit": "Reach people actively investing in their personal safety and wellbeing.",
+      "summary": "Self-defence class booking.\nSafety skills for everyday life.",
+      "detail": "Sydef connects people with self-defence classes and instructors, with simple booking and a member portal.",
+      "features": [
+        "Browse and book self-defence classes",
+        "Member portal with preferences",
+        "Instructor and class listings"
+      ],
+      "url": "https://mysydef.com",
+      "color": "#7C3AED"
     }
   ]
 }
