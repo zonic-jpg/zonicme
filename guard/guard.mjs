@@ -276,7 +276,42 @@ async function adspot(browser, base) {
   }
 }
 
-const APP_CHECKS = { myyanga, myafriart, rubba, confirmahead, sydef, adspot };
+// AdSpot leaderboard: the pages read `pointsTotal`, the backend sends `points`. Pin both halves of that contract.
+async function adspotLeaderboard(browser, base) {
+  const app = "adspot";
+  const ref = "ukhdjvbzbidxoieauhpr";
+  const anon =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVraGRqdmJ6YmlkeG9pZWF1aHByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgyMDc5NzEsImV4cCI6MjEwMzc4Mzk3MX0.OgtjwWjcoRco64Zcdam-xRP9nqj4pBJxFWGNKntoGtY";
+  await check(app, "leaderboard backend returns a numeric points value for every entry", async () => {
+    const r = await fetch(`https://${ref}.supabase.co/functions/v1/leaderboard`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${anon}`, apikey: anon, "Content-Type": "application/json" },
+      body: "{}",
+    });
+    expect(r.ok, `leaderboard function returned HTTP ${r.status}`);
+    const body = await r.json();
+    expect(Array.isArray(body.entries), "no entries array in the response");
+    for (const e of body.entries) {
+      const pts = e.pointsTotal ?? e.points;
+      expect(Number.isFinite(Number(pts)), `entry ${e.rank} has no numeric points (keys: ${Object.keys(e).join(",")})`);
+    }
+  });
+  await check(app, "live app accepts both points and pointsTotal (never shows 0 for real points)", async () => {
+    const html = await (await fetch(base)).text();
+    const assets = [...new Set([...html.matchAll(/\/assets\/[^"']+\.js/g)].map((m) => m[0]))];
+    for (const a of assets) {
+      const js = await (await fetch(base + a)).text();
+      if (/pointsTotal\?\?[^,;]{0,20}\.points/.test(js) || js.includes("pointsTotal??")) return true;
+    }
+    throw new Error("leaderboard normaliser missing from the live bundle");
+  });
+}
+
+const adspotAll = async (browser, base) => {
+  await adspot(browser, base);
+  await adspotLeaderboard(browser, base);
+};
+const APP_CHECKS = { myyanga, myafriart, rubba, confirmahead, sydef, adspot: adspotAll };
 
 const browser = await chromium.launch();
 for (const [app, base] of Object.entries(SITES)) {
