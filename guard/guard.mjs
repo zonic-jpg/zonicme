@@ -82,12 +82,30 @@ async function universal(browser, app, base) {
 // ---------------------------------------------------------------------------
 async function myyanga(browser, base) {
   const app = "myyanga";
-  await check(app, "nav contains Explore and Premium", async () => {
+  await check(app, "nav has Premium, Shop and Events once; Explore retired and redirects to Shop", async () => {
     const { page, context } = await openPage(browser, base + "/");
-    const text = (await page.locator("body").innerText()).toUpperCase();
+    const links = (await page.locator("header a:visible, header button:visible, nav a:visible, nav button:visible").allInnerTexts()).map((t) => t.trim().toUpperCase());
     await context.close();
-    expect(text.includes("EXPLORE"), "Explore missing from nav");
-    expect(text.includes("PREMIUM"), "Premium missing from nav");
+    expect(links.includes("PREMIUM"), "Premium missing from nav");
+    expect(!links.includes("EXPLORE"), "Explore still in nav");
+    expect(links.filter((t) => t === "EVENTS").length <= 1, "Events appears twice in nav");
+    const r = await openPage(browser, base + "/?view=explore", { waitMs: 3000 });
+    const text = await r.page.locator("body").innerText();
+    await r.context.close();
+    expect(/Curated African fashion/i.test(text), "?view=explore did not land on Shop");
+  });
+  await check(app, "Shop has a standalone Fabrics shelf", async () => {
+    const { page, context } = await openPage(browser, base + "/?view=shop", { waitMs: 3000 });
+    const n = await page.getByRole("button", { name: /^Fabrics$/i }).count();
+    await context.close();
+    expect(n >= 1, "no Fabrics chip in Shop");
+  });
+  await check(app, "Events page shows Upcoming and Past sections (no blank page when all events have passed)", async () => {
+    const { page, context } = await openPage(browser, base + "/?view=events", { waitMs: 3500 });
+    const text = await page.locator("body").innerText();
+    await context.close();
+    expect(/Upcoming/.test(text), "Upcoming heading missing");
+    expect(/Past events/.test(text) || /No upcoming events/.test(text) === false, "past events not listed");
   });
   await check(app, "Make Up is promoted on the home page", async () => {
     const { page, context } = await openPage(browser, base + "/");
@@ -120,6 +138,15 @@ async function myyanga(browser, base) {
 
 async function myafriart(browser, base) {
   const app = "myafriart";
+  await check(app, "auction and collateral pages render (Free pricing = no gate in the way)", async () => {
+    for (const path of ["/auction", "/collateral"]) {
+      const { page, context, status } = await openPage(browser, base + path, { waitMs: 3000 });
+      const text = await page.locator("body").innerText();
+      await context.close();
+      expect(status === 200, `${path} HTTP ${status}`);
+      expect(!/paid service/i.test(text), `${path} is unexpectedly gated`);
+    }
+  });
   await check(app, "Stage a Room API is deployed (400 for empty body, never 404)", async () => {
     const res = await fetch(base + "/api/stage-room", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
     expect(res.status === 400, `status ${res.status}`);
@@ -202,6 +229,22 @@ async function rubba(browser, base) {
     const links = await page.locator(".head-nav a").allInnerTexts();
     await context.close();
     expect(links.some((t) => /brands/i.test(t)), `nav: ${links.join(",")}`);
+  });
+  await check(app, "games: landing link asks guests to sign up; league and quiz pages render", async () => {
+    const { page, context } = await openPage(browser, base + "/");
+    await page.getByRole("button", { name: /Stock League/i }).first().click();
+    await page.waitForTimeout(800);
+    const gate = await page.locator("body").innerText();
+    await context.close();
+    expect(/Create your account/i.test(gate), "guest was not asked to sign up");
+    for (const [path, needle] of [["/league", /Stock League/], ["/quiz", /Africa Daily Quiz/]]) {
+      const r = await openPage(browser, base + path, { width: 390, height: 800 });
+      const text = await r.page.locator("body").innerText();
+      const px = await overflowPx(r.page);
+      await r.context.close();
+      expect(needle.test(text), `${path} did not render`);
+      expect(px <= 2, `${path} overflows by ${px}px on phone`);
+    }
   });
 }
 
