@@ -355,7 +355,72 @@ const adspotAll = async (browser, base) => {
   await adspot(browser, base);
   await adspotLeaderboard(browser, base);
 };
-const APP_CHECKS = { myyanga, myafriart, rubba, confirmahead, sydef, adspot: adspotAll };
+
+// ---- Exploit regression checks (anonymous attacker). Each must be REFUSED by the database. ----
+async function anonKey(base, ref) {
+  const html = await (await fetch(base)).text();
+  const assets = [...new Set([...html.matchAll(/\/assets\/[^"']+\.js/g)].map((m) => m[0]))];
+  for (const a of assets) {
+    const js = await (await fetch(base + a)).text();
+    const pub = js.match(/sb_publishable_[A-Za-z0-9_-]{20,}/);
+    if (pub && !ref.startsWith("__")) { const k = pub[0]; if (js.includes(`${ref}.supabase.co`)) return k; }
+    for (const m of js.matchAll(/eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/g)) {
+      try {
+        const payload = JSON.parse(Buffer.from(m[0].split(".")[1], "base64url").toString());
+        if (payload.ref === ref && payload.role === "anon") return m[0];
+      } catch {}
+    }
+  }
+  throw new Error("could not find the public key in the live bundle");
+}
+async function mustRefuse(ref, key, method, path, body) {
+  const r = await fetch(`https://${ref}.supabase.co/rest/v1/${path}`, {
+    method,
+    headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json", Prefer: "return=representation" },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const text = await r.text();
+  // Refused = error status, or an update/delete that touched zero rows.
+  expect(!/PGRST204|PGRST2|column .* does not exist|null value/i.test(text), `test is invalid (schema error, not a security refusal): ${text.slice(0, 120)}`);
+  const touched = r.ok && text.trim() !== "[]" && text.trim() !== "";
+  expect(!touched, `database ACCEPTED an anonymous ${method} on ${path}: ${text.slice(0, 120)}`);
+}
+async function exploits(browser, base, app, ref, tests) {
+  const key = await anonKey(base, ref).catch(() => null);
+  for (const [name, method, path, body] of tests) {
+    await check(app, `exploit refused: ${name}`, async () => {
+      expect(key, "no public key found");
+      await mustRefuse(ref, key, method, path, body);
+    });
+  }
+}
+const adspotAll2 = async (browser, base) => {
+  await adspotAll(browser, base);
+  await exploits(browser, base, "adspot", "ukhdjvbzbidxoieauhpr", [
+    ["forge points in the ledger", "POST", "adspot_points_ledger", { user_id: "00000000-0000-0000-0000-000000000000", amount: 99999, source: "guard" }],
+  ]);
+};
+const myyangaAll = async (browser, base) => {
+  await myyanga(browser, base);
+  await exploits(browser, base, "myyanga", "xbscrygytqcycrumosvc", [
+    ["forge votes on a Pick-Your-Look entry", "POST", "pyl_entries", { votes: 5000, status: "live" }],
+  ]);
+};
+const myafriartAll = async (browser, base) => {
+  await myafriart(browser, base);
+  await exploits(browser, base, "myafriart", "xmsglatdkdypnalvhevx", [
+    ["insert a fake payment", "POST", "payments", { purpose: "guard", amount_ngn: 1, status: "paid" }],
+    ["insert a fake auction bid", "POST", "auction_bids", { amount: 1 }],
+  ]);
+};
+const rubbaAll = async (browser, base) => {
+  await rubba(browser, base);
+  await exploits(browser, base, "rubba", "gdgseklsdpybhzkbzaeg", [
+    ["raise own usage tier", "PATCH", "user_usage?user_id=not.is.null", { tier_id: "pro", used: 0 }],
+    ["edit plan limits", "PATCH", "paid_tiers?id=not.is.null", { generations_per_month: 9999 }],
+  ]);
+};
+const APP_CHECKS = { myyanga: myyangaAll, myafriart: myafriartAll, rubba: rubbaAll, confirmahead, sydef, adspot: adspotAll2 };
 
 const browser = await chromium.launch();
 for (const [app, base] of Object.entries(SITES)) {
