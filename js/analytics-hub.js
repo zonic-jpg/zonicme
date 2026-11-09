@@ -216,7 +216,52 @@
         }
       })
     );
+    await overlayLiveHub(cache);
     return cache;
+  }
+
+  /**
+   * Replace mock numbers with real counts from the hub (zonic-hub-ingest ->
+   * hub_events) for every app that has reported real events.
+   */
+  const HUB_ALIAS = { owanbe: "owanbex", owanbex: "owanbex" };
+  async function overlayLiveHub(cache) {
+    try {
+      const res = await fetch(
+        "https://qdhlbplzdblcvvaaluwu.supabase.co/rest/v1/rpc/hub_app_metrics",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: "sb_publishable_aYNuDQ2xQx1q45xmIKwpOQ_0DmUBmby",
+          },
+          body: "{}",
+        }
+      );
+      if (!res.ok) return;
+      const rows = await res.json();
+      (rows || []).forEach((r) => {
+        const id = HUB_ALIAS[r.app] || r.app;
+        if (!r || !(+r.events_total > 0)) return;
+        const prev = cache[id] || {};
+        cache[id] = {
+          ...prev,
+          metrics: {
+            ...(prev.mock ? {} : prev.metrics || {}),
+            activeUsers7d: +r.active_7d,
+            sessions24h: +r.sessions_24h,
+            events: +r.events_total,
+            people: +r.people,
+          },
+          demographics: prev.demographics,
+          mock: false,
+          demo: false,
+          _source: "hub-live",
+        };
+      });
+    } catch (_) {
+      /* hub unreachable: keep whatever the cache already holds */
+    }
   }
 
   /** Seed the cache so charts are never empty on first paint (last-good, then mock). */
