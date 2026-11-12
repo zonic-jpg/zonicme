@@ -110,9 +110,12 @@
     } catch (_) {}
   }
 
-  /** Fetch JSON with a hard timeout so one slow app can never stall the hub. */
-  async function fetchJson(url, timeoutMs = ORBIT_TIMEOUT_MS) {
-    if (!url) return null;
+  /**
+   * Fetch JSON with a hard timeout so one slow app can never stall the hub.
+   * `reached` is false when the server never answered (offline, timed out).
+   */
+  async function fetchJsonDetailed(url, timeoutMs = ORBIT_TIMEOUT_MS) {
+    if (!url) return { json: null, reached: false };
     const ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
     const timer = ctl ? setTimeout(() => ctl.abort(), timeoutMs) : null;
     try {
@@ -121,14 +124,18 @@
         cache: "no-store",
         signal: ctl ? ctl.signal : undefined,
       });
-      if (!res.ok) return null;
-      const json = await res.json();
-      return json && typeof json === "object" ? json : null;
+      if (!res.ok) return { json: null, reached: true };
+      const json = await res.json().catch(() => null);
+      return { json: json && typeof json === "object" ? json : null, reached: true };
     } catch (_) {
-      return null;
+      return { json: null, reached: false };
     } finally {
       if (timer) clearTimeout(timer);
     }
+  }
+
+  async function fetchJson(url, timeoutMs = ORBIT_TIMEOUT_MS) {
+    return (await fetchJsonDetailed(url, timeoutMs)).json;
   }
 
   /**
@@ -164,8 +171,15 @@
     const lastGood = options.lastGood || readLastGood();
     const mockOff = isMockDisabled();
 
+    // If an app's server did not answer at all, asking it again at another path
+    // only wastes time and puts a blocked-request error in the browser console.
+    const unreachable = new Set();
     for (const url of manifestCandidates(app, lastGood)) {
-      const feed = await fetchJson(url, timeoutMs);
+      let origin = "";
+      try { origin = new URL(url, global.location?.href).origin; } catch (_) {}
+      if (origin && unreachable.has(origin)) continue;
+      const { json: feed, reached } = await fetchJsonDetailed(url, timeoutMs);
+      if (!reached && origin) unreachable.add(origin);
       if (hasMetrics(feed)) {
         const entry = { ...feed, _source: "live", _url: url, mock: !!feed.mock };
         if (!feed.mock) rememberLastGood(app.id, feed, url);
