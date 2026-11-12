@@ -123,3 +123,49 @@
     setTimeout(flush, 3000);
   }
 })(typeof window !== "undefined" ? window : globalThis);
+
+/* Image safety net (shared by every Zonic app).
+   A picture that fails to load (dead link, removed file, flaky connection) is tried
+   once more, then replaced by a neutral placeholder instead of the browser's
+   broken-image icon. Each failure is recorded so it can be fixed at the source.
+   Pages that already handle a failed picture themselves are left alone. */
+(function () {
+  if (typeof window === "undefined" || typeof document === "undefined" || window.__zonicImgGuard) return;
+  window.__zonicImgGuard = true;
+  var broken = (window.__zonicBrokenImages = []);
+  var tries = typeof WeakMap === "function" ? new WeakMap() : null;
+  var PLACEHOLDER = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">' +
+    '<rect width="400" height="300" fill="#e9e6e1"/>' +
+    '<g fill="none" stroke="#b9b3aa" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">' +
+    '<rect x="150" y="110" width="100" height="80" rx="8"/><circle cx="178" cy="137" r="9"/>' +
+    '<path d="M158 182l28-28 20 18 16-14 24 24"/></g></svg>');
+  function current(img) { return img.currentSrc || img.getAttribute("src") || ""; }
+  document.addEventListener("error", function (ev) {
+    var img = ev.target;
+    if (!img || img.tagName !== "IMG") return;
+    var failed = current(img);
+    if (!failed || failed.indexOf("data:") === 0 || failed.indexOf("blob:") === 0) return;
+    // Give the page's own fallback, if it has one, a moment to act first.
+    setTimeout(function () {
+      if (!img.isConnected || current(img) !== failed) return;      // removed, or the page swapped it
+      if (img.complete && img.naturalWidth > 0) return;              // it loaded after all
+      var box = img.getBoundingClientRect();
+      if (box.width <= 2 && box.height <= 2) return;                 // invisible tracking pixel
+      var n = tries ? (tries.get(img) || 0) : 1;
+      if (n < 1) {                                                   // one more go for a flaky connection
+        tries.set(img, n + 1);
+        img.src = failed;
+        return;
+      }
+      if (tries) tries.delete(img);
+      img.removeAttribute("srcset");
+      img.setAttribute("data-zonic-fallback", failed.slice(0, 300));
+      img.src = PLACEHOLDER;
+      if (broken.indexOf(failed) < 0) {
+        broken.push(failed);
+        try { if (window.ZonicTrack && window.ZonicTrack.span) window.ZonicTrack.span("image_error", { src: failed.slice(0, 300), path: location.pathname }); } catch (e) {}
+      }
+    }, 700);
+  }, true);
+})();
