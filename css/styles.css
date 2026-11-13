@@ -503,7 +503,7 @@ footer a:hover{color:var(--teal-bright)}
   .header-nav{padding:6px 16px}
   .nav{flex-wrap:nowrap;gap:2px}
   .nav > a,.nav > .drop > button{padding:6px 6px;font-size:10px;letter-spacing:.05em}
-  .nav > a[href="roadmap.html"]{display:none} /* still reachable from the footer */
+  .nav > a[href="roadmap.html"],.nav > a[href="/roadmap"]{display:none} /* still reachable from the footer */
   .drop-menu{left:auto;right:0}
   .hero{padding:132px 18px 40px}
   .hero-inner{grid-template-columns:1fr;gap:28px}

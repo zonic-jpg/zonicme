@@ -48,9 +48,13 @@
   }
 
   function markCurrentNav() {
-    const here = location.pathname.split("/").pop() || "index.html";
+    // Links may be written as "about.html" or, once published, as "/about": compare them by page name.
+    const navKey = (h) => String(h || "").replace(/^\.?\//, "").replace(/\.html$/, "") || "index";
+    const here = navKey(location.pathname.split("/").pop());
     document.querySelectorAll('.nav > a[href], .footer-nav a[href]').forEach((a) => {
-      if (a.getAttribute("href") === here) a.classList.add("is-current");
+      const href = a.getAttribute("href") || "";
+      if (/^[a-z]+:/i.test(href) || href.indexOf("#") >= 0) return;
+      if (navKey(href) === here) a.classList.add("is-current");
     });
   }
 

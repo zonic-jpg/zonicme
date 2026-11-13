@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Brand Rewards Console — ZonicMe</title>
+<meta name="description" content="Run reward campaigns across the ZonicMe apps: set a budget, write the rules, send gifts and see the results.">
+<link rel="canonical" href="https://zonicme.netlify.app/brand-rewards.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ZonicMe">
+<meta property="og:title" content="Brand Rewards Console — ZonicMe">
+<meta property="og:description" content="Run reward campaigns across the ZonicMe apps: set a budget, write the rules, send gifts and see the results.">
+<meta property="og:url" content="https://zonicme.netlify.app/brand-rewards.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" href="./assets/zonicme-logo.png" type="image/png">
+<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="./css/rewards.css">
+<script src="/auto-refresh.js" defer></script>
+</head>
+<body>
+<div class="page">
+
+<header class="site-header" id="siteHeader">
+  <div class="header-top">
+    <a class="logo" href="index.html" aria-label="ZonicMe home">
+      <img src="./assets/zonicme-logo.png" alt="ZonicMe" width="158" height="67">
+    </a>
+  </div>
+  <div class="header-nav">
+    <nav class="nav" aria-label="Primary">
+      <a href="about.html">About</a>
+      <div class="drop" id="appsDrop">
+        <button type="button" aria-expanded="false" aria-haspopup="true" id="appsBtn">Applications</button>
+        <div class="drop-menu" id="appsMenu" role="menu"></div>
+      </div>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="analytics.html">Analytics</a>
+      <a href="wallet.html">Rewards</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page-hero">
+  <h1>Brand Console</h1>
+  <p>Run reward campaigns across the ZonicMe apps, with a budget you control.</p>
+</div>
+
+<main class="rw-wrap" id="rewards">
+  <div id="rwTop"></div>
+  <div id="rwRoot" aria-live="polite">
+    <div class="rw-card rw-sk" aria-hidden="true"><span class="sk sk-heading"></span><span class="sk sk-line"></span><span class="sk sk-line sk-short"></span></div>
+  </div>
+  <noscript><div class="rw-note"><strong>This page needs JavaScript.</strong> Please switch it on in your browser to use ZonicMe Rewards.</div></noscript>
+</main>
+
+<footer>
+  <nav class="footer-nav" aria-label="Secondary">
+    <a href="index.html#applications">Applications</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="about.html">About</a>
+    <a href="analytics.html">Analytics</a>
+    <a href="wallet.html">Rewards</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+  <p class="footer-sib-label">ZonicMe products</p>
+  <nav class="footer-nav footer-siblings" id="footerSiblings" aria-label="ZonicMe products"></nav>
+  © <span id="yr"></span> ZonicMe Limited · Floor M2, Transcorp Hilton, Abuja
+</footer>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="./js/supabase-client.js"></script>
+<script src="./js/publicMessage.js"></script>
+<script src="./js/adminTesterApproval.js"></script>
+<script src="./js/apps-store.js"></script>
+<script src="./js/zonic-track.js"></script>
+<script src="./js/site-chrome.js"></script>
+<script src="./js/auth.js"></script>
+<script src="./js/rewards.js"></script>
+<script>window.ZONIC_APP_ID = "zonicme-hub";</script>
+<script src="./js/rewards-brand.js"></script>
+</body>
+</html>
