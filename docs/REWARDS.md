@@ -116,7 +116,10 @@ Four starter rules are seeded switched **off** (`rewards_05_starter_rules`).
 
 ## Files
 
-- `supabase/migrations/*rewards_0*.sql` — hub schema, engine, API, starter rules, demo purge (applied to `zonicme`).
+- `supabase/migrations/*rewards_0*.sql` — hub schema, engine, API, starter rules (01 to 05 are applied to `zonicme`).
+  `rewards_06_demo_purge` (the routine behind "Clear demo data") is written but **not applied yet**: applying it asks
+  the project owner for confirmation because it is the one routine that takes rows out. Until it is applied, the
+  "Clear demo data" button answers with a plain message and demo items simply stay marked as demo.
 - `supabase/functions/rewards-ingest`, `rewards-api` — the two edge functions (JWT check off on purpose: they
   authenticate by signature inside the database).
 - `supabase/app-events/` — the SQL applied to each app's project.
