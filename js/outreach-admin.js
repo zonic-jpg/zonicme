@@ -72,7 +72,10 @@
         <p class="rw-hint">${esc(appName(c.app))} · up to ${num(c.daily_send_cap)} emails a day</p>
         ${table(["Who", "Country", "Found"], rows, "No targets set for this campaign.")}
         <div class="rw-actions">${c.status === "active" ? `<button type="button" class="rw-btn ghost" data-act="camp-status" data-id="${c.id}" data-to="paused">Pause</button>` : `<button type="button" class="rw-btn" data-act="camp-status" data-id="${c.id}" data-to="active">Make active</button>`}
-          <button type="button" class="rw-btn ghost" data-act="camp-review" data-id="${c.id}">Open its leads</button></div></div>`;
+          <button type="button" class="rw-btn ghost" data-act="agent" data-op="discover" data-id="${c.id}">Find leads</button>
+          <button type="button" class="rw-btn ghost" data-act="agent" data-op="draft" data-id="${c.id}">Write draft emails</button>
+          <button type="button" class="rw-btn ghost" data-act="camp-review" data-id="${c.id}">Open its leads</button></div>
+        <p class="rw-msg" data-agent-out="${c.id}" role="status" aria-live="polite"></p></div>`;
     });
     return `<div class="rw-card"><h2>New campaign</h2>
       <form id="campNew" class="rw-form">
@@ -108,7 +111,7 @@
         <label>Organisation<input id="lfOrg" value="${esc(l.org_name)}" required${locked ? " disabled" : ""}></label>
         <label>Contact name<input id="lfOwner" value="${esc(l.owner_name || "")}"${locked ? " disabled" : ""}></label>
         <label>Email address<input id="lfEmail" type="email" value="${esc(l.contact_email || "")}"${locked ? " disabled" : ""}></label>
-        <label class="rw-check"><input type="checkbox" id="lfVerified"${l.email_verified ? " checked" : ""}${locked ? " disabled" : ""}> I have checked this address is right${l.verification_note ? ` <span class="rw-sub">${esc(l.verification_note)}</span>` : ""}</label>
+        <label class="rw-check"><input type="checkbox" id="lfVerified"${l.email_verified ? " checked" : ""}${locked ? " disabled" : ""}> This address has been checked${l.verification_note ? ` <span class="rw-sub">${esc(l.verification_note)}</span>` : ""}</label>
         <label>Subject<input id="lfSubject" value="${esc(l.draft_subject || "")}" maxlength="200"${locked ? " disabled" : ""}></label>
         <label>Message<textarea id="lfBody" rows="12"${locked ? " disabled" : ""}>${esc(l.draft_body || "")}</textarea></label>
         ${locked ? "" : `<div class="rw-actions">
@@ -238,6 +241,19 @@
       if (act === "camp-status") { await q(sb().from("outreach_campaigns").update({ status: t.dataset.to, updated_at: new Date().toISOString() }).eq("id", t.dataset.id).select("id")); await show("campaigns"); }
       else if (act === "camp-review") { st.filter.campaign = t.dataset.id; st.filter.app = ""; st.filter.approval = ""; await show("review"); }
       else if (act === "export") exportCsv();
+      else if (act === "agent") {
+        // The research agent only adds leads and fills drafts. Everything it produces waits for review.
+        const msg = $(`[data-agent-out="${t.dataset.id}"]`, rootEl), op = t.dataset.op;
+        const res = await R.withBusy(t, msg, op === "discover" ? "Searching… this can take a minute" : "Writing…", async () => {
+          const { data, error } = await sb().functions.invoke("outreach-agent", { body: { op, campaign_id: t.dataset.id, limit: 6 } });
+          if (error) throw new Error("The research agent could not be reached. Please try again.");
+          if (!data || data.ok === false) throw new Error((data && data.error) || "The research agent could not finish.");
+          return data;
+        });
+        if (res) say(msg, op === "discover"
+          ? (res.done ? res.message : res.added ? `${res.added} new lead${res.added === 1 ? "" : "s"} for ${res.group} in ${res.country}, waiting for review. ${res.remaining} still to find. Press again for more.` : (res.message || "Nothing new found this time. Press again to keep looking."))
+          : (res.written ? `${res.written} draft${res.written === 1 ? "" : "s"} written, waiting for review.` + (res.waiting ? ` ${res.waiting} more to write: press again.` : "") : (res.problems && res.problems[0]) || "No leads in this campaign are waiting for a draft."), "ok");
+      }
       else if (act === "bulk" || act === "bulk-queue") {
         const ids = shownLeads().filter((l) => st.sel.has(l.id)).map((l) => l.id);
         if (!ids.length) return say(out, "Tick the leads you want first.", "bad");
