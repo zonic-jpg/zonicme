@@ -14,6 +14,7 @@
   const TABS = [["overview", "Overview"], ["campaigns", "Campaigns"], ["review", "Review queue"], ["contexts", "Who we look for"], ["dnc", "Do not contact"], ["activity", "Activity"], ["settings", "Settings"]];
   const APPROVAL = { pending_review: "Waiting for review", approved: "Approved", rejected: "Rejected" };
   const SENDING = { unsent: "Not sent", queued: "Queued", sending: "Sending", sent: "Sent", replied: "Replied", bounced: "Bounced", failed: "Failed", suppressed: "Do not contact" };
+  const DELIVERY = { sent: "handed to the email service", delivered: "delivered", delivery_delayed: "delivery delayed", opened: "opened", clicked: "link clicked", bounced: "bounced", complained: "marked as spam" };
   const ctxById = (id) => st.contexts.find((c) => c.id === id);
   const campById = (id) => st.campaigns.find((c) => c.id === id);
   const opt = (v, label, cur) => `<option value="${esc(v)}"${String(v) === String(cur) ? " selected" : ""}>${esc(label)}</option>`;
@@ -104,8 +105,10 @@
   function editorHtml(l) {
     const locked = ["sending", "sent", "replied", "bounced"].includes(l.outreach_status);
     return `<div class="rw-card" id="leadEditor"><h2>${esc(l.org_name)}</h2>
-      <p class="rw-hint">${esc(appName(l.app))} · ${esc((ctxById(l.context_id) || {}).label || "")} · ${esc(APPROVAL[l.approval_status])} · ${esc(SENDING[l.outreach_status])}${l.source_url ? ` · <a class="rw-link" href="${esc(l.source_url)}" target="_blank" rel="noopener noreferrer">where it was found</a>` : ""}</p>
+      <p class="rw-hint">${esc(appName(l.app))} · ${esc((ctxById(l.context_id) || {}).label || "")} · ${esc(APPROVAL[l.approval_status])} · ${esc(SENDING[l.outreach_status])}${l.outreach_status === "sent" && DELIVERY[l.delivery_state] ? " (" + esc(DELIVERY[l.delivery_state]) + ")" : ""}${l.source_url ? ` · <a class="rw-link" href="${esc(l.source_url)}" target="_blank" rel="noopener noreferrer">where it was found</a>` : ""}</p>
       ${l.evidence ? `<p class="rw-lead">${esc(l.evidence)}</p>` : ""}
+      ${l.outreach_status === "failed" ? `<div class="rw-note"><strong>This email was not sent.</strong> ${esc(l.last_error || "The email service did not accept it.")} You can queue it again.</div>` : ""}
+      ${l.outreach_status === "bounced" && l.last_error ? `<div class="rw-note"><strong>${esc(l.last_error)}</strong> The address has been added to the do-not-contact list.</div>` : ""}
       ${locked ? `<div class="rw-note calm">This email has gone out, so it can no longer be changed.</div>` : ""}
       <form id="leadForm" class="rw-form" data-id="${l.id}">
         <label>Organisation<input id="lfOrg" value="${esc(l.org_name)}" required${locked ? " disabled" : ""}></label>
@@ -118,9 +121,10 @@
           <button class="rw-btn ghost" data-do="save">Save changes</button>
           <button class="rw-btn" data-do="approve">Save and approve</button>
           <button class="rw-btn warn" data-do="reject">Reject</button>
-          ${l.approval_status === "approved" && l.outreach_status === "unsent" ? `<button class="rw-btn" data-do="queue">Queue to send</button>` : ""}
+          ${l.approval_status === "approved" && ["unsent", "failed"].includes(l.outreach_status) ? `<button class="rw-btn" data-do="queue">Queue to send</button>` : ""}
           ${l.outreach_status === "queued" ? `<button class="rw-btn ghost" data-do="unqueue">Take out of the queue</button>` : ""}</div>
           <p class="rw-hint">Changing the address, subject or message after approval sends the lead back for review.</p>`}
+        ${l.outreach_status === "sent" ? `<div class="rw-actions"><button class="rw-btn ghost" data-do="replied">They replied</button></div><p class="rw-hint">Marks this lead as replied, so it shows in your reply count.</p>` : ""}
         <p class="rw-msg" id="lfOut" role="status" aria-live="polite"></p>
       </form></div>`;
   }
@@ -212,8 +216,11 @@
       <label>Sender address<input id="osFrom" type="email" value="${esc(s.from_email || "")}" placeholder="partnerships@your-domain"></label>
       <label>Replies go to<input id="osReply" type="email" value="${esc(s.reply_to || "")}"></label>
       <label>Pause automatically when bounces pass (percent)<input id="osBounce" type="number" min="1" max="20" step="0.5" value="${esc(String(Math.round(Number(s.bounce_pause_threshold || 0.03) * 1000) / 10))}"></label>
-      <div class="rw-actions"><button class="rw-btn" id="osBtn">Save</button></div><p class="rw-msg" id="osOut" role="status" aria-live="polite"></p></form>
-      <p class="rw-hint">Emails are only sent from an address on a domain that has been set up for sending. Until one is entered here, nothing is sent even if sending is switched on.</p></div>`;
+      <div class="rw-actions"><button class="rw-btn" id="osBtn">Save</button>
+        <button type="button" class="rw-btn ghost" data-act="send-test">Send me a test email</button></div><p class="rw-msg" id="osOut" role="status" aria-live="polite"></p></form>
+      <p class="rw-msg" id="osReady" role="status" aria-live="polite"></p>
+      <p class="rw-hint">When sending is on, approved and queued emails go out a few at a time, every ten minutes, up to each campaign's daily limit. Every email ends with a line telling the recipient how to opt out. Bounced addresses are added to the do-not-contact list automatically.</p>
+      <p class="rw-hint">The test goes only to your own address and works whether sending is on or off. Emails are only sent from an address on a domain that has been set up for sending.</p></div>`;
   }
 
   // ---------------------------------------------------------------- drawing
@@ -227,7 +234,19 @@
         : tab === "contexts" ? contextsHtml() : tab === "dnc" ? await dncHtml() : tab === "activity" ? await activityHtml() : settingsHtml();
       $("#orBody", rootEl).innerHTML = html;
       if (window.history && window.history.replaceState) window.history.replaceState(null, "", "#" + tab);
+      if (tab === "settings") checkReady();
     } catch (e) { $("#orBody", rootEl).innerHTML = `<div class="rw-note"><strong>This screen could not load.</strong> ${esc(R.errText(e))}</div>`; }
+  }
+
+  async function sender(op) {
+    const { data, error } = await sb().functions.invoke("outreach-send", { body: { op } });
+    if (error) throw new Error("The sending service could not be reached. Please try again.");
+    return data || {};
+  }
+  async function checkReady() {
+    const el = $("#osReady", rootEl); if (!el) return;
+    try { const r = await sender("status"); if ($("#osReady", rootEl) !== el) return;
+      say(el, r.ready ? "The sender address is ready to send." : (r.reason || "The sender address is not ready."), r.ready ? "ok" : "bad"); } catch (e) { /* the check is a courtesy; the page works without it */ }
   }
 
   async function onClick(ev) {
@@ -241,6 +260,11 @@
       if (act === "camp-status") { await q(sb().from("outreach_campaigns").update({ status: t.dataset.to, updated_at: new Date().toISOString() }).eq("id", t.dataset.id).select("id")); await show("campaigns"); }
       else if (act === "camp-review") { st.filter.campaign = t.dataset.id; st.filter.app = ""; st.filter.approval = ""; await show("review"); }
       else if (act === "export") exportCsv();
+      else if (act === "send-test") {
+        const msg = $("#osOut", rootEl);
+        const res = await R.withBusy(t, msg, "Sending…", async () => { const r = await sender("test"); if (r.ok === false) throw new Error(r.error || "The test could not be sent."); return r; });
+        if (res) say(msg, "Test sent to " + res.to + ". It can take a minute to arrive.", "ok");
+      }
       else if (act === "agent") {
         // The research agent only adds leads and fills drafts. Everything it produces waits for review.
         const msg = $(`[data-agent-out="${t.dataset.id}"]`, rootEl), op = t.dataset.op;
@@ -280,9 +304,9 @@
         const content = { org_name: $("#lfOrg", form).value.trim(), owner_name: $("#lfOwner", form).value.trim() || null, contact_email: $("#lfEmail", form).value.trim() || null,
           email_verified: $("#lfVerified", form).checked, draft_subject: $("#lfSubject", form).value.trim() || null, draft_body: $("#lfBody", form).value.trim() || null };
         const steps = doWhat === "approve" ? [content, { approval_status: "approved" }] : doWhat === "reject" ? [{ approval_status: "rejected" }]
-          : doWhat === "queue" ? [{ outreach_status: "queued" }] : doWhat === "unqueue" ? [{ outreach_status: "unsent" }] : [content];
+          : doWhat === "queue" ? [{ outreach_status: "queued" }] : doWhat === "unqueue" ? [{ outreach_status: "unsent" }] : doWhat === "replied" ? [{ outreach_status: "replied" }] : [content];
         for (const patch of steps) { const { error } = await sb().from("outreach_leads").update(patch).eq("id", id); if (error) return say(out, error.message, "bad"); }
-        await show("review"); say($("#lfOut", rootEl) || $("#rvOut", rootEl), doWhat === "approve" ? "Approved." : doWhat === "reject" ? "Rejected." : doWhat === "queue" ? "Queued to send." : doWhat === "unqueue" ? "Taken out of the queue." : "Saved.", "ok");
+        await show("review"); say($("#lfOut", rootEl) || $("#rvOut", rootEl), doWhat === "approve" ? "Approved." : doWhat === "reject" ? "Rejected." : doWhat === "queue" ? "Queued to send." : doWhat === "unqueue" ? "Taken out of the queue." : doWhat === "replied" ? "Marked as replied." : "Saved.", "ok");
       } else if (form.id === "campNew") {
         const out = $("#cnOut", form), app = $("#cnApp", form).value, targets = [];
         $all("[data-ctx]", form).filter((c) => c.checked).forEach((c) => parseQuotas($(`[data-quota="${c.dataset.ctx}"]`, form).value).forEach((p) => targets.push({ context_id: c.dataset.ctx, country: p.country, quota: p.quota })));
