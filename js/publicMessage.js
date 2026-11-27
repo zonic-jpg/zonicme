@@ -1,5 +1,5 @@
 /**
- * Public message guard — ZonicMe admin (ported from MyYangaX publicMessage.js).
+ * Public message guard — ZonicMe admin (ported from MyYanga publicMessage.js).
  */
 (function (global) {
   const GENERIC_ERROR = "Something went wrong. Please try again.";

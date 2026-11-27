@@ -43,10 +43,10 @@
     "sessions": [9200, 9580, 9920, 10340, 10680, 10960, 11240]
   },
   "featured": [
-    { "title": "Partner network campaigns", "location": "AdSpotX" },
-    { "title": "Rewarded ad reviews", "location": "AdSpotX" },
-    { "title": "Brand analytics", "location": "AdSpotX" },
-    { "title": "Weekly payouts", "location": "AdSpotX" }
+    { "title": "Partner network campaigns", "location": "AdSpot" },
+    { "title": "Rewarded ad reviews", "location": "AdSpot" },
+    { "title": "Brand analytics", "location": "AdSpot" },
+    { "title": "Weekly payouts", "location": "AdSpot" }
   ],
   "ingestHint": {
     "push": "POST ${ZONICME_INGEST_URL} with X-Zonic-Api-Key",

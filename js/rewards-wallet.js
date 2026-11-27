@@ -8,7 +8,7 @@
 
   const STEPS = `
     <div class="rw-steps">
-      <div class="rw-step"><h3>Earn in the apps</h3><p>When you complete a purchase or an activity in a ZonicMe app, the app tells ZonicMe and your points are added. MyYangaX, MyAfriArt and AdSpot are taking part first.</p></div>
+      <div class="rw-step"><h3>Earn in the apps</h3><p>When you complete a purchase or an activity in a ZonicMe app, the app tells ZonicMe and your points are added. MyYanga, MyAfriArt and AdSpot are taking part first.</p></div>
       <div class="rw-step"><h3>One balance</h3><p>Everything you earn lands in one wallet, matched by your email address. Use the same email here that you use in the apps.</p></div>
       <div class="rw-step"><h3>Gift and redeem</h3><p>Send points to a friend by email, and redeem them once redemption opens. Every movement is listed in your history.</p></div>
     </div>`;
@@ -23,7 +23,7 @@
       </div></div>`;
     R.mountGate($("#rwGate", root), {
       intro: "Sign in with your ZonicMe account to open your wallet.",
-      note: "Use the same email address you use in MyYangaX, MyAfriArt or AdSpot.",
+      note: "Use the same email address you use in MyYanga, MyAfriArt or AdSpot.",
     });
   }
 

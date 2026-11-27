@@ -43,10 +43,10 @@
     "sessions": [2800, 2920, 3100, 3280, 3410, 3520, 3640]
   },
   "featured": [
-    { "title": "Virtual Wear studio", "location": "MyYangaX" },
-    { "title": "Designer Runway drops", "location": "MyYangaX" },
-    { "title": "Lookbook filters", "location": "MyYangaX" },
-    { "title": "Creator storefronts", "location": "MyYangaX" }
+    { "title": "Virtual Wear studio", "location": "MyYanga" },
+    { "title": "Designer Runway drops", "location": "MyYanga" },
+    { "title": "Lookbook filters", "location": "MyYanga" },
+    { "title": "Creator storefronts", "location": "MyYanga" }
   ],
   "ingestHint": {
     "push": "POST ${ZONICME_INGEST_URL} with X-Zonic-Api-Key",

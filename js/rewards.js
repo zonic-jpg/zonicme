@@ -12,7 +12,7 @@
   const OFFLINE = "The rewards service cannot be reached right now. Please check your connection and try again.";
   const SIGN_IN = "Please sign in to continue.";
   const KNOWN_EVENTS = [
-    ["order_paid", "MyYangaX: an order is paid"],
+    ["order_paid", "MyYanga: an order is paid"],
     ["artwork_purchase_paid", "MyAfriArt: an artwork purchase is paid"],
     ["auction_settlement_paid", "MyAfriArt: an auction win is paid"],
     ["review_completed", "AdSpot: an ad review is completed"],

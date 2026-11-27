@@ -17,13 +17,13 @@
     apps: [
       {
         id: "myyanga",
-        name: "MyYangaX",
+        name: "MyYanga",
         benefit: "Try a look before you buy it, and order straight from the creator who styled it.",
         brandBenefit: "Put your designs in front of fashion-forward shoppers who are ready to discover and buy.",
         summary:
           "African fashion discovery, styling and Runway.\nCreators and shoppers meet in one place.",
         detail:
-          "MyYangaX is ZonicMe’s fashion platform. Browse looks, style them your way, and follow Runway drops from African designers and the diaspora. Discovery meets commerce so creators earn and audiences find style that feels like home.",
+          "MyYanga is ZonicMe’s fashion platform. Browse looks, style them your way, and follow Runway drops from African designers and the diaspora. Discovery meets commerce so creators earn and audiences find style that feels like home.",
         features: [
           "Post your look, collect likes and wait for the reveal",
           "Designer Runway drops with lookbooks, fabric filters and save-to-wishlist",

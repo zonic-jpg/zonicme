@@ -1,6 +1,6 @@
 {
   "appId": "owanbex",
-  "name": "OwanbeX",
+  "name": "Owanbe",
   "version": "1.1",
   "tagline": "Plan your dream Nigerian celebration",
   "description": "Event planning with vetted vendors, live budgets, and aso ebi.",
@@ -43,10 +43,10 @@
     "sessions": [620, 650, 680, 710, 740, 760, 780]
   },
   "featured": [
-    { "title": "Vendor shortlists", "location": "OwanbeX" },
-    { "title": "Live Naira budgets", "location": "OwanbeX" },
-    { "title": "Aso ebi coordination", "location": "OwanbeX" },
-    { "title": "Guest lists & RSVPs", "location": "OwanbeX" }
+    { "title": "Vendor shortlists", "location": "Owanbe" },
+    { "title": "Live Naira budgets", "location": "Owanbe" },
+    { "title": "Aso ebi coordination", "location": "Owanbe" },
+    { "title": "Guest lists & RSVPs", "location": "Owanbe" }
   ],
   "ingestHint": {
     "push": "POST ${ZONICME_INGEST_URL} with X-Zonic-Api-Key",
