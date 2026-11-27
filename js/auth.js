@@ -158,7 +158,8 @@
     const e = normalizeEmail(email);
     if (!e || !e.includes("@")) return { ok: false, error: "Enter the account email" };
     const { error } = await sb().auth.resetPasswordForEmail(e, {
-      redirectTo: global.location ? `${global.location.origin}/admin.html#reset` : undefined,
+      // No "#" here: the sign-in service adds its own "#..." to this address, and two would stop the link working.
+      redirectTo: global.location ? `${global.location.origin}/admin` : undefined,
     });
     if (error) return { ok: false, error: error.message };
     return {

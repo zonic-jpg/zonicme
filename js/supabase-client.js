@@ -16,6 +16,16 @@
   const SUPABASE_URL = "https://qdhlbplzdblcvvaaluwu.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_aYNuDQ2xQx1q45xmIKwpOQ_0DmUBmby";
 
+  // Reset links sent before 27 Nov 2026 arrive as "#reset#access_token=...". Drop the first part so the
+  // sign-in details after it are read; otherwise the new password is refused with "Auth session missing".
+  try {
+    const h = global.location.hash || "";
+    const i = h.indexOf("#", 1);
+    if (i > 0 && /access_token=|error=|code=/.test(h.slice(i))) {
+      global.history.replaceState(null, "", global.location.pathname + global.location.search + h.slice(i));
+    }
+  } catch (_) {}
+
   if (!global.supabase || typeof global.supabase.createClient !== "function") {
     console.error("[ZonicMe] Supabase SDK failed to load — admin login is unavailable.");
     return;
