@@ -7,12 +7,12 @@ import { chromium } from "playwright";
 
 const SITES = {
   owanbe: "https://myowanbe.com",
-  rubba: "https://rubbax.netlify.app",
-  myyanga: "https://myyangax.netlify.app",
-  myafriart: "https://myafriartx.netlify.app",
-  adspot: "https://adspotx.netlify.app",
-  confirmahead: "https://confirmahead.netlify.app",
-  zonicme: "https://zonicme.netlify.app",
+  rubba: "https://myrubba.com",
+  myyanga: "https://myyanga.com",
+  myafriart: "https://myafriart.com",
+  adspot: "https://adspotng.com",
+  confirmahead: "https://confirmahead.com",
+  zonicme: "https://zonicme.com.ng",
   sydef: "https://mysydef.com",
 };
 

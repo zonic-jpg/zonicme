@@ -32,10 +32,10 @@
           "Style reels and curated African fashion collections for diaspora + home",
           "Specials for his and hers, plus fashion events",
         ],
-        url: "https://myyangax.netlify.app",
+        url: "https://myyanga.com",
         thumbnail: "./assets/thumb-myyanga.jpg",
         orbit: "./orbit/myyangax.json",
-        orbitLive: "https://myyangax.netlify.app/orbit-manifest.json",
+        orbitLive: "https://myyanga.com/orbit-manifest.json",
         color: "#E85D04",
       },
       {
@@ -55,10 +55,10 @@
           "Collector wishlists, shortlists and enquiry flows",
           "Gallery insights on pieces listed, stagings and collector interest",
         ],
-        url: "https://myafriartx.netlify.app",
+        url: "https://myafriart.com",
         thumbnail: "./assets/thumb-afriart.jpg",
         orbit: "./orbit/myafriart.json",
-        orbitLive: "https://myafriartx.netlify.app/orbit-manifest.json",
+        orbitLive: "https://myafriart.com/orbit-manifest.json",
         color: "#2F7D4F",
       },
       {
@@ -78,10 +78,10 @@
           "Personal insights dashboard without overwhelming finance jargon",
           "A progress view of plans created, assists used and milestones hit",
         ],
-        url: "https://rubbax.netlify.app",
+        url: "https://myrubba.com",
         thumbnail: "./assets/thumb-rubba.jpg",
         orbit: "./orbit/rubba.json",
-        orbitLive: "https://rubbax.netlify.app/orbit-manifest.json",
+        orbitLive: "https://myrubba.com/orbit-manifest.json",
         color: "#C99A2E",
       },
       {
@@ -101,10 +101,10 @@
           "Brand dashboards for watches, completion and campaign health",
           "Clear reporting on ad watches, campaign reach and viewer activity",
         ],
-        url: "https://adspotx.netlify.app",
+        url: "https://adspotng.com",
         thumbnail: "./assets/thumb-adspot.jpg",
         orbit: "./orbit/adspotx.json",
-        orbitLive: "https://adspotx.netlify.app/orbit-manifest.json",
+        orbitLive: "https://adspotng.com/orbit-manifest.json",
         color: "#1A6B5A",
       },
       {
@@ -144,7 +144,7 @@
           "Business dashboard with bookings and messages",
           "Plans for small and growing businesses"
         ],
-        "url": "https://confirmahead.netlify.app",
+        "url": "https://confirmahead.com",
         "color": "#2563EB"
       },
       {

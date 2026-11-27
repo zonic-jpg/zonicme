@@ -4,7 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const APP_NAME = "ZonicMe";
 const APP_ID = "zonicme";
-const APP_URL = "https://zonicme.netlify.app";
+const APP_URL = "https://zonicme.com.ng";
 const APPROVALS_PATH = "/admin.html#approvals";
 const OWNER = "oadeagbo@gmail.com";
 const HOURLY_CAP = 20;
