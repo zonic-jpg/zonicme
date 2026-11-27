@@ -124,10 +124,10 @@
           "Guest lists, RSVPs and day-of planning checklists",
           "Brand / sponsorship analytics for celebration partners",
         ],
-        url: "https://owanbex.netlify.app",
+        url: "https://myowanbe.com",
         thumbnail: "./assets/thumb-owanbe.jpg",
         orbit: "./orbit/owanbex.json",
-        orbitLive: "https://owanbex.netlify.app/orbit-manifest.json",
+        orbitLive: "https://myowanbe.com/orbit-manifest.json",
         color: "#9B2335",
       },
       {

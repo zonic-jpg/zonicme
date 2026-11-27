@@ -6,7 +6,7 @@
 import { chromium } from "playwright";
 
 const SITES = {
-  owanbe: "https://owanbex.netlify.app",
+  owanbe: "https://myowanbe.com",
   rubba: "https://rubbax.netlify.app",
   myyanga: "https://myyangax.netlify.app",
   myafriart: "https://myafriartx.netlify.app",

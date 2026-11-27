@@ -13,7 +13,7 @@ const APPS: Record<string, { name: string; url: string; what: string }> = {
   rubba: { name: "Rubba", url: "https://myrubba.com", what: "a life-planning app that helps people in Nigeria plan goals such as saving, study, property and travel" },
   myyanga: { name: "MyYanga", url: "https://myyangax.netlify.app", what: "an African fashion platform with brand profiles, virtual try-on and a virtual runway" },
   myafriart: { name: "MyAfriArt", url: "https://myafriartx.netlify.app", what: "a marketplace for African art with a catalogue, auctions and room staging" },
-  owanbe: { name: "Owanbe", url: "https://owanbex.netlify.app", what: "an event-planning app for weddings and celebrations with a vendor directory" },
+  owanbe: { name: "Owanbe", url: "https://myowanbe.com", what: "an event-planning app for weddings and celebrations with a vendor directory" },
   sydef: { name: "Sydef", url: "https://mysydef.com", what: "a membership programme with plans for individuals and packages for organisations" },
   confirmahead: { name: "ConfirmAhead", url: "https://confirmahead.netlify.app", what: "an appointment booking and confirmation tool for small businesses" },
 };
