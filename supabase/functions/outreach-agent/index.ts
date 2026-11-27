@@ -75,7 +75,7 @@ Deno.serve(async (req: Request) => {
   if (req.method !== "POST") return json({ ok: false, error: "Use POST." }, 405);
   if (!(await isAdmin(req))) return json({ ok: false, error: "This is for ZonicMe administrators." }, 403);
   const key = Deno.env.get("ANTHROPIC_API_KEY");
-  if (!key) return json({ ok: false, code: "no_ai_key", error: "The research agent is not connected yet: this project has no AI key. Leads can still be added from a spreadsheet." });
+  if (!key) return json({ ok: false, code: "no_ai_key", error: "On-demand research is not switched on for this button. Set the campaign to Active and the Creative Desk assistant researches its leads once a day (about 5:45am) and files them here for your review. You can also add leads from a spreadsheet." });
 
   const b = await req.json().catch(() => ({}));
   const sb = service();

@@ -162,7 +162,7 @@
       new IntersectionObserver((entries) => {
         onScreen = entries[0].isIntersecting;
         schedule();
-      }, { threshold: 0.35 }).observe(root);
+      }, { threshold: 0.15 }).observe(root);
     }
     document.addEventListener("visibilitychange", schedule);
     window.addEventListener("resize", () => {
