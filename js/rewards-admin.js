@@ -442,7 +442,7 @@
     if (!w.is_admin) {
       root.innerHTML = `<div class="rw-card"><h2>This area is for ZonicMe administrators</h2>
         <p class="rw-lead">The account you are signed in with does not have admin access. If you should have it, ask the owner to grant it from the ZonicMe admin page.</p>
-        <p class="rw-lead">Your own points are in <a class="rw-link" href="wallet.html">your wallet</a>.</p></div>`;
+        <p class="rw-lead">Your own points are in your wallet on the public website.</p></div>`;
       return;
     }
     if (!root.__rwBound) { root.addEventListener("click", onClick); root.addEventListener("submit", onSubmit); root.addEventListener("change", onChange); root.__rwBound = true; }

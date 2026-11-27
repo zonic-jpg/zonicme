@@ -18,6 +18,7 @@
 <link rel="icon" href="./assets/zonicme-logo.png" type="image/png">
 <link rel="stylesheet" href="./css/styles.css">
 <link rel="stylesheet" href="./css/rewards.css">
+<link rel="stylesheet" href="./css/admin.css">
 <script src="/auto-refresh.js" defer></script>
 <style>
 .rw-inline{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;align-items:end}
@@ -31,25 +32,20 @@
 .rw-card code{font-size:13px;background:rgba(0,0,0,.05);padding:1px 5px;border-radius:4px}
 </style>
 </head>
-<body>
+<body class="is-admin">
 <div class="page">
 
-<header class="site-header" id="siteHeader">
-  <nav class="gn" aria-label="Primary">
-    <a class="gn-logo" href="./" aria-label="ZonicMe home"><img src="./assets/zonicme-logo.png" alt="ZonicMe" width="71" height="30"></a>
-    <button type="button" class="gn-toggle" id="gnToggle" aria-expanded="false" aria-controls="gnLinks" aria-label="Open menu"><span></span><span></span></button>
-    <div class="gn-links" id="gnLinks">
-      <div class="drop" id="appsDrop">
-        <button type="button" aria-expanded="false" aria-haspopup="true" aria-controls="appsMenu" id="appsBtn">Apps</button>
-        <div class="drop-menu" id="appsMenu" role="menu"></div>
-      </div>
-      <a href="about.html">About</a>
-      <a href="roadmap.html">Roadmap</a>
-      <a href="analytics.html">Analytics</a>
-      <a href="wallet.html">Rewards</a>
-      <a href="contact.html">Contact</a>
-    </div>
-  </nav>
+<header class="ab" id="adminBar">
+  <div class="ab-in">
+    <a class="ab-brand" href="/admin" aria-label="ZonicMe admin home"><img src="./assets/zonicme-mark.svg" alt="" width="20" height="20"><span>ZonicMe</span><em>Admin</em></a>
+    <nav class="ab-nav" aria-label="Admin sections">
+      <a href="/admin">Overview</a>
+      <a href="./creative-desk.html" class="is-current" aria-current="page">Creative Desk</a>
+      <a href="./outreach.html">Outreach</a>
+      <a href="./rewards-admin.html">Rewards</a>
+    </nav>
+    <a class="ab-site" href="./" target="_blank" rel="noopener">View website<span aria-hidden="true"> &#8599;</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+  </div>
 </header>
 
 <div class="page-hero">
@@ -65,37 +61,7 @@
   <noscript><div class="rw-note"><strong>This page needs JavaScript.</strong> Please switch it on in your browser to use the Creative Desk.</div></noscript>
 </main>
 
-<footer class="gf">
-  <div class="gf-in">
-    <p class="gf-note">ZonicMe builds apps for the creative economy across Africa and the diaspora.</p>
-    <div class="gf-cols">
-      <div class="gf-col">
-        <h3>Apps</h3>
-        <!-- Built from the same config as the app cards so the two can never disagree. -->
-        <nav id="footerSiblings" aria-label="ZonicMe apps"></nav>
-      </div>
-      <div class="gf-col">
-        <h3>ZonicMe</h3>
-        <nav aria-label="Company">
-          <a href="about.html">About</a>
-          <a href="roadmap.html">Roadmap</a>
-          <a href="contact.html">Contact</a>
-        </nav>
-      </div>
-      <div class="gf-col">
-        <h3>Members and brands</h3>
-        <nav aria-label="Members and brands">
-          <a href="wallet.html">Rewards</a>
-          <a href="analytics.html">Analytics</a>
-        </nav>
-      </div>
-    </div>
-    <div class="gf-legal">
-      <span>Copyright © <span id="yr"></span> ZonicMe Limited. All rights reserved.</span>
-      <span>Floor M2, Transcorp Hilton, Abuja, Nigeria</span>
-    </div>
-  </div>
-</footer>
+<footer class="ab-foot">ZonicMe admin. Private: this area is not part of the public website.</footer>
 
 </div>
 

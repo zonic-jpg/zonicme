@@ -128,9 +128,10 @@
 
   function tabsHtml() {
     const a = state.access;
+    // Admin pages have their own navigation bar; the member pages never link into the admin area.
+    if (state.page !== "wallet" && state.page !== "brand") return "";
     const items = [["wallet", "wallet.html", "My wallet"]];
     if (a.is_admin || a.brand_count > 0 || state.page === "brand") items.push(["brand", "brand-rewards.html", "Brand console"]);
-    if (a.is_admin || state.page === "admin") items.push(["admin", "rewards-admin.html", "Admin console"]);
     if (items.length < 2) return "";
     return `<nav class="rw-tabs" aria-label="Rewards sections">${items.map(([id, href, label]) =>
       `<a class="rw-tab${id === state.page ? " is-on" : ""}" href="${href}"${id === state.page ? ' aria-current="page"' : ""}>${label}</a>`).join("")}</nav>`;

@@ -2,112 +2,29 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ZonicMe Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
-<style>
-/* Text never drops below the standard size, whatever the browser's own font-size setting. */
-html{font-size:max(16px,100%);-webkit-text-size-adjust:100%;text-size-adjust:100%}
-:root{
-  --ink:#12110F;--muted:#5C574E;--line:#E6E2D9;--paper:#FAF8F4;--accent:#E85D04;
-  --font:"DM Sans",system-ui,sans-serif;--display:"Fraunces",Georgia,serif;--ok:#1D7A52;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;font-family:var(--font);color:var(--ink);-webkit-font-smoothing:antialiased;
-  background:
-    radial-gradient(ellipse 80% 50% at 10% 0%, rgba(232,93,4,.1), transparent 50%),
-    radial-gradient(ellipse 60% 40% at 100% 20%, rgba(31,58,52,.08), transparent 45%),
-    linear-gradient(165deg,#faf8f4,#f0ebe3 50%,#e8efe9);
-  min-height:100vh;
-}
-a{color:inherit}
-.wrap{max-width:960px;margin:0 auto;padding:28px 20px 60px}
-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:28px}
-h1{margin:0;font-family:var(--display);font-size:1.75rem;font-weight:700;letter-spacing:-.02em}
-.sub{color:var(--muted);font-size:14px;margin-top:6px}
-.back{font-weight:600;font-size:14px}
-.panel{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;backdrop-filter:blur(6px)}
-label{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-input,textarea,select{
-  width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;
-  font:inherit;background:#fff;margin-bottom:12px;
-}
-textarea{min-height:72px;resize:vertical}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
-button,.btn{
-  appearance:none;border:1px solid var(--ink);background:var(--ink);color:#fff;
-  padding:10px 16px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;
-}
-button.secondary,.btn.secondary{background:#fff;color:var(--ink)}
-button.danger{background:#fff;color:#A33;border-color:#A33}
-.toast{font-size:13px;color:var(--ok);font-weight:600;min-height:1.2em}
-.err{color:#A33;font-size:13px;font-weight:600;min-height:1.2em;margin-top:8px}
-.app-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.app-head h2{margin:0;font-size:1.1rem}
-.hint{font-size:13px;color:var(--muted);line-height:1.5;margin:0 0 14px}
-code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.tab{
-  border:1px solid var(--line);background:#fff;color:var(--ink);
-  padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;
-}
-.tab.active{background:var(--ink);color:#fff;border-color:var(--ink)}
-.hidden{display:none !important}
-.session-bar{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.badge{
-  display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;
-  text-transform:uppercase;padding:4px 8px;border-radius:6px;background:#F0EEE8;
-}
-.badge.owner{background:#ffe8d6;color:#c45c26}
-.gate{
-  max-width:420px;margin:10vh auto;padding:28px;
-  background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:16px;
-  box-shadow:0 20px 50px rgba(18,17,15,.08);
-}
-.gate h1{font-size:1.5rem;margin-bottom:8px}
-.gate .sub{margin-bottom:20px}
-.divider-or{
-  display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px;
-  font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:16px 0;
-}
-.divider-or::before,.divider-or::after{content:"";flex:1;height:1px;background:var(--line)}
-#googleBtn{min-height:44px;display:flex;justify-content:center;margin-bottom:8px}
-.user-row{
-  display:grid;grid-template-columns:1.2fr 1fr auto;gap:10px;align-items:end;
-  padding:12px 0;border-bottom:1px solid var(--line);
-}
-.user-row:last-child{border-bottom:0}
-.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
-.chart-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:12px}
-.chart-panel{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px}
-.chart-panel h4{margin:0 0 12px;font-size:.95rem;font-weight:700}
-.bar-chart{display:flex;flex-direction:column;gap:8px}
-.bar-row{display:grid;grid-template-columns:minmax(72px,30%) 1fr 40px;gap:8px;align-items:center;font-size:12px}
-.bar-label{color:var(--muted);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bar-track{height:8px;background:#eee;border-radius:999px;overflow:hidden}
-.bar-fill{height:100%;border-radius:999px}
-.bar-val{font-weight:700;text-align:right;font-size:11px}
-.pill{font-size:11px;font-weight:600;padding:5px 10px;border-radius:20px;background:#eee;color:var(--muted);display:inline-block}
-.pill.ok{background:#e0f5ec;color:var(--ok)}
-.pill.warn{background:#fff0e6;color:var(--accent)}
-.mock-badge{margin-left:8px}
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
-.stat-box{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;text-align:center}
-.stat-box .v{font-family:var(--display);font-size:1.4rem;font-weight:700}
-.stat-box .l{font-size:11px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
-@media(max-width:640px){
-  .row,.user-row{grid-template-columns:1fr}
-  .chart-grid,.chart-grid-3,.stat-grid{grid-template-columns:1fr}
-  header{flex-direction:column}
-}
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/admin.css">
 <script src="/auto-refresh.js" defer></script>
 </head>
-<body>
+<body class="adm-home">
+
+<header class="ab" id="adminBar">
+  <div class="ab-in">
+    <a class="ab-brand" href="/admin" aria-label="ZonicMe admin home"><img src="./assets/zonicme-mark.svg" alt="" width="20" height="20"><span>ZonicMe</span><em>Admin</em></a>
+    <nav class="ab-nav" aria-label="Admin sections">
+      <a href="/admin" class="is-current" aria-current="page">Overview</a>
+      <a href="./creative-desk.html">Creative Desk</a>
+      <a href="./outreach.html">Outreach</a>
+      <a href="./rewards-admin.html">Rewards</a>
+    </nav>
+    <a class="ab-site" href="./" target="_blank" rel="noopener">View website<span aria-hidden="true"> &#8599;</span></a>
+  </div>
+</header>
 
 <!-- Sign-in gate (hidden route — not linked from public nav) -->
 <div id="gate" class="gate hidden">
@@ -137,7 +54,7 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
     <button type="button" id="requestAccessBtn" style="width:100%">Request admin access</button>
     <p class="hint" id="requestAccessMsg" style="margin:8px 0 0"></p>
   </div>
-  <p style="margin-top:18px;font-size:13px"><a class="back" href="./index.html">← Back to hub</a></p>
+  <p style="margin-top:18px"><a href="./" target="_blank" rel="noopener">Go to the public website</a></p>
 </div>
 
 <div id="forgotPanel" class="gate hidden">
@@ -161,26 +78,31 @@ code{font-size:12px;background:#F0EEE8;padding:2px 6px;border-radius:4px}
 </div>
 
 <div id="adminApp" class="wrap hidden">
-  <header>
+  <div class="adm-head">
     <div>
-      <h1>ZonicMe Admin</h1>
-      <p class="sub">Edit the application cards, analytics settings and team roles. Changes are saved in this browser — use <strong>Download JSON</strong> to ship them as the site default.</p>
-      <div class="session-bar" id="sessionBar"></div>
+      <h1>Admin</h1>
+      <p class="sub">Run the ZonicMe tools and manage what the public website shows.</p>
     </div>
-    <div class="actions" style="margin:0">
-      <a class="back" href="./rewards-admin.html">Rewards admin</a>
-      <a class="back" href="./outreach.html">Outreach</a>
-      <a class="back" href="./creative-desk.html">Creative Desk</a>
-      <a class="back" href="./index.html">← Landing</a>
+    <div class="adm-who">
+      <div class="session-bar" id="sessionBar"></div>
       <button type="button" class="secondary" id="logoutBtn">Sign out</button>
     </div>
-  </header>
+  </div>
+
+  <div class="adm-tools">
+    <a class="adm-tool" href="./creative-desk.html"><b>Creative Desk</b><span>Story drafts, emerging creatives, opportunities and app ideas, waiting for your review.</span><i>Open</i></a>
+    <a class="adm-tool" href="./outreach.html"><b>Outreach</b><span>Campaigns, leads and draft emails. Nothing is sent without your approval.</span><i>Open</i></a>
+    <a class="adm-tool" href="./rewards-admin.html"><b>Rewards</b><span>Points rules, brands, redemptions and the rewards ledger.</span><i>Open</i></a>
+  </div>
+
+  <h2 class="adm-h2">Website settings</h2>
+  <p class="adm-note">The app cards and mission shown on the public website, analytics, pricing and who can sign in here. App card changes are saved in this browser; use Download JSON to make them the site default.</p>
 
   <div class="tabs" id="tabs">
-    <button type="button" class="tab active" data-tab="apps">Apps &amp; ingest</button>
+    <button type="button" class="tab active" data-tab="apps">App cards</button>
     <button type="button" class="tab" data-tab="analytics" id="analyticsTabBtn">Analytics</button>
     <button type="button" class="tab" data-tab="pricing" id="pricingTabBtn">Service pricing</button>
-    <button type="button" class="tab" data-tab="users" id="usersTabBtn">Users &amp; roles</button>
+    <button type="button" class="tab" data-tab="users" id="usersTabBtn">Team and access</button>
   </div>
 
   <div id="tab-apps">
@@ -561,7 +483,8 @@ async function enterAdmin() {
   renderApps();
   renderUsers();
   renderApprovals();
-  if (ZonicMeAuth.isOwner(session)) {
+  // Open on the overview. Jump to access requests only when the owner arrived from the emailed link.
+  if (ZonicMeAuth.isOwner(session) && /admintester-queue|approvals/.test(location.hash + location.search)) {
     document.querySelector('[data-tab="users"]')?.click();
     setTimeout(() => document.getElementById("admintester-queue")?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
   }
@@ -849,5 +772,6 @@ window.__zToast = window.__zToast || ((msg) => {
 });
 </script>
 <script src="./js/pw-eye.js" defer></script>
+<footer class="ab-foot">ZonicMe admin. Private: this area is not part of the public website.</footer>
 </body>
 </html>
