@@ -813,7 +813,7 @@ document.getElementById("flushSpansBtn").addEventListener("click", async () => {
   // Every panel starts hidden, so an exception here would leave a blank page.
   // Fail visibly instead: always end up on either the console or the sign-in gate.
   try {
-    const isRecoveryLink = /type=recovery/.test(location.hash);
+    const isRecoveryLink = window.__zonicRecovery === true || /type=recovery/.test(location.hash);
     await ZonicMeAuth.init();
     if (isRecoveryLink) {
       showForgot(true, true);

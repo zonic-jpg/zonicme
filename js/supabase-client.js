@@ -26,6 +26,10 @@
     }
   } catch (_) {}
 
+  // Note that this visit came from a reset link before the sign-in library tidies the address bar,
+  // so the page can still show the "choose a new password" form afterwards.
+  try { global.__zonicRecovery = /type=recovery/.test(global.location.hash || ""); } catch (_) { global.__zonicRecovery = false; }
+
   if (!global.supabase || typeof global.supabase.createClient !== "function") {
     console.error("[ZonicMe] Supabase SDK failed to load — admin login is unavailable.");
     return;
