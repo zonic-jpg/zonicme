@@ -13,7 +13,7 @@
 <meta property="og:url" content="https://zonicme.netlify.app/analytics.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="icon" href="./assets/zonicme-logo.png" type="image/png">
 <link rel="stylesheet" href="./css/styles.css">
 <script src="/auto-refresh.js" defer></script>
@@ -22,28 +22,25 @@
 <div class="page">
 
 <header class="site-header" id="siteHeader">
-  <div class="header-top">
-    <a class="logo" href="index.html" aria-label="ZonicMe home">
-      <img src="./assets/zonicme-logo.png" alt="ZonicMe" width="158" height="67">
-    </a>
-  </div>
-  <div class="header-nav">
-    <nav class="nav" aria-label="Primary">
-      <a href="about.html">About</a>
+  <nav class="gn" aria-label="Primary">
+    <a class="gn-logo" href="./" aria-label="ZonicMe home"><img src="./assets/zonicme-logo.png" alt="ZonicMe" width="71" height="30"></a>
+    <button type="button" class="gn-toggle" id="gnToggle" aria-expanded="false" aria-controls="gnLinks" aria-label="Open menu"><span></span><span></span></button>
+    <div class="gn-links" id="gnLinks">
       <div class="drop" id="appsDrop">
-        <button type="button" aria-expanded="false" aria-haspopup="true" id="appsBtn">Applications</button>
+        <button type="button" aria-expanded="false" aria-haspopup="true" aria-controls="appsMenu" id="appsBtn">Apps</button>
         <div class="drop-menu" id="appsMenu" role="menu"></div>
       </div>
+      <a href="about.html">About</a>
       <a href="roadmap.html">Roadmap</a>
       <a href="analytics.html">Analytics</a>
       <a href="wallet.html">Rewards</a>
       <a href="contact.html">Contact</a>
-    </nav>
-  </div>
+    </div>
+  </nav>
 </header>
 
 <div class="page-hero">
-  <h1>Analytics</h1>
+  <h1>The numbers.</h1>
   <p>Privacy-first orbit insight for the ZonicMe family of apps.</p>
 </div>
 
@@ -51,7 +48,7 @@
   <div class="privacy-note">
     <strong>Compliance &amp; privacy.</strong>
     ZonicMe Analytics is designed for compliance with applicable privacy laws, including Nigeria’s NDPA and GDPR-aligned principles where they apply.
-    Metrics and disclosures use <strong>anonymised data</strong> only — aggregated, consented signals without personal identifiers — so partners and operators can understand the orbit without exposing individuals.
+    Metrics and disclosures use <strong>anonymised data</strong> only (aggregated, consented signals without personal identifiers), so partners and operators can understand the orbit without exposing individuals.
   </div>
   <div class="metrics" id="metricGrid" aria-busy="true">
     <div class="metric" aria-hidden="true"><span class="sk sk-line sk-short" style="margin:0 auto 12px"></span><span class="sk sk-heading" style="width:60%;margin:0 auto 8px"></span><span class="sk sk-line sk-short" style="margin:0 auto"></span></div>
@@ -67,18 +64,36 @@
   </div>
 </div>
 
-<footer>
-  <nav class="footer-nav" aria-label="Secondary">
-    <a href="index.html#applications">Applications</a>
-    <a href="roadmap.html">Roadmap</a>
-    <a href="about.html">About</a>
-    <a href="analytics.html">Analytics</a>
-      <a href="wallet.html">Rewards</a>
-    <a href="contact.html">Contact</a>
-  </nav>
-  <p class="footer-sib-label">ZonicMe products</p>
-  <nav class="footer-nav footer-siblings" id="footerSiblings" aria-label="ZonicMe products"></nav>
-  © <span id="yr"></span> ZonicMe Limited · Floor M2, Transcorp Hilton, Abuja
+<footer class="gf">
+  <div class="gf-in">
+    <p class="gf-note">ZonicMe builds apps for the creative economy across Africa and the diaspora.</p>
+    <div class="gf-cols">
+      <div class="gf-col">
+        <h3>Apps</h3>
+        <!-- Built from the same config as the app cards so the two can never disagree. -->
+        <nav id="footerSiblings" aria-label="ZonicMe apps"></nav>
+      </div>
+      <div class="gf-col">
+        <h3>ZonicMe</h3>
+        <nav aria-label="Company">
+          <a href="about.html">About</a>
+          <a href="roadmap.html">Roadmap</a>
+          <a href="contact.html">Contact</a>
+        </nav>
+      </div>
+      <div class="gf-col">
+        <h3>Members and brands</h3>
+        <nav aria-label="Members and brands">
+          <a href="wallet.html">Rewards</a>
+          <a href="analytics.html">Analytics</a>
+        </nav>
+      </div>
+    </div>
+    <div class="gf-legal">
+      <span>Copyright © <span id="yr"></span> ZonicMe Limited. All rights reserved.</span>
+      <span>Floor M2, Transcorp Hilton, Abuja, Nigeria</span>
+    </div>
+  </div>
 </footer>
 
 </div>
@@ -111,7 +126,7 @@ function renderAnalytics(apps) {
   const notice = document.getElementById("dataNotice");
   if (totals.mockCount > 0) {
     notice.classList.remove("hidden");
-    notice.innerHTML = `<strong>Illustrative figures.</strong> Live reporting is switching on app by app across the orbit — the charts below show indicative scale, not measured traffic.`;
+    notice.innerHTML = `<strong>Illustrative figures.</strong> Live reporting is switching on app by app. The charts below show indicative scale, not measured traffic.`;
   } else {
     notice.classList.add("hidden");
     notice.innerHTML = "";

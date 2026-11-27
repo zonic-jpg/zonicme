@@ -3,331 +3,173 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ZonicMe — empower Africans through the creative economy</title>
-<meta name="description" content="ZonicMe is the home of MyYangaX, MyAfriArt, Rubba, AdSpot and Owanbe — apps that turn fashion, art, media and everyday planning into real opportunity across Africa and the diaspora.">
+<title>ZonicMe | Empower Africans through the creative economy</title>
+<meta name="description" content="ZonicMe is the home of MyYangaX, MyAfriArt, Rubba, AdSpot, Owanbe, ConfirmAhead and Sydef: apps that turn fashion, art, media and everyday planning into real opportunity across Africa and the diaspora.">
 <link rel="canonical" href="https://zonicme.netlify.app/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="ZonicMe">
-<meta property="og:title" content="ZonicMe — empower Africans through the creative economy">
-<meta property="og:description" content="One family of apps across fashion, art, media, life planning and celebrations — built for Africa and the diaspora.">
+<meta property="og:title" content="ZonicMe | Empower Africans through the creative economy">
+<meta property="og:description" content="One family of apps across fashion, art, media, life planning and celebrations, built for Africa and the diaspora.">
 <meta property="og:url" content="https://zonicme.netlify.app/">
 <meta property="og:image" content="https://zonicme.netlify.app/assets/zonicme-hero-youth-phone.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="ZonicMe — empower Africans through the creative economy">
-<meta name="twitter:description" content="One family of apps across fashion, art, media, life planning and celebrations — built for Africa and the diaspora.">
+<meta name="twitter:title" content="ZonicMe | Empower Africans through the creative economy">
+<meta name="twitter:description" content="One family of apps across fashion, art, media, life planning and celebrations, built for Africa and the diaspora.">
 <meta name="twitter:image" content="https://zonicme.netlify.app/assets/zonicme-hero-youth-phone.jpg">
-<!-- deploy: site restructured into separate pages (Home / About / Roadmap / Analytics / Contact) -->
+<meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="icon" href="./assets/zonicme-logo.png" type="image/png">
 <link rel="stylesheet" href="./css/styles.css">
+<link rel="preload" as="image" href="./assets/app-myyanga.jpg">
 <script src="/auto-refresh.js" defer></script>
 </head>
 <body>
 <div class="page">
 
 <header class="site-header" id="siteHeader">
-  <div class="header-top">
-    <a class="logo" href="index.html" aria-label="ZonicMe home">
-      <img src="./assets/zonicme-logo.png" alt="ZonicMe" width="158" height="67">
-    </a>
-  </div>
-  <div class="header-nav">
-    <nav class="nav" aria-label="Primary">
-      <a href="about.html">About</a>
+  <nav class="gn" aria-label="Primary">
+    <a class="gn-logo" href="./" aria-label="ZonicMe home"><img src="./assets/zonicme-logo.png" alt="ZonicMe" width="71" height="30"></a>
+    <button type="button" class="gn-toggle" id="gnToggle" aria-expanded="false" aria-controls="gnLinks" aria-label="Open menu"><span></span><span></span></button>
+    <div class="gn-links" id="gnLinks">
       <div class="drop" id="appsDrop">
-        <button type="button" aria-expanded="false" aria-haspopup="true" id="appsBtn">Applications</button>
+        <button type="button" aria-expanded="false" aria-haspopup="true" aria-controls="appsMenu" id="appsBtn">Apps</button>
         <div class="drop-menu" id="appsMenu" role="menu"></div>
       </div>
+      <a href="about.html">About</a>
       <a href="roadmap.html">Roadmap</a>
       <a href="analytics.html">Analytics</a>
       <a href="wallet.html">Rewards</a>
       <a href="contact.html">Contact</a>
-    </nav>
-  </div>
+    </div>
+  </nav>
 </header>
 
+<main>
 <section class="hero" id="top">
-  <div class="hero-inner">
-    <div class="hero-copy">
-      <span class="hero-kicker">The ZonicMe Orbit</span>
-      <h1>Empower Africans through the creative economy</h1>
-      <p id="missionText">ZonicMe builds apps that turn fashion, art, media and everyday planning into real opportunity across Africa and the diaspora.</p>
-      <a class="btn-cta" href="#applications">Get Started</a>
+  <h1>Empower Africans through the <span class="spectrum">creative economy.</span></h1>
+  <p id="missionText">ZonicMe builds apps that turn fashion, art, media and everyday planning into real opportunity across Africa and the diaspora.</p>
+  <div class="hero-cta">
+    <a class="cta" href="#applications">Explore the apps</a>
+    <a class="more" href="about.html">About ZonicMe</a>
+  </div>
+</section>
+
+<section class="gal" id="applications" aria-roledescription="carousel" aria-labelledby="applicationsTitle">
+  <h2 class="visually-hidden" id="applicationsTitle">The ZonicMe apps</h2>
+  <div class="gal-track" id="galTrack" tabindex="0" aria-busy="true" aria-label="ZonicMe apps. Use the arrow keys to move between them.">
+    <div class="gal-card is-skeleton" aria-hidden="true"></div>
+    <div class="gal-card is-skeleton" aria-hidden="true"></div>
+  </div>
+  <div class="gal-bar">
+    <div class="gal-mid">
+      <div class="gal-dots" id="galDots" role="group" aria-label="Choose an app"></div>
+      <button type="button" class="gal-btn" id="galPlay" aria-label="Pause the gallery">
+        <svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true"><rect x="3.2" y="2.5" width="3.3" height="11" rx="1"/><rect x="9.5" y="2.5" width="3.3" height="11" rx="1"/></svg>
+        <svg class="i-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.7v10.6a.6.6 0 0 0 .92.5l8.3-5.3a.6.6 0 0 0 0-1L5.42 2.2a.6.6 0 0 0-.92.5z"/></svg>
+      </button>
     </div>
-    <div class="hero-photo">
-      <img
-        src="./assets/zonicme-hero-youth-phone.jpg"
-        alt="A young African woman smiling warmly at her phone on a lively city street at golden hour"
-        width="1600" height="893" loading="eager" fetchpriority="high">
+    <div class="gal-arrows">
+      <button type="button" class="gal-btn" id="galPrev" aria-label="Previous app"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg></button>
+      <button type="button" class="gal-btn" id="galNext" aria-label="Next app"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5"/></svg></button>
     </div>
   </div>
 </section>
 
-<div class="benefit-strip">
-  <div class="benefit-item">
-    <h4>One trusted orbit</h4>
-    <p>Seven apps, one parent brand — move between them without starting over.</p>
-  </div>
-  <div class="benefit-item">
-    <h4>Built to earn, not just spend</h4>
-    <p>Creators sell, viewers get paid for attention, planners save on the real cost of an event.</p>
-  </div>
-  <div class="benefit-item">
-    <h4>Privacy-first for everyone</h4>
-    <p>Anonymised, aggregated signals for brands — never a personal dossier.</p>
-  </div>
-  <div class="benefit-item">
-    <h4>Made for Africa &amp; diaspora</h4>
-    <p>Local currency, local culture, local vendors — with reach back home from anywhere.</p>
-  </div>
-</div>
-
-<section class="section" id="applications">
-  <h2 class="section-title">ZonicMe Applications</h2>
-  <p class="section-lead" id="appsLead">Select a card to open its story and live site.</p>
-  <div class="divider"></div>
-  <div class="apps-deck-layout">
-    <!-- Skeletons mirror the real card/detail shape so nothing jumps when config lands. -->
-    <div class="apps-deck" id="appDeck" role="listbox" aria-label="Application cards" tabindex="0" aria-busy="true">
-      <div class="deck-card is-skeleton" aria-hidden="true"><div class="deck-thumb"></div><div class="deck-body"><span class="sk sk-title"></span><span class="sk sk-line"></span><span class="sk sk-line sk-short"></span></div></div>
-      <div class="deck-card is-skeleton" aria-hidden="true"><div class="deck-thumb"></div><div class="deck-body"><span class="sk sk-title"></span><span class="sk sk-line"></span><span class="sk sk-line sk-short"></span></div></div>
-      <div class="deck-card is-skeleton" aria-hidden="true"><div class="deck-thumb"></div><div class="deck-body"><span class="sk sk-title"></span><span class="sk sk-line"></span><span class="sk sk-line sk-short"></span></div></div>
-      <div class="deck-card is-skeleton" aria-hidden="true"><div class="deck-thumb"></div><div class="deck-body"><span class="sk sk-title"></span><span class="sk sk-line"></span><span class="sk sk-line sk-short"></span></div></div>
-      <div class="deck-card is-skeleton" aria-hidden="true"><div class="deck-thumb"></div><div class="deck-body"><span class="sk sk-title"></span><span class="sk sk-line"></span><span class="sk sk-line sk-short"></span></div></div>
+<section class="band" id="why">
+  <div class="band-in">
+    <h2>Opportunity, built in.</h2>
+    <p class="lead">Every ZonicMe app is made so that the people who use it gain something real: income, savings, confidence or time.</p>
+    <div class="bento">
+      <div class="tile photo t-a">
+        <img src="./assets/zonicme-hero-youth-phone.jpg" alt="A young woman smiling at her phone on a lively city street at golden hour" width="1600" height="893" loading="lazy" decoding="async">
+        <h3>Made for Africa and the diaspora.</h3>
+        <p>Local currency, local culture and local vendors, with reach back home from anywhere.</p>
+      </div>
+      <div class="tile t-b">
+        <div class="fig" data-app-count aria-hidden="true">7</div>
+        <h3>One family of apps.</h3>
+        <p>One parent brand you already trust. Move between apps without starting over.</p>
+      </div>
+      <div class="tile night t-c">
+        <h3>Built to earn, not just to spend.</h3>
+        <p>Creators sell, viewers are paid for their attention, and planners save on the real cost of an event.</p>
+      </div>
+      <div class="tile t-d">
+        <h3>Privacy first, for everyone.</h3>
+        <p>Brands see anonymised, aggregated signals. Never a personal dossier.</p>
+      </div>
     </div>
-    <aside class="apps-detail" id="appDetail" aria-live="polite" aria-busy="true">
-      <span class="sk sk-kicker" aria-hidden="true"></span>
-      <span class="sk sk-heading" aria-hidden="true"></span>
-      <span class="sk sk-line" aria-hidden="true"></span>
-      <span class="sk sk-line" aria-hidden="true"></span>
-      <span class="sk sk-line sk-short" aria-hidden="true"></span>
-      <span class="sk sk-line" aria-hidden="true"></span>
-      <span class="sk sk-line" aria-hidden="true"></span>
-      <span class="sk sk-line sk-short" aria-hidden="true"></span>
-      <span class="sk sk-cta" aria-hidden="true"></span>
-      <span class="visually-hidden">Loading applications…</span>
-    </aside>
   </div>
 </section>
 
-<footer>
-  <nav class="footer-nav" aria-label="Secondary">
-    <a href="index.html#applications">Applications</a>
-    <a href="roadmap.html">Roadmap</a>
-    <a href="about.html">About</a>
-    <a href="analytics.html">Analytics</a>
-      <a href="wallet.html">Rewards</a>
-    <a href="contact.html">Contact</a>
-  </nav>
-  <p class="footer-sib-label">ZonicMe products</p>
-  <!-- Built from the same config as the app cards so the two can never disagree. -->
-  <nav class="footer-nav footer-siblings" id="footerSiblings" aria-label="ZonicMe products"></nav>
-  © <span id="yr"></span> ZonicMe Limited · Floor M2, Transcorp Hilton, Abuja
+<section class="band cloud" id="lineupBand" aria-labelledby="lineupTitle">
+  <div class="band-in">
+    <h2 id="lineupTitle">Seven apps. One family.</h2>
+    <p class="lead">Each one answers an everyday need. Open any of them, or read a little more first.</p>
+    <div class="lineup" id="lineup" role="list">
+      <div class="lu-row" aria-hidden="true"><span class="sk sk-heading" style="width:120px;margin:0"></span><span class="sk sk-line" style="margin:0"></span><span class="sk sk-line" style="width:120px;margin:0"></span></div>
+      <div class="lu-row" aria-hidden="true"><span class="sk sk-heading" style="width:120px;margin:0"></span><span class="sk sk-line" style="margin:0"></span><span class="sk sk-line" style="width:120px;margin:0"></span></div>
+      <div class="lu-row" aria-hidden="true"><span class="sk sk-heading" style="width:120px;margin:0"></span><span class="sk sk-line" style="margin:0"></span><span class="sk sk-line" style="width:120px;margin:0"></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="band brands" id="brands">
+  <div class="band-in">
+    <h2>For brands and partners.</h2>
+    <p class="lead">Meet people inside fashion, art, media and celebrations, with their consent. Partner once across the family instead of app by app.</p>
+    <div class="brands-links">
+      <a class="more" href="contact.html">Talk to us</a>
+      <a class="more" href="analytics.html">See the numbers</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="gf">
+  <div class="gf-in">
+    <p class="gf-note">ZonicMe builds apps for the creative economy across Africa and the diaspora.</p>
+    <div class="gf-cols">
+      <div class="gf-col">
+        <h3>Apps</h3>
+        <!-- Built from the same config as the app cards so the two can never disagree. -->
+        <nav id="footerSiblings" aria-label="ZonicMe apps"></nav>
+      </div>
+      <div class="gf-col">
+        <h3>ZonicMe</h3>
+        <nav aria-label="Company">
+          <a href="about.html">About</a>
+          <a href="roadmap.html">Roadmap</a>
+          <a href="contact.html">Contact</a>
+        </nav>
+      </div>
+      <div class="gf-col">
+        <h3>Members and brands</h3>
+        <nav aria-label="Members and brands">
+          <a href="wallet.html">Rewards</a>
+          <a href="analytics.html">Analytics</a>
+        </nav>
+      </div>
+    </div>
+    <div class="gf-legal">
+      <span>Copyright © <span id="yr"></span> ZonicMe Limited. All rights reserved.</span>
+      <span>Floor M2, Transcorp Hilton, Abuja, Nigeria</span>
+    </div>
+  </div>
 </footer>
 
 </div>
 
+<dialog class="sheet" id="appSheet" aria-labelledby="sheetTitle">
+  <button type="button" class="sheet-x" id="sheetClose" aria-label="Close"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2 2 12"/></svg></button>
+  <div class="sheet-body" id="sheetBody"></div>
+</dialog>
+
 <script src="./js/apps-store.js"></script>
 <script src="./js/zonic-track.js"></script>
 <script src="./js/site-chrome.js"></script>
-<script>
-window.ZONIC_APP_ID = "zonicme-hub";
-
-const PLACEHOLDER = (name, color) =>
-`data:image/svg+xml,${encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400">
-    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${color || '#e85d04'}"/><stop offset="1" stop-color="#0d9488"/></linearGradient></defs>
-    <rect width="640" height="400" fill="url(#g)"/>
-    <circle cx="560" cy="80" r="48" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="3"/>
-    <circle cx="560" cy="80" r="14" fill="#fff" fill-opacity=".35"/>
-    <text x="32" y="220" fill="#fff" font-family="Montserrat,sans-serif" font-size="42" font-weight="700">${name}</text>
-  </svg>`
-)}`;
-
-let CONFIG = null;
-let activeAppId = null;
-let deckObserver = null;
-const esc = ZonicChrome.esc;
-
-function thumbSrc(app) {
-  return app.thumbnail || PLACEHOLDER(app.name, app.color || "#c45c26");
-}
-
-// Falls back to the same generated placeholder used for a missing thumbnail
-// when a *set* thumbnail URL 404s or otherwise fails to load, instead of
-// showing a broken-image icon. Exposed on window so the inline onerror=
-// attribute below (deck cards are built via innerHTML, not React/JSX) can
-// reach it.
-window.__zonicThumbFallback = function (img) {
-  img.onerror = null; // avoid a loop if the placeholder itself somehow fails
-  img.src = PLACEHOLDER(img.dataset.appName || "", img.dataset.appColor || "#c45c26");
-};
-
-const COUNT_WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
-
-function renderAppsLead(apps) {
-  const n = apps.length;
-  const word = COUNT_WORDS[n] || String(n);
-  document.getElementById("appsLead").textContent =
-    `${word} app${n === 1 ? "" : "s"} in the ZonicMe orbit — select a card to open its story and live site.`;
-}
-
-function summaryLines(app) {
-  // Lead with the benefit to the person looking at the card, not a feature list —
-  // the feature list still lives in the detail pane once a card is open.
-  const raw = (app.benefit || app.summary || "").trim();
-  return raw || "Part of the ZonicMe orbit.\nCreative economy tools for Africa.";
-}
-
-function renderDeck(apps) {
-  const deck = document.getElementById("appDeck");
-  deck.removeAttribute("aria-busy");
-  deck.innerHTML = apps.map((a, i) => {
-    const isActive = a.id === activeAppId || (!activeAppId && i === 0);
-    return `
-    <button type="button" class="deck-card${isActive ? " is-active" : ""}" role="option"
-      aria-selected="${isActive ? "true" : "false"}" data-app-id="${esc(a.id)}" id="deck-${esc(a.id)}">
-      <div class="deck-thumb"><img src="${esc(thumbSrc(a))}" alt="" loading="lazy"
-        data-app-name="${esc(a.name)}" data-app-color="${esc(a.color || "#c45c26")}"
-        onerror="window.__zonicThumbFallback(this)"></div>
-      <div class="deck-body">
-        <h3>${esc(a.name)}</h3>
-        <div class="deck-summary">${esc(summaryLines(a))}</div>
-      </div>
-    </button>`;
-  }).join("");
-
-  deck.querySelectorAll(".deck-card").forEach((card) => {
-    card.addEventListener("click", () => setActiveApp(card.dataset.appId, true));
-  });
-
-  if (!activeAppId && apps[0]) activeAppId = apps[0].id;
-  renderDetail(apps.find((a) => a.id === activeAppId) || apps[0]);
-  bindDeckObserver();
-}
-
-function renderDetail(app) {
-  const pane = document.getElementById("appDetail");
-  pane.removeAttribute("aria-busy");
-  if (!app) {
-    pane.innerHTML = `<p class="detail-empty">No applications configured.</p>`;
-    return;
-  }
-  pane.style.setProperty("--detail-accent", app.color || "var(--accent)");
-  const copy = app.detail || app.summary || "";
-  const features = Array.isArray(app.features) ? app.features.filter(Boolean) : [];
-  const featureList = features.length
-    ? `<div class="detail-features-title">Key features</div>
-       <ul class="detail-features">${features.map((f) => `<li>${esc(f)}</li>`).join("")}</ul>`
-    : "";
-  const benefits = (app.benefit || app.brandBenefit)
-    ? `<div class="detail-benefits">
-        ${app.benefit ? `<div class="detail-benefit"><h5>For you</h5><p>${esc(app.benefit)}</p></div>` : ""}
-        ${app.brandBenefit ? `<div class="detail-benefit"><h5>For brands</h5><p>${esc(app.brandBenefit)}</p></div>` : ""}
-      </div>`
-    : "";
-  pane.innerHTML = `
-    <div class="detail-kicker">Application</div>
-    <h3>${esc(app.name)}</h3>
-    <p class="detail-copy">${esc(copy)}</p>
-    ${benefits}
-    ${featureList}
-    <div class="detail-meta">
-      ${app.url
-        ? `<a class="detail-url" href="${esc(app.url)}" target="_blank" rel="noopener">${esc(app.url)}</a>`
-        : `<span class="pill warn">URL coming soon</span>`}
-    </div>
-    ${app.url
-      ? `<a class="detail-cta" href="${esc(app.url)}" target="_blank" rel="noopener">Visit website</a>`
-      : ""}`;
-}
-
-function setActiveApp(id, scrollIntoView) {
-  if (!CONFIG?.apps?.length) return;
-  const app = CONFIG.apps.find((a) => a.id === id);
-  if (!app) return;
-  activeAppId = id;
-
-  const pane = document.getElementById("appDetail");
-  pane.classList.add("is-switching");
-  window.setTimeout(() => {
-    renderDetail(app);
-    pane.classList.remove("is-switching");
-  }, 120);
-
-  document.querySelectorAll(".deck-card").forEach((card) => {
-    const on = card.dataset.appId === id;
-    card.classList.toggle("is-active", on);
-    card.setAttribute("aria-selected", on ? "true" : "false");
-  });
-
-  if (scrollIntoView) {
-    const el = document.getElementById(`deck-${id}`);
-    el?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-  }
-}
-
-function bindDeckObserver() {
-  if (deckObserver) deckObserver.disconnect();
-  const deck = document.getElementById("appDeck");
-  const cards = [...deck.querySelectorAll(".deck-card")];
-  if (!cards.length) return;
-  // Compact deck shows all cards — click selects; skip scroll-spy unless overflowing.
-  if (deck.scrollHeight <= deck.clientHeight + 4) return;
-
-  deckObserver = new IntersectionObserver(
-    (entries) => {
-      const visible = entries
-        .filter((e) => e.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-      if (!visible.length) return;
-      const id = visible[0].target.dataset.appId;
-      if (id && id !== activeAppId) setActiveApp(id, false);
-    },
-    { root: deck, threshold: [0.45, 0.65, 0.8] }
-  );
-  cards.forEach((c) => deckObserver.observe(c));
-}
-
-window.addEventListener("zonic:select-app", (e) => setActiveApp(e.detail.id, true));
-
-async function boot() {
-  const chromeConfig = await ZonicChrome.bootChrome();
-  CONFIG = await ZonicMeAppsStore.loadConfig("./config/apps.json");
-  if (CONFIG.mission) document.getElementById("missionText").textContent = CONFIG.mission;
-
-  const fallbackById = Object.fromEntries(
-    (ZonicMeAppsStore.FALLBACK?.apps || []).map((a) => [a.id, a])
-  );
-  const apps = CONFIG.apps || [];
-  apps.forEach((a) => {
-    if (!Array.isArray(a.features) || !a.features.length) {
-      a.features = fallbackById[a.id]?.features || [];
-    }
-  });
-
-  renderDeck(apps);
-  renderAppsLead(apps);
-  void chromeConfig;
-  await ZonicTrack.flush();
-  ZonicTrack.span("hub_boot", { apps: apps.length });
-}
-
-boot().catch((err) => {
-  console.error("[ZonicMe hub boot]", err);
-  const apps = (window.ZonicMeAppsStore?.FALLBACK?.apps) || [];
-  if (apps.length) {
-    CONFIG = { apps, mission: document.getElementById("missionText")?.textContent || "" };
-    renderDeck(apps);
-    renderAppsLead(apps);
-  } else {
-    document.getElementById("appDeck").innerHTML = "";
-    document.getElementById("appDetail").innerHTML =
-      `<p class="detail-empty">We couldn’t load the app list just now. Please refresh the page.</p>`;
-  }
-});
-</script>
+<script src="./js/home.js"></script>
 </body>
 </html>

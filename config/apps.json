@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "mission": "ZonicMe empowers Africans through the creative economy — building apps that turn fashion, art, media and everyday planning into real opportunity across the continent and diaspora.",
+  "mission": "ZonicMe builds apps that turn fashion, art, media and everyday planning into real opportunity across Africa and the diaspora.",
   "ingest": {
     "ZONICME_INGEST_URL": "https://qdhlbplzdblcvvaaluwu.supabase.co/functions/v1/zonic-hub-ingest",
     "note": "Set window.ZONICME_INGEST_URL or localStorage zonicme_ingest_url to override."
@@ -12,7 +12,7 @@
       "benefit": "Try a look before you buy it, and order straight from the creator who styled it.",
       "brandBenefit": "Put your designs in front of fashion-forward shoppers who are ready to discover and buy.",
       "summary": "African fashion discovery, styling and Runway.\nCreators and shoppers meet in one place.",
-      "detail": "MyYangaX is ZonicMe’s fashion platform — browse looks, style them your way, and follow Runway drops from African designers and the diaspora. Discovery meets commerce so creators earn and audiences find style that feels like home.",
+      "detail": "MyYangaX is ZonicMe’s fashion platform. Browse looks, style them your way, and follow Runway drops from African designers and the diaspora. Discovery meets commerce so creators earn and audiences find style that feels like home.",
       "features": [
         "Post your look, collect likes and wait for the reveal",
         "Designer Runway drops with lookbooks, fabric filters and save-to-wishlist",
@@ -32,8 +32,8 @@
       "name": "MyAfriArt",
       "benefit": "Preview a piece on your own wall before you commit, and buy with real provenance.",
       "brandBenefit": "Get your gallery and artists in front of collectors actively looking to buy African art.",
-      "summary": "African art marketplace — discover, stage, collect.\nGalleries and collectors in one place.",
-      "detail": "MyAfriArt connects artists, galleries, and collectors across Africa and the diaspora. Discover original work, stage digital exhibitions, and collect with confidence — a marketplace built for the continent’s creative voice.",
+      "summary": "African art marketplace: discover, stage, collect.\nGalleries and collectors in one place.",
+      "detail": "MyAfriArt connects artists, galleries, and collectors across Africa and the diaspora. Discover original work, stage digital exhibitions, and collect with confidence, on a marketplace built for the continent’s creative voice.",
       "features": [
         "Artist and gallery storefronts with provenance-ready listings",
         "AI room / wall staging so collectors preview art in a real space",
@@ -52,14 +52,14 @@
       "id": "rubba",
       "name": "Rubba",
       "benefit": "Turn a vague goal into milestones you can actually track, week by week.",
-      "brandBenefit": "Reach people mid-plan for a big purchase — a move, a wedding, a business — while they're deciding.",
+      "brandBenefit": "Reach people mid-plan for a big purchase (a move, a wedding, a business) while they're deciding.",
       "summary": "Life-planning for goals, savings, milestones.\nTurn ambition into a clear next step.",
-      "detail": "Rubba helps people plan life with clarity — goals, savings targets, and milestones in one calm workspace. Built for everyday Africans who want structure without complexity, and progress they can see.",
+      "detail": "Rubba helps people plan life with clarity: goals, savings targets, and milestones in one calm workspace. Built for everyday Africans who want structure without complexity, and progress they can see.",
       "features": [
         "Goal categories with milestones you can track week by week",
         "Savings targets with progress bars and check-in reminders",
         "City-aware cost planning for African metros and diaspora moves",
-        "Genie-assisted plans — turn a wish into a concrete next step",
+        "Genie-assisted plans that turn a wish into a concrete next step",
         "Personal insights dashboard without overwhelming finance jargon",
         "A progress view of plans created, assists used and milestones hit"
       ],
@@ -75,7 +75,7 @@
       "benefit": "Get paid for the attention you already give, on your own terms.",
       "brandBenefit": "Reach real, consented African audiences and pay only for attention that's genuine.",
       "summary": "Media & partner ads with rewarded attention.\nBrands reach real people, audiences earn.",
-      "detail": "AdSpot is the orbit’s media and partner network. Rewarded attention means brands reach consented audiences while users earn value — transparent, fair, and tuned for African markets and diaspora reach.",
+      "detail": "AdSpot is the orbit’s media and partner network. Rewarded attention means brands reach consented audiences while users earn value. Transparent, fair, and tuned for African markets and diaspora reach.",
       "features": [
         "Rewarded video / ad feed with quizzes for engaged attention",
         "XP, leaderboards and weekly payouts for consented viewers",
@@ -93,10 +93,10 @@
     {
       "id": "owanbex",
       "name": "Owanbe",
-      "benefit": "Plan a Nigerian celebration without spreadsheets — vendors, budget and guest list in one place.",
+      "benefit": "Plan a Nigerian celebration without spreadsheets: vendors, budget and guest list in one place.",
       "brandBenefit": "Reach families actively budgeting and buying for real, dated celebrations.",
       "summary": "Plan Nigerian celebrations end-to-end.\nVendors, budgets, aso ebi, guest lists.",
-      "detail": "Owanbe helps families and brands plan weddings, birthdays, and milestone events across Nigeria — vetted vendors, live Naira budgets, aso ebi coordination, and brand analytics in one planner.",
+      "detail": "Owanbe helps families and brands plan weddings, birthdays, and milestone events across Nigeria, with vetted vendors, live Naira budgets, aso ebi coordination, and brand analytics in one planner.",
       "features": [
         "End-to-end event builder for weddings, birthdays and milestones",
         "Vetted vendor directory with shortlists and comparison notes",
