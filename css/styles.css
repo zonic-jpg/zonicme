@@ -397,3 +397,6 @@ footer.gf{background:var(--cloud);color:var(--muted);font-size:12px;line-height:
 
 /* Text never drops below the standard size, whatever the browser's own font-size setting. */
 html{font-size:max(16px,100%);-webkit-text-size-adjust:100%;text-size-adjust:100%}
+
+/* Long unbroken text typed by anyone (a link, a run of letters) wraps instead of pushing the page sideways. */
+p,dd,blockquote,li:not(nav li){overflow-wrap:anywhere}
