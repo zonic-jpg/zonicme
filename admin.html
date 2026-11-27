@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
 <style>
+/* Text never drops below the standard size, whatever the browser's own font-size setting. */
+html{font-size:max(16px,100%);-webkit-text-size-adjust:100%;text-size-adjust:100%}
 :root{
   --ink:#12110F;--muted:#5C574E;--line:#E6E2D9;--paper:#FAF8F4;--accent:#E85D04;
   --font:"DM Sans",system-ui,sans-serif;--display:"Fraunces",Georgia,serif;--ok:#1D7A52;
@@ -846,5 +848,6 @@ window.__zToast = window.__zToast || ((msg) => {
   }
 });
 </script>
+<script src="./js/pw-eye.js" defer></script>
 </body>
 </html>

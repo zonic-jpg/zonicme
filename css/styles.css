@@ -394,3 +394,6 @@ footer.gf{background:var(--cloud);color:var(--muted);font-size:12px;line-height:
   select,
   textarea { font-size: 16px !important; }
 }
+
+/* Text never drops below the standard size, whatever the browser's own font-size setting. */
+html{font-size:max(16px,100%);-webkit-text-size-adjust:100%;text-size-adjust:100%}
